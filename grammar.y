@@ -15,6 +15,9 @@ const MaxColumnNameLength = 64
   convertType ConvertType
   when *When
   whens []*When
+  resultColumn ResultColumn
+  resultColumns ResultColumns
+  selectStmt *Select
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -23,6 +26,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
+%token <empty> SELECT FROM WHERE
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -37,10 +41,13 @@ const MaxColumnNameLength = 64
 %left <empty> COLLATE
 %right <empty> '~' UNARY
 
+%type <selectStmt> select_stmt
 %type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt
 %type <exprs> expr_list
 %type <string> cmp_op cmp_inequality_op like_op between_op
-%type <column> column_name 
+%type <column> column_name as_column_opt col_alias
+%type <resultColumn> result_column
+%type <resultColumns> result_column_list
 %type <table> table_name
 %type <convertType> convert_type
 %type <when> when 
@@ -48,53 +55,60 @@ const MaxColumnNameLength = 64
 
 %%
 start: 
-  expr { yylex.(*Lexer).ast = &AST{$1} }
+  select_stmt { yylex.(*Lexer).ast = &AST{$1} }
 ;
 
+select_stmt:
+  SELECT result_column_list FROM table_name WHERE expr
+  {
+    $$ = &Select{ResultColumns: $2, From: $4, Where: NewWhere(WhereStr, $6)}
+  }
 
-literal_value:
-  STRING
+result_column_list:
+  result_column
   {
-    $$ = &Value{Type: StrValue, Value: $1[1:len($1)-1]}
+    $$ = ResultColumns{$1}
   }
-|  INTEGRAL
+| result_column_list ',' result_column
   {
-    $$ = &Value{Type: IntValue, Value: $1}
+    $$ = append($1, $3)
   }
-|  FLOAT
-  {
-    $$ = &Value{Type: FloatValue, Value: $1}
-  }
-| BLOB
-  {
-    $$ = &Value{Type: BlobValue, Value: $1}
-  }
-|  HEXNUM
-  {
-    $$ = &Value{Type: HexNumValue, Value: $1}
-  }
-|  TRUE
-  {
-    $$ = BoolValue(true)
-  }
-| FALSE
-  {
-    $$ = BoolValue(false)
-  }
-| NULL
-  {
-    $$ = &NullValue{}
-  }
-;
 
-column_name:
+result_column:
+  '*'
+  {
+    $$ = &StarResultColumn{}
+  }
+| expr as_column_opt
+  {
+    $$ = &AliasedResultColumn{Expr: $1, As: $2}
+  }
+| table_name '.' '*'
+  {
+    $$ = &StarResultColumn{TableRef: $1}
+  }
+
+as_column_opt:
+  {
+    $$ = nil
+  }
+| col_alias
+  {
+    $$ = $1
+  }
+| AS col_alias
+  {
+    $$ = $2
+  }
+
+col_alias:
   IDENTIFIER
-  { 
-    if len($1) > MaxColumnNameLength {
-      yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
-      return 1
-    }
-    $$ = &Column{Name : string($1)} 
+  {
+    $$ = &Column{Name: string($1)}
+  }
+| STRING
+  {
+    $$ = &Column{Name: string($1)}
   }
 ;
 
@@ -104,142 +118,6 @@ table_name:
     $$ = &Table{Name : string($1)} 
   }
 ;
-
-cmp_op:
-  '='
-  {
-    $$ = EqualStr
-  }
-| NE
-  {
-    $$ = NotEqualStr
-  }
-|  REGEXP
-  {
-    $$ = RegexpStr
-  }
-| NOT REGEXP
-  {
-    $$ = NotRegexpStr
-  }
-| GLOB
-  {
-    $$ = GlobStr
-  }
-| NOT GLOB
-  {
-    $$ = NotGlobStr
-  }
-| MATCH
-  {
-    $$ = MatchStr
-  }
-| NOT MATCH
-  {
-    $$ = NotMatchStr
-  }
-;
-
-cmp_inequality_op:
- '<'
-  {
-    $$ = LessThanStr
-  }
-| '>'
-  {
-    $$ = GreaterThanStr
-  }
-| LE
-  {
-    $$ = LessEqualStr
-  }
-| GE
-  {
-    $$ = GreaterEqualStr
-  }
-;
-
-like_op:
-    LIKE
-    {
-        $$ = LikeStr
-    }
-|   NOT LIKE
-    {
-        $$ = NotLikeStr
-    }
-;
-
-between_op:
-    BETWEEN
-    {
-        $$ = BetweenStr
-    }
-|   NOT BETWEEN
-    {
-        $$ = NotBetweenStr
-    }
-;
-
-convert_type:
-  NONE { $$ = NoneStr}
-| TEXT { $$ = TextStr}
-| REAL { $$ = RealStr}
-| INTEGER { $$ = IntegerStr}
-| NUMERIC { $$ = NumericStr}
-;
-
-function_call_keyword:
-  CAST '(' expr AS convert_type ')'
-  {
-    $$ = &ConvertExpr{Expr: $3, Type: $5}
-  }
-;
-
-expr_list:
-  expr
-  {
-    $$ = Exprs{$1}
-  }
-| expr_list ',' expr
-  {
-    $$ = append($1, $3)
-  }
-
-expr_opt:
-  {
-    $$ = nil
-  }
-| expr
-  {
-    $$ = $1
-  }
-
-when:
-  WHEN expr THEN expr
-  {
-    $$ = &When{Condition: $2, Value: $4}
-  }
-;
-
-when_expr_list:
-  when
-  {
-       $$ = []*When{$1}
-  }
-| when_expr_list when
-  {
-    $$ = append($1, $2)
-  }
-
-else_expr_opt:
-  {
-    $$ = nil
-  }
-| ELSE expr 
-  {
-    $$ = $2
-  }
 
 expr: 
   literal_value { $$ = $1 }
@@ -375,4 +253,188 @@ expr:
   }
 | function_call_keyword
 ;
+
+literal_value:
+  STRING
+  {
+    $$ = &Value{Type: StrValue, Value: $1[1:len($1)-1]}
+  }
+|  INTEGRAL
+  {
+    $$ = &Value{Type: IntValue, Value: $1}
+  }
+|  FLOAT
+  {
+    $$ = &Value{Type: FloatValue, Value: $1}
+  }
+| BLOB
+  {
+    $$ = &Value{Type: BlobValue, Value: $1}
+  }
+|  HEXNUM
+  {
+    $$ = &Value{Type: HexNumValue, Value: $1}
+  }
+|  TRUE
+  {
+    $$ = BoolValue(true)
+  }
+| FALSE
+  {
+    $$ = BoolValue(false)
+  }
+| NULL
+  {
+    $$ = &NullValue{}
+  }
+;
+
+column_name:
+  IDENTIFIER
+  { 
+    if len($1) > MaxColumnNameLength {
+      yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
+      return 1
+    }
+    $$ = &Column{Name : string($1)} 
+  }
+;
+
+cmp_op:
+  '='
+  {
+    $$ = EqualStr
+  }
+| NE
+  {
+    $$ = NotEqualStr
+  }
+|  REGEXP
+  {
+    $$ = RegexpStr
+  }
+| NOT REGEXP
+  {
+    $$ = NotRegexpStr
+  }
+| GLOB
+  {
+    $$ = GlobStr
+  }
+| NOT GLOB
+  {
+    $$ = NotGlobStr
+  }
+| MATCH
+  {
+    $$ = MatchStr
+  }
+| NOT MATCH
+  {
+    $$ = NotMatchStr
+  }
+;
+
+cmp_inequality_op:
+ '<'
+  {
+    $$ = LessThanStr
+  }
+| '>'
+  {
+    $$ = GreaterThanStr
+  }
+| LE
+  {
+    $$ = LessEqualStr
+  }
+| GE
+  {
+    $$ = GreaterEqualStr
+  }
+;
+
+like_op:
+    LIKE
+    {
+        $$ = LikeStr
+    }
+|   NOT LIKE
+    {
+        $$ = NotLikeStr
+    }
+;
+
+between_op:
+    BETWEEN
+    {
+        $$ = BetweenStr
+    }
+|   NOT BETWEEN
+    {
+        $$ = NotBetweenStr
+    }
+;
+
+convert_type:
+  NONE { $$ = NoneStr}
+| TEXT { $$ = TextStr}
+| REAL { $$ = RealStr}
+| INTEGER { $$ = IntegerStr}
+| NUMERIC { $$ = NumericStr}
+;
+
+function_call_keyword:
+  CAST '(' expr AS convert_type ')'
+  {
+    $$ = &ConvertExpr{Expr: $3, Type: $5}
+  }
+;
+
+expr_list:
+  expr
+  {
+    $$ = Exprs{$1}
+  }
+| expr_list ',' expr
+  {
+    $$ = append($1, $3)
+  }
+
+expr_opt:
+  {
+    $$ = nil
+  }
+| expr
+  {
+    $$ = $1s
+  }
+
+when:
+  WHEN expr THEN expr
+  {
+    $$ = &When{Condition: $2, Value: $4}
+  }
+;
+
+when_expr_list:
+  when
+  {
+       $$ = []*When{$1}
+  }
+| when_expr_list when
+  {
+    $$ = append($1, $2)
+  }
+
+else_expr_opt:
+  {
+    $$ = nil
+  }
+| ELSE expr 
+  {
+    $$ = $2
+  }
+
 %%
+

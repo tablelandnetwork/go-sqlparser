@@ -35,6 +35,9 @@ var keywords = map[string]int{
 	"THEN":    THEN,
 	"ELSE":    ELSE,
 	"END":     END,
+	"SELECT":  SELECT,
+	"FROM":    FROM,
+	"WHERE":   WHERE,
 }
 
 const EOF = 0

@@ -7,20 +7,18 @@ With the parser, you can generate an AST from a SQL statement.
 
 - This is highly inspired/based on the famous [xwb1989/sqlparser](https://github.com/xwb1989/sqlparser) and SQLite's [grammar](https://repo.or.cz/sqlite.git/blob/HEAD:/src/parse.y) and [spec](https://www.sqlite.org/lang.html).
 
-- note: this is very experimental. Right now it only handles the `expr` syntax as shown in the Syntax Diagrams.
+- note: this is very experimental. Right now it only handles a simple `SELECT` as describe in Syntax Diagram below.
 
 ## Generating the parser
 
-```go
+```bash
 go run golang.org/x/tools/cmd/goyacc@master -l -o yy_parser.go grammar.y
 ```
 
 ## Usage
 
 ```go
-parser := NewParser()
-
-ast, err := parser.Parse("c1 = 2 * c2 AND c3 IS NOT NULL")
+ast, err := sqlparser.Parse("SELECT * FROM table WHERE c1 > c2")
 if err != nil {
     panic(err)
 }
@@ -31,42 +29,44 @@ ast.PrettyPrint()
 Resulting AST:
 
 ```bash
- Root: (*sqlparser.AndExpr)({
-  Left: (*sqlparser.CmpExpr)({
-   Operator: (string) (len=1) "=",
-   Left: (*sqlparser.Column)({
-    Name: (string) (len=2) "c1",
+(*sqlparser.AST)({
+ Root: (*sqlparser.Select)({
+  ResultColumns: (sqlparser.ResultColumns) (len=1 cap=1) {
+   (*sqlparser.StarResultColumn)({
     TableRef: (*sqlparser.Table)(<nil>)
-   }),
-   Right: (*sqlparser.BinaryExpr)({
-    Operator: (string) (len=1) "*",
-    Left: (*sqlparser.Value)({
-     Type: (sqlparser.ValueType) 1,
-     Value: ([]uint8) (len=1) {
-      00000000  32                                                |2|
-     }
+   })
+  },
+  From: (*sqlparser.Table)({
+   Name: (string) (len=5) "table"
+  }),
+  Where: (*sqlparser.Where)({
+   Type: (string) (len=5) "where",
+   Expr: (*sqlparser.CmpExpr)({
+    Operator: (string) (len=1) ">",
+    Left: (*sqlparser.Column)({
+     Name: (string) (len=2) "c1",
+     TableRef: (*sqlparser.Table)(<nil>)
     }),
     Right: (*sqlparser.Column)({
      Name: (string) (len=2) "c2",
      TableRef: (*sqlparser.Table)(<nil>)
-    })
-   }),
-   Escape: (sqlparser.Expr) <nil>
-  }),
-  Right: (*sqlparser.IsExpr)({
-   Left: (*sqlparser.Column)({
-    Name: (string) (len=2) "c3",
-    TableRef: (*sqlparser.Table)(<nil>)
-   }),
-   Right: (*sqlparser.NotExpr)({
-    Expr: (*sqlparser.NullValue)({
-    })
+    }),
+    Escape: (sqlparser.Expr) <nil>
    })
   })
  })
+})
  ```
 
 ## Syntax Diagrams
+
+### Select
+
+```mermaid
+flowchart LR;
+S("·") --> SELECT --> N2(result-column) --> FROM --> N3(table-name) --> WHERE --> expr --> E("·");
+N2(result-column) --> , --> N2(result-column);
+````
 
 ### Expr
 

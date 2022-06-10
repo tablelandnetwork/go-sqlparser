@@ -14,7 +14,7 @@ type Node interface {
 
 // AST represents the root Node of the AST.
 type AST struct {
-	Root Node
+	Root Statement
 }
 
 func (ast *AST) ToString() string {
@@ -27,6 +27,116 @@ func (ast *AST) ToString() string {
 func (ast *AST) PrettyPrint() {
 	spew.Config.DisablePointerAddresses = true
 	spew.Dump("%#v", ast)
+}
+
+// Statement represents a SQL statement.
+type Statement interface {
+	iStatement()
+	Node
+}
+
+func (*Select) iStatement() {}
+
+// SelectStatement any SELECT statement.
+type SelectStatement interface {
+	iSelectStatement()
+	iStatement()
+	// AddOrder(*Order)
+	// SetLimit(*Limit)
+	Node
+}
+
+func (*Select) iSelectStatement() {}
+
+// Select represents a SELECT statement.
+type Select struct {
+	ResultColumns ResultColumns
+	From          *Table
+	Where         *Where
+}
+
+// ToString returns the string representation of the node.
+func (s *Select) ToString() string {
+	return fmt.Sprintf("select %s from %s%s", s.ResultColumns.ToString(), s.From.ToString(), s.Where.ToString())
+}
+
+// ResultColumns represents a list of result columns of a SELECT.
+type ResultColumns []ResultColumn
+
+// ToString returns the string representation of the node.
+func (cols ResultColumns) ToString() string {
+	var colsStr []string
+	for _, rc := range cols {
+		colsStr = append(colsStr, rc.ToString())
+	}
+
+	return strings.Join(colsStr, ", ")
+}
+
+// ResultColumn represents a SELECT result column.
+type ResultColumn interface {
+	iResultColumn()
+	Node
+}
+
+func (*StarResultColumn) iResultColumn()    {}
+func (*AliasedResultColumn) iResultColumn() {}
+
+// StarResultColumn defines a '*' or 'table.*' result column.
+type StarResultColumn struct {
+	TableRef *Table
+}
+
+// ToString returns the string representation of the node.
+func (c *StarResultColumn) ToString() string {
+	if c.TableRef != nil {
+		return fmt.Sprintf("%s.*", c.TableRef.ToString())
+	}
+	return "*"
+}
+
+// AliasedResultColumn defines an aliased SELECT result column.
+type AliasedResultColumn struct {
+	Expr Expr
+	As   *Column
+}
+
+// ToString returns the string representation of the node.
+func (c *AliasedResultColumn) ToString() string {
+	if c.As != nil {
+		return fmt.Sprintf("%s as %s", c.Expr.ToString(), c.As.ToString())
+	}
+
+	return c.Expr.ToString()
+}
+
+// Where represents a WHERE or HAVING clause.
+type Where struct {
+	Type string
+	Expr Expr
+}
+
+// Types for Where.
+const (
+	WhereStr  = "where"
+	HavingStr = "having"
+)
+
+// NewWhere creates a WHERE or HAVING clause out
+// of a Expr. If the expression is nil, it returns nil.
+func NewWhere(typ string, expr Expr) *Where {
+	if expr == nil {
+		return nil
+	}
+	return &Where{Type: typ, Expr: expr}
+}
+
+// ToString returns the string representation of the node.
+func (w *Where) ToString() string {
+	if w == nil || w.Expr == nil {
+		return ""
+	}
+	return fmt.Sprintf(" %s %s", w.Type, w.Expr.ToString())
 }
 
 // Expr represents an expr node in the AST.
@@ -74,7 +184,7 @@ func (v BoolValue) ToString() string {
 	return "false"
 }
 
-// Value represents a sing.
+// Value represents a single value.
 type Value struct {
 	Type  ValueType
 	Value []byte
@@ -350,8 +460,7 @@ func (e *CaseExpr) ToString() string {
 
 // Table represents a table.
 type Table struct {
-	Name     string
-	TableRef *Table
+	Name string
 }
 
 // ToString returns the string representation of the node.
@@ -367,6 +476,9 @@ type Column struct {
 
 // ToString returns the string representation of the node.
 func (c *Column) ToString() string {
+	if c.TableRef != nil {
+		return fmt.Sprintf("%s.%s", c.TableRef.ToString(), c.Name)
+	}
 	return c.Name
 }
 
