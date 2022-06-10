@@ -50,6 +50,7 @@ func (*NotNullExpr) iExpr() {}
 func (*CollateExpr) iExpr() {}
 func (*ConvertExpr) iExpr() {}
 func (*BetweenExpr) iExpr() {}
+func (*CaseExpr) iExpr()    {}
 func (*Column) iExpr()      {}
 func (Exprs) iExpr()        {}
 
@@ -308,6 +309,43 @@ const (
 // ToString returns the string representation of the node.
 func (e *BetweenExpr) ToString() string {
 	return fmt.Sprintf("%s %s %s and %s", e.Left.ToString(), e.Operator, e.From.ToString(), e.To.ToString())
+}
+
+// When represents a WHEN sub-expression.
+type When struct {
+	Condition Expr
+	Value     Expr
+}
+
+// ToString returns the string representation of the node.
+func (e *When) ToString() string {
+	return fmt.Sprintf("when %v then %v", e.Condition.ToString(), e.Value.ToString())
+}
+
+// CaseExpr represents a CASE expression.
+type CaseExpr struct {
+	Expr  Expr
+	Whens []*When
+	Else  Expr
+}
+
+// ToString returns the string representation of the node.
+func (e *CaseExpr) ToString() string {
+	var b strings.Builder
+	b.WriteString("case ")
+	if e.Expr != nil {
+		b.WriteString(fmt.Sprintf("%s ", e.Expr.ToString()))
+	}
+
+	for _, when := range e.Whens {
+		b.WriteString(fmt.Sprintf("%s ", when.ToString()))
+	}
+
+	if e.Else != nil {
+		b.WriteString(fmt.Sprintf("else %s ", e.Else.ToString()))
+	}
+	b.WriteString("end")
+	return b.String()
 }
 
 // Table represents a table.

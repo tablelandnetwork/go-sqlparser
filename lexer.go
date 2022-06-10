@@ -30,6 +30,11 @@ var keywords = map[string]int{
 	"MATCH":   MATCH,
 	"ESCAPE":  ESCAPE,
 	"BETWEEN": BETWEEN,
+	"CASE":    CASE,
+	"WHEN":    WHEN,
+	"THEN":    THEN,
+	"ELSE":    ELSE,
+	"END":     END,
 }
 
 const EOF = 0
@@ -47,7 +52,7 @@ type Lexer struct {
 	// - expr AND expr
 	// - expr BETWEEN expr AND expr
 	//
-	// Ff BETWEEN was seen, we emit a different token for AND.
+	// If BETWEEN was seen, we emit a different token for AND.
 	hasSeenBetween bool
 
 	ast *AST

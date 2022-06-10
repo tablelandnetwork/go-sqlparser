@@ -17,6 +17,7 @@ func TestLexer(t *testing.T) {
 		NOTNULL IN regexp GLOB MATCH 
 		ESCAPE COLLATE . & | + * / % ~
 		<< >> BETWEEN AND
+		CASE WHEN THEN ELSE END
 	`
 	expTokens := []int{
 		IDENTIFIER, INTEGRAL, FLOAT, FLOAT, STRING,
@@ -31,6 +32,7 @@ func TestLexer(t *testing.T) {
 		ESCAPE, COLLATE, '.', '&', '|',
 		'+', '*', '/', '%', '~',
 		LSHIFT, RSHIFT, BETWEEN, AND,
+		CASE, WHEN, THEN, ELSE, END,
 	}
 
 	lval := &yySymType{}

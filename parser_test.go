@@ -850,6 +850,27 @@ func TestExpr(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "case",
+			expr:     "CASE c1 WHEN 0 THEN 'zero' WHEN 1 THEN 'one' ELSE 'panic' END",
+			deparsed: "case c1 when 0 then 'zero' when 1 then 'one' else 'panic' end",
+			expectedAST: &AST{
+				Root: &CaseExpr{
+					Expr: &Column{Name: "c1"},
+					Whens: []*When{
+						{
+							Condition: &Value{Type: IntValue, Value: []byte("0")},
+							Value:     &Value{Type: StrValue, Value: []byte("zero")},
+						},
+						{
+							Condition: &Value{Type: IntValue, Value: []byte("1")},
+							Value:     &Value{Type: StrValue, Value: []byte("one")},
+						},
+					},
+					Else: &Value{Type: StrValue, Value: []byte("panic")},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

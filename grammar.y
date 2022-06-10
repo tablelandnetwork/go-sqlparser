@@ -2,7 +2,6 @@
 package sqlparser
 
 const MaxColumnNameLength = 64
-
 %}
 
 %union{
@@ -14,6 +13,8 @@ const MaxColumnNameLength = 64
   column *Column
   table *Table
   convertType ConvertType
+  when *When
+  whens []*When
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -21,6 +22,7 @@ const MaxColumnNameLength = 64
 %token <empty> TRUE FALSE NULL AND
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
+%token <empty> CASE WHEN THEN ELSE END
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -35,16 +37,19 @@ const MaxColumnNameLength = 64
 %left <empty> COLLATE
 %right <empty> '~' UNARY
 
-%type <expr> expr literal_value function_call_keyword
+%type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt
 %type <exprs> expr_list
 %type <string> cmp_op cmp_inequality_op like_op between_op
 %type <column> column_name 
 %type <table> table_name
 %type <convertType> convert_type
+%type <when> when 
+%type <whens> when_expr_list
 
 %%
 start: 
-  expr { yylex.(*Lexer).ast = &AST{$1} } ;
+  expr { yylex.(*Lexer).ast = &AST{$1} }
+;
 
 
 literal_value:
@@ -83,7 +88,7 @@ literal_value:
 ;
 
 column_name:
-  IDENTIFIER 
+  IDENTIFIER
   { 
     if len($1) > MaxColumnNameLength {
       yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
@@ -94,7 +99,7 @@ column_name:
 ;
 
 table_name:
-  IDENTIFIER 
+  IDENTIFIER
   { 
     $$ = &Table{Name : string($1)} 
   }
@@ -201,7 +206,42 @@ expr_list:
     $$ = append($1, $3)
   }
 
-expr:
+expr_opt:
+  {
+    $$ = nil
+  }
+| expr
+  {
+    $$ = $1
+  }
+
+when:
+  WHEN expr THEN expr
+  {
+    $$ = &When{Condition: $2, Value: $4}
+  }
+;
+
+when_expr_list:
+  when
+  {
+       $$ = []*When{$1}
+  }
+| when_expr_list when
+  {
+    $$ = append($1, $2)
+  }
+
+else_expr_opt:
+  {
+    $$ = nil
+  }
+| ELSE expr 
+  {
+    $$ = $2
+  }
+
+expr: 
   literal_value { $$ = $1 }
 | column_name { $$ = $1 }
 | table_name '.' column_name
@@ -320,6 +360,10 @@ expr:
 | expr between_op expr AND expr %prec BETWEEN
   {  
     $$ = &BetweenExpr{Left : $1, Operator: $2, From: $3 , To: $5}
+  }
+| CASE expr_opt when_expr_list else_expr_opt END
+  {
+    $$ = &CaseExpr{Expr: $2, Whens: $3, Else: $4}
   }
 | expr COLLATE IDENTIFIER
   {  
