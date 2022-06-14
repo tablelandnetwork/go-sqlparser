@@ -31,8 +31,8 @@ Resulting AST:
 ```bash
 (*sqlparser.AST)({
  Root: (*sqlparser.Select)({
-  ResultColumns: (sqlparser.ResultColumns) (len=1 cap=1) {
-   (*sqlparser.StarResultColumn)({
+  SelectColumnList: (sqlparser.SelectColumnList) (len=1 cap=1) {
+   (*sqlparser.StarSelectColumn)({
     TableRef: (*sqlparser.Table)(<nil>)
    })
   },

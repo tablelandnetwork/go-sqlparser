@@ -50,21 +50,21 @@ func (*Select) iSelectStatement() {}
 
 // Select represents a SELECT statement.
 type Select struct {
-	ResultColumns ResultColumns
-	From          *Table
-	Where         *Where
+	SelectColumnList SelectColumnList
+	From             *Table
+	Where            *Where
 }
 
 // ToString returns the string representation of the node.
 func (s *Select) ToString() string {
-	return fmt.Sprintf("select %s from %s%s", s.ResultColumns.ToString(), s.From.ToString(), s.Where.ToString())
+	return fmt.Sprintf("select %s from %s%s", s.SelectColumnList.ToString(), s.From.ToString(), s.Where.ToString())
 }
 
-// ResultColumns represents a list of result columns of a SELECT.
-type ResultColumns []ResultColumn
+// SelectColumnList represents a list of columns of a SELECT.
+type SelectColumnList []SelectColumn
 
 // ToString returns the string representation of the node.
-func (cols ResultColumns) ToString() string {
+func (cols SelectColumnList) ToString() string {
 	var colsStr []string
 	for _, rc := range cols {
 		colsStr = append(colsStr, rc.ToString())
@@ -73,36 +73,36 @@ func (cols ResultColumns) ToString() string {
 	return strings.Join(colsStr, ", ")
 }
 
-// ResultColumn represents a SELECT result column.
-type ResultColumn interface {
-	iResultColumn()
+// SelectColumn represents a SELECT column.
+type SelectColumn interface {
+	iSelectColumn()
 	Node
 }
 
-func (*StarResultColumn) iResultColumn()    {}
-func (*AliasedResultColumn) iResultColumn() {}
+func (*StarSelectColumn) iSelectColumn()    {}
+func (*AliasedSelectColumn) iSelectColumn() {}
 
-// StarResultColumn defines a '*' or 'table.*' result column.
-type StarResultColumn struct {
+// StarSelectColumn defines a '*' or 'table.*' column.
+type StarSelectColumn struct {
 	TableRef *Table
 }
 
 // ToString returns the string representation of the node.
-func (c *StarResultColumn) ToString() string {
+func (c *StarSelectColumn) ToString() string {
 	if c.TableRef != nil {
 		return fmt.Sprintf("%s.*", c.TableRef.ToString())
 	}
 	return "*"
 }
 
-// AliasedResultColumn defines an aliased SELECT result column.
-type AliasedResultColumn struct {
+// AliasedSelectColumn defines an aliased SELECT column.
+type AliasedSelectColumn struct {
 	Expr Expr
 	As   *Column
 }
 
 // ToString returns the string representation of the node.
-func (c *AliasedResultColumn) ToString() string {
+func (c *AliasedSelectColumn) ToString() string {
 	if c.As != nil {
 		return fmt.Sprintf("%s as %s", c.Expr.ToString(), c.As.ToString())
 	}

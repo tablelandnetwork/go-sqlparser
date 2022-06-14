@@ -6,21 +6,21 @@ import __yyfmt__ "fmt"
 const MaxColumnNameLength = 64
 
 type yySymType struct {
-	yys           int
-	bool          bool
-	string        string
-	bytes         []byte
-	expr          Expr
-	exprs         Exprs
-	column        *Column
-	table         *Table
-	convertType   ConvertType
-	when          *When
-	whens         []*When
-	resultColumn  ResultColumn
-	resultColumns ResultColumns
-	selectStmt    *Select
-	where         *Where
+	yys              int
+	bool             bool
+	string           string
+	bytes            []byte
+	expr             Expr
+	exprs            Exprs
+	column           *Column
+	table            *Table
+	convertType      ConvertType
+	when             *When
+	whens            []*When
+	SelectColumn     SelectColumn
+	SelectColumnList SelectColumnList
+	selectStmt       *Select
+	where            *Where
 }
 
 const IDENTIFIER = 57346
@@ -674,32 +674,32 @@ yydefault:
 	case 2:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			yyVAL.selectStmt = &Select{ResultColumns: yyDollar[2].resultColumns, From: yyDollar[4].table, Where: yyDollar[5].where}
+			yyVAL.selectStmt = &Select{SelectColumnList: yyDollar[2].SelectColumnList, From: yyDollar[4].table, Where: yyDollar[5].where}
 		}
 	case 3:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.resultColumns = ResultColumns{yyDollar[1].resultColumn}
+			yyVAL.SelectColumnList = SelectColumnList{yyDollar[1].SelectColumn}
 		}
 	case 4:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.resultColumns = append(yyDollar[1].resultColumns, yyDollar[3].resultColumn)
+			yyVAL.SelectColumnList = append(yyDollar[1].SelectColumnList, yyDollar[3].SelectColumn)
 		}
 	case 5:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.resultColumn = &StarResultColumn{}
+			yyVAL.SelectColumn = &StarSelectColumn{}
 		}
 	case 6:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.resultColumn = &AliasedResultColumn{Expr: yyDollar[1].expr, As: yyDollar[2].column}
+			yyVAL.SelectColumn = &AliasedSelectColumn{Expr: yyDollar[1].expr, As: yyDollar[2].column}
 		}
 	case 7:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			yyVAL.resultColumn = &StarResultColumn{TableRef: yyDollar[1].table}
+			yyVAL.SelectColumn = &StarSelectColumn{TableRef: yyDollar[1].table}
 		}
 	case 8:
 		yyDollar = yyS[yypt-0 : yypt+1]

@@ -15,8 +15,8 @@ const MaxColumnNameLength = 64
   convertType ConvertType
   when *When
   whens []*When
-  resultColumn ResultColumn
-  resultColumns ResultColumns
+  SelectColumn SelectColumn
+  SelectColumnList SelectColumnList
   selectStmt *Select
   where *Where
 }
@@ -47,8 +47,8 @@ const MaxColumnNameLength = 64
 %type <exprs> expr_list
 %type <string> cmp_op cmp_inequality_op like_op between_op
 %type <column> column_name as_column_opt col_alias
-%type <resultColumn> result_column
-%type <resultColumns> result_column_list
+%type <SelectColumn> select_column
+%type <SelectColumnList> select_column_list
 %type <table> table_name
 %type <where> where_opt
 %type <convertType> convert_type
@@ -61,33 +61,33 @@ start:
 ;
 
 select_stmt:
-  SELECT result_column_list FROM table_name where_opt
+  SELECT select_column_list FROM table_name where_opt
   {
-    $$ = &Select{ResultColumns: $2, From: $4, Where: $5}
+    $$ = &Select{SelectColumnList: $2, From: $4, Where: $5}
   }
 
-result_column_list:
-  result_column
+select_column_list:
+  select_column
   {
-    $$ = ResultColumns{$1}
+    $$ = SelectColumnList{$1}
   }
-| result_column_list ',' result_column
+| select_column_list ',' select_column
   {
     $$ = append($1, $3)
   }
 
-result_column:
+select_column:
   '*'
   {
-    $$ = &StarResultColumn{}
+    $$ = &StarSelectColumn{}
   }
 | expr as_column_opt
   {
-    $$ = &AliasedResultColumn{Expr: $1, As: $2}
+    $$ = &AliasedSelectColumn{Expr: $1, As: $2}
   }
 | table_name '.' '*'
   {
-    $$ = &StarResultColumn{TableRef: $1}
+    $$ = &StarSelectColumn{TableRef: $1}
   }
 
 as_column_opt:

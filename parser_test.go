@@ -22,8 +22,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select true from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: BoolValue(true),
 						},
 					},
@@ -37,8 +37,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select true from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: BoolValue(true),
 						},
 					},
@@ -52,8 +52,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select false from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: BoolValue(false),
 						},
 					},
@@ -67,8 +67,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select false from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: BoolValue(false),
 						},
 					},
@@ -82,8 +82,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 'anything betwen single quotes is a string' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{
 								Type:  StrValue,
 								Value: []byte("anything betwen single quotes is a string")},
@@ -99,8 +99,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 'bruno''s car' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: StrValue, Value: []byte("bruno''s car")},
 						},
 					},
@@ -114,8 +114,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 12 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: IntValue, Value: []byte("12")},
 						},
 					},
@@ -129,8 +129,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select -12 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: IntValue, Value: []byte("-12")},
 						},
 					},
@@ -144,8 +144,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 1.2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: FloatValue, Value: []byte("1.2")},
 						},
 					},
@@ -159,8 +159,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 0.2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: FloatValue, Value: []byte("0.2")},
 						},
 					},
@@ -174,8 +174,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select .2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: FloatValue, Value: []byte(".2")},
 						},
 					},
@@ -189,8 +189,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 1e2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: FloatValue, Value: []byte("1e2")},
 						},
 					},
@@ -204,8 +204,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 1E2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: FloatValue, Value: []byte("1E2")},
 						},
 					},
@@ -219,8 +219,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select 0xAF12 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: HexNumValue, Value: []byte("0xAF12")},
 						},
 					},
@@ -234,8 +234,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select X'AF12' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: BlobValue, Value: []byte("AF12")},
 						},
 					},
@@ -249,8 +249,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select X'AF12' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Value{Type: BlobValue, Value: []byte("AF12")},
 						},
 					},
@@ -264,8 +264,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select null from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &NullValue{},
 						},
 					},
@@ -279,8 +279,8 @@ func TestValueLiteral(t *testing.T) {
 			deparsed: "select null from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &NullValue{},
 						},
 					},
@@ -321,8 +321,8 @@ func TestColumnName(t *testing.T) {
 			deparsed: "select thisisacolumn from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Column{Name: "thisisacolumn"},
 						},
 					},
@@ -336,8 +336,8 @@ func TestColumnName(t *testing.T) {
 			deparsed: "select this_is_a_column3208ADKJHKDS_ from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Column{Name: "this_is_a_column3208ADKJHKDS_"},
 						},
 					},
@@ -351,8 +351,8 @@ func TestColumnName(t *testing.T) {
 			deparsed: "select _also_column from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &Column{Name: "_also_column"},
 						},
 					},
@@ -404,8 +404,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select -2.3 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &UnaryExpr{
 								Operator: UMinusStr,
 								Expr:     &Value{Type: FloatValue, Value: []byte("2.3")},
@@ -422,8 +422,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select -column from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &UnaryExpr{Operator: UMinusStr, Expr: &Column{Name: "column"}},
 						},
 					},
@@ -437,8 +437,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select - -column from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &UnaryExpr{
 								Operator: UMinusStr,
 								Expr: &UnaryExpr{
@@ -457,8 +457,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a = 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: EqualStr,
 								Left:     &Column{Name: "a"},
@@ -476,8 +476,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a != 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotEqualStr,
 								Left:     &Column{Name: "a"},
@@ -495,8 +495,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a != 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotEqualStr,
 								Left:     &Column{Name: "a"},
@@ -514,8 +514,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a > 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: GreaterThanStr,
 								Left:     &Column{Name: "a"},
@@ -533,8 +533,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a < 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: LessThanStr,
 								Left:     &Column{Name: "a"},
@@ -552,8 +552,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a >= 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: GreaterEqualStr,
 								Left:     &Column{Name: "a"},
@@ -571,8 +571,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a <= 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: LessEqualStr,
 								Left:     &Column{Name: "a"},
@@ -590,8 +590,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a regexp 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: RegexpStr,
 								Left:     &Column{Name: "a"},
@@ -609,8 +609,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a not regexp 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotRegexpStr,
 								Left:     &Column{Name: "a"},
@@ -628,8 +628,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a glob 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: GlobStr,
 								Left:     &Column{Name: "a"},
@@ -647,8 +647,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a not glob 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotGlobStr,
 								Left:     &Column{Name: "a"},
@@ -666,8 +666,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a match 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: MatchStr,
 								Left:     &Column{Name: "a"},
@@ -685,8 +685,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a not match 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotMatchStr,
 								Left:     &Column{Name: "a"},
@@ -704,8 +704,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a like 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: LikeStr,
 								Left:     &Column{Name: "a"},
@@ -723,8 +723,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a not like 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotLikeStr,
 								Left:     &Column{Name: "a"},
@@ -742,8 +742,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a like '%a\\%%' escape '\\' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: LikeStr,
 								Left:     &Column{Name: "a"},
@@ -762,8 +762,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a not like '%a\\%%' escape '\\' from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: NotLikeStr,
 								Left:     &Column{Name: "a"},
@@ -782,8 +782,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a and b from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &AndExpr{
 								Left:  &Column{Name: "a"},
 								Right: &Column{Name: "b"},
@@ -800,8 +800,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a or b from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &OrExpr{
 								Left:  &Column{Name: "a"},
 								Right: &Column{Name: "b"},
@@ -818,8 +818,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a is b from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &IsExpr{
 								Left:  &Column{Name: "a"},
 								Right: &Column{Name: "b"},
@@ -836,8 +836,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a is not b from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &IsExpr{
 								Left: &Column{Name: "a"},
 								Right: &NotExpr{
@@ -856,8 +856,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a isnull from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &IsNullExpr{
 								Expr: &Column{Name: "a"},
 							},
@@ -873,8 +873,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a notnull from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &NotNullExpr{
 								Expr: &Column{Name: "a"},
 							},
@@ -890,8 +890,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select a notnull from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &NotNullExpr{
 								Expr: &Column{Name: "a"},
 							},
@@ -907,8 +907,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select cast (1 as text) from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Value{
 									Type:  IntValue,
@@ -928,8 +928,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select cast (column as real) from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
 									Name: "column",
@@ -948,8 +948,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select cast (column as none) from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
 									Name: "column",
@@ -968,8 +968,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select cast (column as numeric) from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
 									Name: "column",
@@ -988,8 +988,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select cast (column as integer) from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
 									Name: "column",
@@ -1008,8 +1008,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 = c2 collate rtrim from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CmpExpr{
 								Operator: EqualStr,
 								Left:     &Column{Name: "c1"},
@@ -1030,8 +1030,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 + 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: PlusStr,
 								Left:     &Column{Name: "c1"},
@@ -1049,8 +1049,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 - 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: MinusStr,
 								Left:     &Column{Name: "c1"},
@@ -1068,8 +1068,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 * 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: MultStr,
 								Left:     &Column{Name: "c1"},
@@ -1087,8 +1087,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 / 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: DivStr,
 								Left:     &Column{Name: "c1"},
@@ -1106,8 +1106,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 % 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: ModStr,
 								Left:     &Column{Name: "c1"},
@@ -1125,8 +1125,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 & 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: BitAndStr,
 								Left:     &Column{Name: "c1"},
@@ -1144,8 +1144,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 | 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: BitOrStr,
 								Left:     &Column{Name: "c1"},
@@ -1163,8 +1163,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 << 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: ShiftLeftStr,
 								Left:     &Column{Name: "c1"},
@@ -1182,8 +1182,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 >> 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: ShiftRightStr,
 								Left:     &Column{Name: "c1"},
@@ -1201,8 +1201,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 || c2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: ConcatStr,
 								Left:     &Column{Name: "c1"},
@@ -1220,8 +1220,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 -> c2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: JSONExtractOp,
 								Left:     &Column{Name: "c1"},
@@ -1239,8 +1239,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 ->> c2 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BinaryExpr{
 								Operator: JSONUnquoteExtractOp,
 								Left:     &Column{Name: "c1"},
@@ -1258,8 +1258,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select ~c from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &UnaryExpr{
 								Operator: TildaStr,
 								Expr:     &Column{Name: "c"},
@@ -1276,8 +1276,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select +c from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &UnaryExpr{
 								Operator: UPlusStr,
 								Expr:     &Column{Name: "c"},
@@ -1294,8 +1294,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 between c2 and c3 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BetweenExpr{
 								Operator: BetweenStr,
 								Left:     &Column{Name: "c1"},
@@ -1314,8 +1314,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select c1 not between c2 and c3 from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &BetweenExpr{
 								Operator: NotBetweenStr,
 								Left:     &Column{Name: "c1"},
@@ -1334,8 +1334,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select (c1, c2, 1) from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: Exprs{
 								&Column{Name: "c1"},
 								&Column{Name: "c2"},
@@ -1353,8 +1353,8 @@ func TestExpr(t *testing.T) {
 			deparsed: "select case c1 when 0 then 'zero' when 1 then 'one' else 'panic' end from t",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: []ResultColumn{
-						&AliasedResultColumn{
+					SelectColumnList: []SelectColumn{
+						&AliasedSelectColumn{
 							Expr: &CaseExpr{
 								Expr: &Column{Name: "c1"},
 								Whens: []*When{
@@ -1407,8 +1407,8 @@ func TestSelectStatement(t *testing.T) {
 			deparsed: "select * from table where c1 > c2",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: ResultColumns{
-						&StarResultColumn{},
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
 					},
 					From: &Table{Name: "table"},
 					Where: &Where{
@@ -1428,12 +1428,12 @@ func TestSelectStatement(t *testing.T) {
 			deparsed: "select a, table.b, column as c1, column2 as c2, * from table where 1",
 			expectedAST: &AST{
 				Root: &Select{
-					ResultColumns: ResultColumns{
-						&AliasedResultColumn{Expr: &Column{Name: "a"}},
-						&AliasedResultColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "table"}}},
-						&AliasedResultColumn{Expr: &Column{Name: "column"}, As: &Column{Name: "c1"}},
-						&AliasedResultColumn{Expr: &Column{Name: "column2"}, As: &Column{Name: "c2"}},
-						&StarResultColumn{},
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{Expr: &Column{Name: "a"}},
+						&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "table"}}},
+						&AliasedSelectColumn{Expr: &Column{Name: "column"}, As: &Column{Name: "c1"}},
+						&AliasedSelectColumn{Expr: &Column{Name: "column2"}, As: &Column{Name: "c2"}},
+						&StarSelectColumn{},
 					},
 					From: &Table{Name: "table"},
 					Where: &Where{

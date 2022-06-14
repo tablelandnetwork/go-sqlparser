@@ -22,7 +22,7 @@ state 2
 
 
 state 3
-	select_stmt:  SELECT.result_column_list FROM table_name where_opt 
+	select_stmt:  SELECT.select_column_list FROM table_name where_opt 
 
 	IDENTIFIER  shift 17
 	STRING  shift 18
@@ -46,13 +46,13 @@ state 3
 	literal_value  goto 9
 	function_call_keyword  goto 16
 	column_name  goto 10
-	result_column  goto 5
-	result_column_list  goto 4
+	select_column  goto 5
+	select_column_list  goto 4
 	table_name  goto 8
 
 state 4
-	select_stmt:  SELECT result_column_list.FROM table_name where_opt 
-	result_column_list:  result_column_list.',' result_column 
+	select_stmt:  SELECT select_column_list.FROM table_name where_opt 
+	select_column_list:  select_column_list.',' select_column 
 
 	','  shift 28
 	FROM  shift 27
@@ -60,19 +60,19 @@ state 4
 
 
 state 5
-	result_column_list:  result_column.    (3)
+	select_column_list:  select_column.    (3)
 
 	.  reduce 3 (src line 69)
 
 
 state 6
-	result_column:  '*'.    (5)
+	select_column:  '*'.    (5)
 
 	.  reduce 5 (src line 79)
 
 
 state 7
-	result_column:  expr.as_column_opt 
+	select_column:  expr.as_column_opt 
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -143,7 +143,7 @@ state 7
 	col_alias  goto 53
 
 state 8
-	result_column:  table_name.'.' '*' 
+	select_column:  table_name.'.' '*' 
 	expr:  table_name.'.' column_name 
 
 	'.'  shift 68
@@ -365,7 +365,7 @@ state 26
 
 
 state 27
-	select_stmt:  SELECT result_column_list FROM.table_name where_opt 
+	select_stmt:  SELECT select_column_list FROM.table_name where_opt 
 
 	IDENTIFIER  shift 79
 	.  error
@@ -373,7 +373,7 @@ state 27
 	table_name  goto 78
 
 state 28
-	result_column_list:  result_column_list ','.result_column 
+	select_column_list:  select_column_list ','.select_column 
 
 	IDENTIFIER  shift 17
 	STRING  shift 18
@@ -397,11 +397,11 @@ state 28
 	literal_value  goto 9
 	function_call_keyword  goto 16
 	column_name  goto 10
-	result_column  goto 80
+	select_column  goto 80
 	table_name  goto 8
 
 state 29
-	result_column:  expr as_column_opt.    (6)
+	select_column:  expr as_column_opt.    (6)
 
 	.  reduce 6 (src line 84)
 
@@ -1033,7 +1033,7 @@ state 67
 
 
 state 68
-	result_column:  table_name '.'.'*' 
+	select_column:  table_name '.'.'*' 
 	expr:  table_name '.'.column_name 
 
 	IDENTIFIER  shift 111
@@ -1329,7 +1329,7 @@ state 77
 	table_name  goto 70
 
 state 78
-	select_stmt:  SELECT result_column_list FROM table_name.where_opt 
+	select_stmt:  SELECT select_column_list FROM table_name.where_opt 
 	where_opt: .    (13)
 
 	WHERE  shift 120
@@ -1344,7 +1344,7 @@ state 79
 
 
 state 80
-	result_column_list:  result_column_list ',' result_column.    (4)
+	select_column_list:  select_column_list ',' select_column.    (4)
 
 	.  reduce 4 (src line 74)
 
@@ -2308,7 +2308,7 @@ state 108
 
 
 state 109
-	result_column:  table_name '.' '*'.    (7)
+	select_column:  table_name '.' '*'.    (7)
 
 	.  reduce 7 (src line 88)
 
@@ -2476,7 +2476,7 @@ state 118
 	between_op  goto 51
 
 state 119
-	select_stmt:  SELECT result_column_list FROM table_name where_opt.    (2)
+	select_stmt:  SELECT select_column_list FROM table_name where_opt.    (2)
 
 	.  reduce 2 (src line 63)
 
