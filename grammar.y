@@ -31,7 +31,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST
+%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -49,7 +49,7 @@ const MaxColumnNameLength = 64
 %type <selectStmt> select_stmt
 %type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt
 %type <exprs> expr_list group_by_opt
-%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt
+%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt
 %type <column> column_name as_column_opt col_alias
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
@@ -69,19 +69,33 @@ start:
 ;
 
 select_stmt:
-  SELECT select_column_list FROM table_name where_opt group_by_opt having_opt order_by_opt limit_opt
+  SELECT distinct_opt select_column_list FROM table_name where_opt group_by_opt having_opt order_by_opt limit_opt
   {
     $$ = &Select{
-            SelectColumnList: $2, 
-            From: $4, 
-            Where: $5, 
-            GroupBy: 
-            GroupBy($6), 
-            Having: $7, 
-            OrderBy: $8,
-            Limit: $9,
+            Distinct: $2,
+            SelectColumnList: $3, 
+            From: $5, 
+            Where: $6, 
+            GroupBy: GroupBy($7), 
+            Having: $8, 
+            OrderBy: $9,
+            Limit: $10,
          }
   }
+
+distinct_opt:
+  {
+    $$ = ""
+  }
+| DISTINCT 
+  {
+    $$ = DistinctStr
+  }
+| ALL
+  {
+    $$ = AllStr
+  }
+;
 
 select_column_list:
   select_column

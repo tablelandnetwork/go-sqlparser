@@ -1656,6 +1656,34 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "simple-select-distinct",
+			stmt:     "SELECT DISTINCT * FROM table",
+			deparsed: "select distinct * from table",
+			expectedAST: &AST{
+				Root: &Select{
+					Distinct: DistinctStr,
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: &Table{Name: "table"},
+				},
+			},
+		},
+		{
+			name:     "simple-select-all",
+			stmt:     "SELECT ALL * FROM table",
+			deparsed: "select all * from table",
+			expectedAST: &AST{
+				Root: &Select{
+					Distinct: AllStr,
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: &Table{Name: "table"},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

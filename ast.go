@@ -50,6 +50,7 @@ func (*Select) iSelectStatement() {}
 
 // Select represents a SELECT statement.
 type Select struct {
+	Distinct         string
 	SelectColumnList SelectColumnList
 	From             *Table
 	Where            *Where
@@ -62,7 +63,8 @@ type Select struct {
 // ToString returns the string representation of the node.
 func (s *Select) ToString() string {
 	return fmt.Sprintf(
-		"select %s from %s%s%s%s%s%s",
+		"select %s%s from %s%s%s%s%s%s",
+		s.Distinct,
 		s.SelectColumnList.ToString(),
 		s.From.ToString(),
 		s.Where.ToString(),
@@ -72,6 +74,12 @@ func (s *Select) ToString() string {
 		s.Limit.ToString(),
 	)
 }
+
+// Distinct/All
+const (
+	DistinctStr = "distinct "
+	AllStr      = "all "
+)
 
 // SelectColumnList represents a list of columns of a SELECT.
 type SelectColumnList []SelectColumn
