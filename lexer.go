@@ -38,6 +38,8 @@ var keywords = map[string]int{
 	"SELECT":  SELECT,
 	"FROM":    FROM,
 	"WHERE":   WHERE,
+	"GROUP":   GROUP,
+	"BY":      BY,
 }
 
 const EOF = 0

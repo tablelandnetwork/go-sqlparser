@@ -53,11 +53,12 @@ type Select struct {
 	SelectColumnList SelectColumnList
 	From             *Table
 	Where            *Where
+	GroupBy          GroupBy
 }
 
 // ToString returns the string representation of the node.
 func (s *Select) ToString() string {
-	return fmt.Sprintf("select %s from %s%s", s.SelectColumnList.ToString(), s.From.ToString(), s.Where.ToString())
+	return fmt.Sprintf("select %s from %s%s%s", s.SelectColumnList.ToString(), s.From.ToString(), s.Where.ToString(), s.GroupBy.ToString())
 }
 
 // SelectColumnList represents a list of columns of a SELECT.
@@ -137,6 +138,22 @@ func (w *Where) ToString() string {
 		return ""
 	}
 	return fmt.Sprintf(" %s %s", w.Type, w.Expr.ToString())
+}
+
+// GroupBy represents a GROUP BY clause.
+type GroupBy Exprs
+
+// ToString returns the string representation of the node.
+func (node GroupBy) ToString() string {
+	if len(node) == 0 {
+		return ""
+	}
+	var strs []string
+	for _, e := range node {
+		strs = append(strs, e.ToString())
+	}
+
+	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
 }
 
 // Expr represents an expr node in the AST.

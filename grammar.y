@@ -27,7 +27,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE
+%token <empty> SELECT FROM WHERE GROUP BY
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -44,7 +44,7 @@ const MaxColumnNameLength = 64
 
 %type <selectStmt> select_stmt
 %type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt
-%type <exprs> expr_list
+%type <exprs> expr_list group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op
 %type <column> column_name as_column_opt col_alias
 %type <SelectColumn> select_column
@@ -61,9 +61,9 @@ start:
 ;
 
 select_stmt:
-  SELECT select_column_list FROM table_name where_opt
+  SELECT select_column_list FROM table_name where_opt group_by_opt
   {
-    $$ = &Select{SelectColumnList: $2, From: $4, Where: $5}
+    $$ = &Select{SelectColumnList: $2, From: $4, Where: $5, GroupBy: GroupBy($6)}
   }
 
 select_column_list:
@@ -121,6 +121,16 @@ where_opt:
 | WHERE expr
 {
    $$ = NewWhere(WhereStr, $2)
+}
+;
+
+group_by_opt:
+  {
+    $$ = nil
+  }
+| GROUP BY expr_list
+{
+   $$ = $3
 }
 ;
 

@@ -1443,6 +1443,28 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "groupby",
+			stmt:     "SELECT a, b FROM table GROUP BY a, b",
+			deparsed: "select a, b from table group by a, b",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "b"},
+						},
+					},
+					From: &Table{Name: "table"},
+					GroupBy: []Expr{
+						&Column{Name: "a"},
+						&Column{Name: "b"},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
