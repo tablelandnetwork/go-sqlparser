@@ -18,6 +18,7 @@ const MaxColumnNameLength = 64
   resultColumn ResultColumn
   resultColumns ResultColumns
   selectStmt *Select
+  where *Where
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -49,6 +50,7 @@ const MaxColumnNameLength = 64
 %type <resultColumn> result_column
 %type <resultColumns> result_column_list
 %type <table> table_name
+%type <where> where_opt
 %type <convertType> convert_type
 %type <when> when 
 %type <whens> when_expr_list
@@ -59,9 +61,9 @@ start:
 ;
 
 select_stmt:
-  SELECT result_column_list FROM table_name WHERE expr
+  SELECT result_column_list FROM table_name where_opt
   {
-    $$ = &Select{ResultColumns: $2, From: $4, Where: NewWhere(WhereStr, $6)}
+    $$ = &Select{ResultColumns: $2, From: $4, Where: $5}
   }
 
 result_column_list:
@@ -110,6 +112,16 @@ col_alias:
   {
     $$ = &Column{Name: string($1)}
   }
+;
+
+where_opt:
+  {
+    $$ = nil
+  }
+| WHERE expr
+{
+   $$ = NewWhere(WhereStr, $2)
+}
 ;
 
 table_name:
@@ -407,8 +419,9 @@ expr_opt:
   }
 | expr
   {
-    $$ = $1s
+    $$ = $1
   }
+  ;
 
 when:
   WHEN expr THEN expr
