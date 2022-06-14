@@ -41,6 +41,8 @@ var keywords = map[string]int{
 	"GROUP":   GROUP,
 	"BY":      BY,
 	"HAVING":  HAVING,
+	"LIMIT":   LIMIT,
+	"OFFSET":  OFFSET,
 }
 
 const EOF = 0

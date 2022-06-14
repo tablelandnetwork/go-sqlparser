@@ -19,6 +19,7 @@ const MaxColumnNameLength = 64
   SelectColumnList SelectColumnList
   selectStmt *Select
   where *Where
+  limit *Limit
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -27,7 +28,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY HAVING
+%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -54,6 +55,7 @@ const MaxColumnNameLength = 64
 %type <convertType> convert_type
 %type <when> when 
 %type <whens> when_expr_list
+%type <limit> limit_opt
 
 %%
 start: 
@@ -61,9 +63,17 @@ start:
 ;
 
 select_stmt:
-  SELECT select_column_list FROM table_name where_opt group_by_opt having_opt
+  SELECT select_column_list FROM table_name where_opt group_by_opt having_opt limit_opt
   {
-    $$ = &Select{SelectColumnList: $2, From: $4, Where: $5, GroupBy: GroupBy($6), Having: $7}
+    $$ = &Select{
+            SelectColumnList: $2, 
+            From: $4, 
+            Where: $5, 
+            GroupBy: 
+            GroupBy($6), 
+            Having: $7, 
+            Limit: $8,
+         }
   }
 
 select_column_list:
@@ -124,6 +134,16 @@ where_opt:
 }
 ;
 
+group_by_opt:
+  {
+    $$ = nil
+  }
+| GROUP BY expr_list
+{
+   $$ = $3
+}
+;
+
 having_opt:
   {
     $$ = nil
@@ -134,14 +154,22 @@ having_opt:
 }
 ;
 
-group_by_opt:
+limit_opt:
   {
     $$ = nil
   }
-| GROUP BY expr_list
-{
-   $$ = $3
-}
+| LIMIT expr
+  {
+    $$ = &Limit{Limit: $2}
+  }
+| LIMIT expr ',' expr
+  {
+    $$ = &Limit{Offset: $2, Limit: $4}
+  }
+| LIMIT expr OFFSET expr
+  {
+    $$ = &Limit{Offset: $4, Limit: $2}
+  }
 ;
 
 table_name:

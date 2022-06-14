@@ -55,17 +55,19 @@ type Select struct {
 	Where            *Where
 	GroupBy          GroupBy
 	Having           *Where
+	Limit            *Limit
 }
 
 // ToString returns the string representation of the node.
 func (s *Select) ToString() string {
 	return fmt.Sprintf(
-		"select %s from %s%s%s%s",
+		"select %s from %s%s%s%s%s",
 		s.SelectColumnList.ToString(),
 		s.From.ToString(),
 		s.Where.ToString(),
 		s.GroupBy.ToString(),
 		s.Having.ToString(),
+		s.Limit.ToString(),
 	)
 }
 
@@ -162,6 +164,25 @@ func (node GroupBy) ToString() string {
 	}
 
 	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
+}
+
+// Limit represents the LIMIT clause.
+type Limit struct {
+	Limit  Expr
+	Offset Expr
+}
+
+// ToString returns the string representation of the node.
+func (node *Limit) ToString() string {
+	if node == nil {
+		return ""
+	}
+
+	if node.Offset == nil {
+		return fmt.Sprintf(" limit %s", node.Limit.ToString())
+	}
+
+	return fmt.Sprintf(" limit %s offset %s", node.Limit.ToString(), node.Offset.ToString())
 }
 
 // Expr represents an expr node in the AST.

@@ -1495,6 +1495,56 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "limit",
+			stmt:     "SELECT * FROM table LIMIT 1",
+			deparsed: "select * from table limit 1",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: &Table{Name: "table"},
+					Limit: &Limit{
+						Limit: &Value{Type: IntValue, Value: []byte("1")},
+					},
+				},
+			},
+		},
+		{
+			name:     "limit-offet",
+			stmt:     "SELECT * FROM table LIMIT 1 OFFSET 2",
+			deparsed: "select * from table limit 1 offset 2",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: &Table{Name: "table"},
+					Limit: &Limit{
+						Limit:  &Value{Type: IntValue, Value: []byte("1")},
+						Offset: &Value{Type: IntValue, Value: []byte("2")},
+					},
+				},
+			},
+		},
+		{
+			name:     "limit-offet-alternative",
+			stmt:     "SELECT * FROM table LIMIT 1, 2",
+			deparsed: "select * from table limit 2 offset 1",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: &Table{Name: "table"},
+					Limit: &Limit{
+						Limit:  &Value{Type: IntValue, Value: []byte("2")},
+						Offset: &Value{Type: IntValue, Value: []byte("1")},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
