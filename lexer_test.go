@@ -18,7 +18,7 @@ func TestLexer(t *testing.T) {
 		ESCAPE COLLATE . & | + * / % ~
 		<< >> BETWEEN AND
 		CASE WHEN THEN ELSE END
-		SELECT FROM WHERE GROUP BY
+		SELECT FROM WHERE GROUP BY HAVING
 	`
 	expTokens := []int{
 		IDENTIFIER, INTEGRAL, FLOAT, FLOAT, STRING,
@@ -34,7 +34,7 @@ func TestLexer(t *testing.T) {
 		'+', '*', '/', '%', '~',
 		LSHIFT, RSHIFT, BETWEEN, AND,
 		CASE, WHEN, THEN, ELSE, END,
-		SELECT, FROM, WHERE, GROUP, BY,
+		SELECT, FROM, WHERE, GROUP, BY, HAVING,
 	}
 
 	lval := &yySymType{}

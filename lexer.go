@@ -40,6 +40,7 @@ var keywords = map[string]int{
 	"WHERE":   WHERE,
 	"GROUP":   GROUP,
 	"BY":      BY,
+	"HAVING":  HAVING,
 }
 
 const EOF = 0

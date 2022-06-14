@@ -54,11 +54,19 @@ type Select struct {
 	From             *Table
 	Where            *Where
 	GroupBy          GroupBy
+	Having           *Where
 }
 
 // ToString returns the string representation of the node.
 func (s *Select) ToString() string {
-	return fmt.Sprintf("select %s from %s%s%s", s.SelectColumnList.ToString(), s.From.ToString(), s.Where.ToString(), s.GroupBy.ToString())
+	return fmt.Sprintf(
+		"select %s from %s%s%s%s",
+		s.SelectColumnList.ToString(),
+		s.From.ToString(),
+		s.Where.ToString(),
+		s.GroupBy.ToString(),
+		s.Having.ToString(),
+	)
 }
 
 // SelectColumnList represents a list of columns of a SELECT.

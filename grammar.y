@@ -27,7 +27,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY
+%token <empty> SELECT FROM WHERE GROUP BY HAVING
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -50,7 +50,7 @@ const MaxColumnNameLength = 64
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
 %type <table> table_name
-%type <where> where_opt
+%type <where> where_opt having_opt
 %type <convertType> convert_type
 %type <when> when 
 %type <whens> when_expr_list
@@ -61,9 +61,9 @@ start:
 ;
 
 select_stmt:
-  SELECT select_column_list FROM table_name where_opt group_by_opt
+  SELECT select_column_list FROM table_name where_opt group_by_opt having_opt
   {
-    $$ = &Select{SelectColumnList: $2, From: $4, Where: $5, GroupBy: GroupBy($6)}
+    $$ = &Select{SelectColumnList: $2, From: $4, Where: $5, GroupBy: GroupBy($6), Having: $7}
   }
 
 select_column_list:
@@ -121,6 +121,16 @@ where_opt:
 | WHERE expr
 {
    $$ = NewWhere(WhereStr, $2)
+}
+;
+
+having_opt:
+  {
+    $$ = nil
+  }
+| HAVING expr
+{
+   $$ = NewWhere(HavingStr, $2)
 }
 ;
 
