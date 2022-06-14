@@ -56,17 +56,19 @@ type Select struct {
 	GroupBy          GroupBy
 	Having           *Where
 	Limit            *Limit
+	OrderBy          OrderBy
 }
 
 // ToString returns the string representation of the node.
 func (s *Select) ToString() string {
 	return fmt.Sprintf(
-		"select %s from %s%s%s%s%s",
+		"select %s from %s%s%s%s%s%s",
 		s.SelectColumnList.ToString(),
 		s.From.ToString(),
 		s.Where.ToString(),
 		s.GroupBy.ToString(),
 		s.Having.ToString(),
+		s.OrderBy.ToString(),
 		s.Limit.ToString(),
 	)
 }
@@ -164,6 +166,64 @@ func (node GroupBy) ToString() string {
 	}
 
 	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
+}
+
+// OrderBy represents an ORDER BY clause.
+type OrderBy []*OrderingTerm
+
+// ToString returns the string representation of the node.
+func (node OrderBy) ToString() string {
+	if len(node) == 0 {
+		return ""
+	}
+	var strs []string
+	for _, e := range node {
+		strs = append(strs, e.ToString())
+	}
+
+	return fmt.Sprintf(" order by %s", strings.Join(strs, ", "))
+}
+
+// OrderingTerm represents an ordering term expression.
+type OrderingTerm struct {
+	Expr      Expr
+	Direction string
+	Nulls     NullsType
+}
+
+// Possible directions for OrderingTerm.
+const (
+	AscStr  = "asc"
+	DescStr = "desc"
+)
+
+// NullsType represents nulls type.
+type NullsType int
+
+// All values of NullsType type.
+const (
+	NullsNil NullsType = iota
+	NullsFirst
+	NullsLast
+)
+
+// ToString returns the string representation of the node.
+func (node *OrderingTerm) ToString() string {
+	if node, ok := node.Expr.(*NullValue); ok {
+		return node.ToString()
+	}
+
+	var nullsStr string
+	switch node.Nulls {
+	case NullsNil:
+		nullsStr = ""
+	case NullsFirst:
+		nullsStr = " nulls first"
+	case NullsLast:
+		nullsStr = " nulls last"
+	}
+
+	return fmt.Sprintf("%s %s%s", node.Expr.ToString(), node.Direction, nullsStr)
 }
 
 // Limit represents the LIMIT clause.

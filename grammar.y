@@ -20,6 +20,9 @@ const MaxColumnNameLength = 64
   selectStmt *Select
   where *Where
   limit *Limit
+  orderBy OrderBy
+  orderingTerm *OrderingTerm
+  nulls NullsType
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -28,7 +31,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET
+%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -46,7 +49,7 @@ const MaxColumnNameLength = 64
 %type <selectStmt> select_stmt
 %type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt
 %type <exprs> expr_list group_by_opt
-%type <string> cmp_op cmp_inequality_op like_op between_op
+%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt
 %type <column> column_name as_column_opt col_alias
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
@@ -56,6 +59,9 @@ const MaxColumnNameLength = 64
 %type <when> when 
 %type <whens> when_expr_list
 %type <limit> limit_opt
+%type <orderBy> order_by_opt order_list
+%type <orderingTerm> ordering_term
+%type <nulls> nulls
 
 %%
 start: 
@@ -63,7 +69,7 @@ start:
 ;
 
 select_stmt:
-  SELECT select_column_list FROM table_name where_opt group_by_opt having_opt limit_opt
+  SELECT select_column_list FROM table_name where_opt group_by_opt having_opt order_by_opt limit_opt
   {
     $$ = &Select{
             SelectColumnList: $2, 
@@ -72,7 +78,8 @@ select_stmt:
             GroupBy: 
             GroupBy($6), 
             Having: $7, 
-            Limit: $8,
+            OrderBy: $8,
+            Limit: $9,
          }
   }
 
@@ -152,6 +159,62 @@ having_opt:
 {
    $$ = NewWhere(HavingStr, $2)
 }
+;
+
+order_by_opt:
+  {
+    $$ = nil
+  }
+| ORDER BY order_list
+  {
+    $$ = $3
+  }
+;
+
+order_list:
+  ordering_term
+  {
+    $$ = OrderBy{$1}
+  }
+| order_list ',' ordering_term
+  {
+    $$ = append($1, $3)
+  }
+;
+
+ordering_term:
+  expr asc_desc_opt nulls
+  {
+    $$ = &OrderingTerm{Expr: $1, Direction: $2, Nulls: $3}
+  }
+;
+
+asc_desc_opt:
+  {
+    $$ = AscStr
+  }
+| ASC
+  {
+    $$ = AscStr
+  }
+| DESC
+  {
+    $$ = DescStr
+  }
+;
+
+nulls:
+  {
+    $$ = NullsNil
+  }
+| NULLS FIRST
+  {
+    $$ = NullsFirst
+  }
+| NULLS LAST
+  {
+    $$ = NullsLast
+  }
 ;
 
 limit_opt:

@@ -1496,6 +1496,117 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
+			name:     "orderby",
+			stmt:     "SELECT a, b FROM table ORDER BY a",
+			deparsed: "select a, b from table order by a asc",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "b"},
+						},
+					},
+					From: &Table{Name: "table"},
+					OrderBy: OrderBy{
+						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: AscStr},
+					},
+				},
+			},
+		},
+		{
+			name:     "orderby-asc",
+			stmt:     "SELECT a, b FROM table ORDER BY a asc",
+			deparsed: "select a, b from table order by a asc",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "b"},
+						},
+					},
+					From: &Table{Name: "table"},
+					OrderBy: OrderBy{
+						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: AscStr},
+					},
+				},
+			},
+		},
+		{
+			name:     "orderby-asc",
+			stmt:     "SELECT a, b FROM table ORDER BY a desc",
+			deparsed: "select a, b from table order by a desc",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "b"},
+						},
+					},
+					From: &Table{Name: "table"},
+					OrderBy: OrderBy{
+						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: DescStr},
+					},
+				},
+			},
+		},
+		{
+			name:     "orderby-desc-asc",
+			stmt:     "SELECT a, b FROM table ORDER BY a desc, b",
+			deparsed: "select a, b from table order by a desc, b asc",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "b"},
+						},
+					},
+					From: &Table{Name: "table"},
+					OrderBy: OrderBy{
+						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: DescStr},
+						&OrderingTerm{Expr: &Column{Name: "b"}, Direction: AscStr},
+					},
+				},
+			},
+		},
+		{
+			name:     "orderby-nulls",
+			stmt:     "SELECT a, b, c FROM table ORDER BY a desc, b NULLS FIRST, c NULLS LAST",
+			deparsed: "select a, b, c from table order by a desc, b asc nulls first, c asc nulls last",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "b"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "c"},
+						},
+					},
+					From: &Table{Name: "table"},
+					OrderBy: OrderBy{
+						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: DescStr, Nulls: NullsNil},
+						&OrderingTerm{Expr: &Column{Name: "b"}, Direction: AscStr, Nulls: NullsFirst},
+						&OrderingTerm{Expr: &Column{Name: "c"}, Direction: AscStr, Nulls: NullsLast},
+					},
+				},
+			},
+		},
+		{
 			name:     "limit",
 			stmt:     "SELECT * FROM table LIMIT 1",
 			deparsed: "select * from table limit 1",

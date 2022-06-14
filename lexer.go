@@ -43,6 +43,12 @@ var keywords = map[string]int{
 	"HAVING":  HAVING,
 	"LIMIT":   LIMIT,
 	"OFFSET":  OFFSET,
+	"ORDER":   ORDER,
+	"ASC":     ASC,
+	"DESC":    DESC,
+	"NULLS":   NULLS,
+	"FIRST":   FIRST,
+	"LAST":    LAST,
 }
 
 const EOF = 0
