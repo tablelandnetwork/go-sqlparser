@@ -71,7 +71,7 @@ const MaxColumnNameLength = 64
 %type <nulls> nulls
 %type <tableExprList> table_expr_list from_clause
 %type <tableExpr> table_expr
-%type <joinTableExpr> join_clause join_expr join_constraint
+%type <joinTableExpr> join_clause join_constraint
 %type <columnList> column_name_list
 
 %%
@@ -222,33 +222,18 @@ table_alias:
 ;
 
 join_clause:
-  table_expr join_expr 
+  table_expr JOIN table_expr join_constraint
   {
-    prev, next := $2, $2.LeftExpr
-    for {
-      nextJoinExpr, ok := next.(*JoinTableExpr)
-      if !ok {
-        break
-      }
-      prev, next = nextJoinExpr, nextJoinExpr.LeftExpr
-    }
-    prev.LeftExpr = $1
-    $$ = $2
-  }
-;
-
-join_expr:
-  JOIN table_expr join_constraint
-  {
-    if $3 == nil {
-      $$ = &JoinTableExpr{JoinOperator: JoinStr, RightExpr: $2}
+    if $4 == nil {
+      $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: JoinStr, RightExpr: $3}
     } else {
-      $3.JoinOperator = JoinStr
-      $3.RightExpr = $2
-      $$ = $3
+      $4.LeftExpr = $1
+      $4.JoinOperator = JoinStr
+      $4.RightExpr = $3
+      $$ = $4
     }
   }
-| join_expr JOIN table_expr join_constraint
+| join_clause JOIN table_expr join_constraint
   {
     if $4 == nil {
       $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: JoinStr, RightExpr: $3}
