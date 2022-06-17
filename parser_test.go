@@ -27,7 +27,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: BoolValue(true),
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -42,7 +46,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: BoolValue(true),
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -57,7 +65,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: BoolValue(false),
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -72,7 +84,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: BoolValue(false),
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -89,7 +105,11 @@ func TestValueLiteral(t *testing.T) {
 								Value: []byte("anything betwen single quotes is a string")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -104,7 +124,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: StrValue, Value: []byte("bruno''s car")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -119,7 +143,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: IntValue, Value: []byte("12")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -134,7 +162,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: IntValue, Value: []byte("-12")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -149,7 +181,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: FloatValue, Value: []byte("1.2")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -164,7 +200,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: FloatValue, Value: []byte("0.2")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -179,7 +219,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: FloatValue, Value: []byte(".2")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -194,7 +238,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: FloatValue, Value: []byte("1e2")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -209,7 +257,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: FloatValue, Value: []byte("1E2")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -224,7 +276,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: HexNumValue, Value: []byte("0xAF12")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -239,7 +295,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: BlobValue, Value: []byte("AF12")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -254,7 +314,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &Value{Type: BlobValue, Value: []byte("AF12")},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -269,7 +333,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &NullValue{},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -284,7 +352,11 @@ func TestValueLiteral(t *testing.T) {
 							Expr: &NullValue{},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -326,7 +398,11 @@ func TestColumnName(t *testing.T) {
 							Expr: &Column{Name: "thisisacolumn"},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -341,7 +417,11 @@ func TestColumnName(t *testing.T) {
 							Expr: &Column{Name: "this_is_a_column3208ADKJHKDS_"},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -356,7 +436,11 @@ func TestColumnName(t *testing.T) {
 							Expr: &Column{Name: "_also_column"},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -412,7 +496,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -427,7 +515,11 @@ func TestExpr(t *testing.T) {
 							Expr: &UnaryExpr{Operator: UMinusStr, Expr: &Column{Name: "column"}},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -447,7 +539,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -466,7 +562,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -485,7 +585,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -504,7 +608,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -523,7 +631,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -542,7 +654,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -561,7 +677,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -580,7 +700,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -599,7 +723,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -618,7 +746,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -637,7 +769,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -656,7 +792,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -675,7 +815,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -694,7 +838,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -713,7 +861,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -732,7 +884,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -752,7 +908,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -772,7 +932,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -790,7 +954,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -808,7 +976,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -826,7 +998,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -846,7 +1022,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -863,7 +1043,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -880,7 +1064,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -897,7 +1085,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -918,7 +1110,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -938,7 +1134,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -958,7 +1158,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -978,7 +1182,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -998,7 +1206,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1020,7 +1232,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1039,7 +1255,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1058,7 +1278,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1077,7 +1301,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1096,7 +1324,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1115,7 +1347,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1134,7 +1370,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1153,7 +1393,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1172,7 +1416,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1191,7 +1439,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1210,7 +1462,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1229,7 +1485,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1248,7 +1508,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1266,7 +1530,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1284,7 +1552,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1304,7 +1576,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1324,7 +1600,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1343,7 +1623,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1371,7 +1655,11 @@ func TestExpr(t *testing.T) {
 							},
 						},
 					},
-					From: &Table{Name: "t"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
 				},
 			},
 		},
@@ -1410,7 +1698,11 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					Where: &Where{
 						Type: WhereStr,
 						Expr: &CmpExpr{
@@ -1435,7 +1727,11 @@ func TestSelectStatement(t *testing.T) {
 						&AliasedSelectColumn{Expr: &Column{Name: "column2"}, As: &Column{Name: "c2"}},
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					Where: &Where{
 						Type: WhereStr,
 						Expr: &Value{Type: IntValue, Value: []byte("1")},
@@ -1457,7 +1753,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "b"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					GroupBy: []Expr{
 						&Column{Name: "a"},
 						&Column{Name: "b"},
@@ -1479,7 +1779,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "b"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					GroupBy: []Expr{
 						&Column{Name: "a"},
 						&Column{Name: "b"},
@@ -1509,7 +1813,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "b"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					OrderBy: OrderBy{
 						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: AscStr},
 					},
@@ -1530,7 +1838,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "b"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					OrderBy: OrderBy{
 						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: AscStr},
 					},
@@ -1551,7 +1863,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "b"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					OrderBy: OrderBy{
 						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: DescStr},
 					},
@@ -1572,7 +1888,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "b"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					OrderBy: OrderBy{
 						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: DescStr},
 						&OrderingTerm{Expr: &Column{Name: "b"}, Direction: AscStr},
@@ -1597,7 +1917,11 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &Column{Name: "c"},
 						},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					OrderBy: OrderBy{
 						&OrderingTerm{Expr: &Column{Name: "a"}, Direction: DescStr, Nulls: NullsNil},
 						&OrderingTerm{Expr: &Column{Name: "b"}, Direction: AscStr, Nulls: NullsFirst},
@@ -1615,7 +1939,11 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					Limit: &Limit{
 						Limit: &Value{Type: IntValue, Value: []byte("1")},
 					},
@@ -1631,7 +1959,11 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					Limit: &Limit{
 						Limit:  &Value{Type: IntValue, Value: []byte("1")},
 						Offset: &Value{Type: IntValue, Value: []byte("2")},
@@ -1648,7 +1980,11 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 					Limit: &Limit{
 						Limit:  &Value{Type: IntValue, Value: []byte("2")},
 						Offset: &Value{Type: IntValue, Value: []byte("1")},
@@ -1666,7 +2002,11 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
 				},
 			},
 		},
@@ -1680,7 +2020,240 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
-					From: &Table{Name: "table"},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "simple-select-alias-table",
+			stmt:     "SELECT * FROM table as t",
+			deparsed: "select * from table as t",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+							As:   &Table{Name: "t"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "simple-select-alias-table-alt",
+			stmt:     "SELECT * FROM table t",
+			deparsed: "select * from table as t",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+							As:   &Table{Name: "t"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select-multiple-tables",
+			stmt:     "SELECT a.*, b.column1 as c1 FROM a, b",
+			deparsed: "select a.*, b.column1 as c1 from a, b",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{TableRef: &Table{Name: "a"}},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "column1", TableRef: &Table{Name: "b"}},
+							As:   &Column{Name: "c1"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "a"},
+						},
+						&AliasedTableExpr{
+							Expr: &Table{Name: "b"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select-from-subquery",
+			stmt:     "SELECT * FROM (SELECT * FROM table)",
+			deparsed: "select * from (select * from table)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Subquery{
+								Select: &Select{
+									SelectColumnList: SelectColumnList{
+										&StarSelectColumn{},
+									},
+									From: TableExprList{
+										&AliasedTableExpr{
+											Expr: &Table{Name: "table"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select-from-subquery-aliased",
+			stmt:     "SELECT * FROM (SELECT * FROM table) as subquery",
+			deparsed: "select * from (select * from table) as subquery",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Subquery{
+								Select: &Select{
+									SelectColumnList: SelectColumnList{
+										&StarSelectColumn{},
+									},
+									From: TableExprList{
+										&AliasedTableExpr{
+											Expr: &Table{Name: "table"},
+										},
+									},
+								},
+							},
+							As: &Table{Name: "subquery"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select-from-subquery-aliased-alt",
+			stmt:     "SELECT * FROM (SELECT * FROM table) subquery",
+			deparsed: "select * from (select * from table) as subquery",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Subquery{
+								Select: &Select{
+									SelectColumnList: SelectColumnList{
+										&StarSelectColumn{},
+									},
+									From: TableExprList{
+										&AliasedTableExpr{
+											Expr: &Table{Name: "table"},
+										},
+									},
+								},
+							},
+							As: &Table{Name: "subquery"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "join",
+			stmt:     "SELECT * FROM a JOIN b JOIN c JOIN d",
+			deparsed: "select * from a join b join c join d",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&JoinTableExpr{
+							LeftExpr: &JoinTableExpr{
+								LeftExpr: &JoinTableExpr{
+									LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "a"}},
+									JoinOperator: JoinStr,
+									RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "b"}},
+								},
+								JoinOperator: JoinStr,
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "c"}},
+							},
+							JoinOperator: JoinStr,
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "d"}},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "join-on",
+			stmt:     "SELECT * FROM a JOIN b ON a.id = b.id JOIN c ON b.c1 = c.c1",
+			deparsed: "select * from a join b on a.id = b.id join c on b.c1 = c.c1",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&JoinTableExpr{
+							LeftExpr: &JoinTableExpr{
+								LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "a"}},
+								JoinOperator: JoinStr,
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "b"}},
+								On: &CmpExpr{
+									Operator: EqualStr,
+									Left:     &Column{Name: "id", TableRef: &Table{Name: "a"}},
+									Right:    &Column{Name: "id", TableRef: &Table{Name: "b"}},
+								},
+							},
+							JoinOperator: JoinStr,
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "c"}},
+							On: &CmpExpr{
+								Operator: EqualStr,
+								Left:     &Column{Name: "c1", TableRef: &Table{Name: "b"}},
+								Right:    &Column{Name: "c1", TableRef: &Table{Name: "c"}},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "join-using",
+			stmt:     "SELECT * FROM a JOIN b USING(c1, c2)",
+			deparsed: "select * from a join b using (c1, c2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&JoinTableExpr{
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "a"}},
+							JoinOperator: JoinStr,
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "b"}},
+							Using: ColumnList{
+								&Column{Name: "c1"},
+								&Column{Name: "c2"},
+							},
+						},
+					},
 				},
 			},
 		},

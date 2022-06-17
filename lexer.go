@@ -51,6 +51,9 @@ var keywords = map[string]int{
 	"LAST":     LAST,
 	"DISTINCT": DISTINCT,
 	"ALL":      ALL,
+	"JOIN":     JOIN,
+	"ON":       ON,
+	"USING":    USING,
 }
 
 const EOF = 0

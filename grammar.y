@@ -23,6 +23,10 @@ const MaxColumnNameLength = 64
   orderBy OrderBy
   orderingTerm *OrderingTerm
   nulls NullsType
+  tableExprList TableExprList
+  tableExpr TableExpr
+  joinTableExpr *JoinTableExpr
+  columnList ColumnList
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -32,6 +36,9 @@ const MaxColumnNameLength = 64
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL
+
+%left <empty> JOIN
+%left <empty> ON USING
 
 %left <empty> OR
 %left <empty> ANDOP
@@ -53,7 +60,7 @@ const MaxColumnNameLength = 64
 %type <column> column_name as_column_opt col_alias
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
-%type <table> table_name
+%type <table> table_name as_table_opt table_alias
 %type <where> where_opt having_opt
 %type <convertType> convert_type
 %type <when> when 
@@ -62,6 +69,10 @@ const MaxColumnNameLength = 64
 %type <orderBy> order_by_opt order_list
 %type <orderingTerm> ordering_term
 %type <nulls> nulls
+%type <tableExprList> table_expr_list from_clause
+%type <tableExpr> table_expr
+%type <joinTableExpr> join_clause join_expr join_constraint
+%type <columnList> column_name_list
 
 %%
 start: 
@@ -69,17 +80,17 @@ start:
 ;
 
 select_stmt:
-  SELECT distinct_opt select_column_list FROM table_name where_opt group_by_opt having_opt order_by_opt limit_opt
+  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt limit_opt
   {
     $$ = &Select{
             Distinct: $2,
             SelectColumnList: $3, 
-            From: $5, 
-            Where: $6, 
-            GroupBy: GroupBy($7), 
-            Having: $8, 
-            OrderBy: $9,
-            Limit: $10,
+            From: $4, 
+            Where: $5, 
+            GroupBy: GroupBy($6), 
+            Having: $7, 
+            OrderBy: $8,
+            Limit: $9,
          }
   }
 
@@ -142,6 +153,125 @@ col_alias:
 | STRING
   {
     $$ = &Column{Name: string($1)}
+  }
+;
+
+from_clause:
+  FROM table_expr_list
+  {
+    $$ = $2
+  }
+| FROM join_clause
+  {
+    $$ = TableExprList{$2}
+  }
+;
+
+table_expr_list:
+  table_expr
+  {
+    $$ = TableExprList{$1}
+  }
+| table_expr_list ',' table_expr
+  {
+    $$ = append($$, $3)
+  }
+;
+
+table_expr:
+  table_name as_table_opt
+  {
+    $$ = &AliasedTableExpr{Expr: $1, As: $2}
+  }
+| '(' select_stmt ')' as_table_opt
+  {
+    $$ = &AliasedTableExpr{Expr: &Subquery{Select: $2}, As: $4}
+  }
+| '(' table_expr_list ')'
+  {
+    $$ = &ParenTableExpr{TableExprList: $2}
+  }
+|  '(' join_clause ')'
+  {
+    $$ = $2
+  }
+;
+
+as_table_opt:
+  {
+    $$ = nil
+  }
+| table_alias
+  {
+    $$ = $1
+  }
+| AS table_alias
+  {
+    $$ = $2
+  }
+
+table_alias:
+  IDENTIFIER
+  {
+    $$ = &Table{Name: string($1)}
+  }
+| STRING
+  {
+    $$ = &Table{Name: string($1)}
+  }
+;
+
+join_clause:
+  table_expr join_expr 
+  {
+    prev, next := $2, $2.LeftExpr
+    for {
+      nextJoinExpr, ok := next.(*JoinTableExpr)
+      if !ok {
+        break
+      }
+      prev, next = nextJoinExpr, nextJoinExpr.LeftExpr
+    }
+    prev.LeftExpr = $1
+    $$ = $2
+  }
+;
+
+join_expr:
+  JOIN table_expr join_constraint
+  {
+    if $3 == nil {
+      $$ = &JoinTableExpr{JoinOperator: JoinStr, RightExpr: $2}
+    } else {
+      $3.JoinOperator = JoinStr
+      $3.RightExpr = $2
+      $$ = $3
+    }
+  }
+| join_expr JOIN table_expr join_constraint
+  {
+    if $4 == nil {
+      $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: JoinStr, RightExpr: $3}
+    } else {
+      $4.LeftExpr = $1
+      $4.JoinOperator = JoinStr
+      $4.RightExpr = $3
+      $$ = $4
+    }
+  }
+;
+
+join_constraint:
+  {
+    $$ = nil
+  }
+| ON expr 
+  {
+    $$ = &JoinTableExpr{On: $2}
+  }
+| USING '(' column_name_list ')'
+  {
+    $$ = &JoinTableExpr{Using: $3}
   }
 ;
 
@@ -434,6 +564,17 @@ column_name:
       return 1
     }
     $$ = &Column{Name : string($1)} 
+  }
+;
+
+column_name_list:
+  column_name
+  {
+    $$ = ColumnList{$1}
+  }
+| column_name_list ',' column_name
+  {
+    $$ = append($1, $3)
   }
 ;
 

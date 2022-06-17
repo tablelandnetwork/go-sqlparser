@@ -52,7 +52,7 @@ func (*Select) iSelectStatement() {}
 type Select struct {
 	Distinct         string
 	SelectColumnList SelectColumnList
-	From             *Table
+	From             TableExprList
 	Where            *Where
 	GroupBy          GroupBy
 	Having           *Where
@@ -129,6 +129,111 @@ func (c *AliasedSelectColumn) ToString() string {
 	}
 
 	return c.Expr.ToString()
+}
+
+// TableExpr represents an expression referenced by FROM.
+type TableExpr interface {
+	iTableExpr()
+	Node
+}
+
+func (*AliasedTableExpr) iTableExpr() {}
+func (*ParenTableExpr) iTableExpr()   {}
+func (*JoinTableExpr) iTableExpr()    {}
+
+// TableExprList represents a list of table expressions.
+type TableExprList []TableExpr
+
+// ToString returns the string representation of the node.
+func (node TableExprList) ToString() string {
+	if len(node) == 0 {
+		return ""
+	}
+	var strs []string
+	for _, e := range node {
+		strs = append(strs, e.ToString())
+	}
+
+	return strings.Join(strs, ", ")
+}
+
+// AliasedTableExpr represents a table expression
+// coupled with an optional alias.
+// If As is empty, no alias was used.
+type AliasedTableExpr struct {
+	Expr SimpleTableExpr
+	As   *Table
+}
+
+// ToString returns the string representation of the node.
+func (node *AliasedTableExpr) ToString() string {
+	if node.As == nil {
+		return node.Expr.ToString()
+	}
+
+	return fmt.Sprintf("%s as %s", node.Expr.ToString(), node.As.ToString())
+}
+
+// SimpleTableExpr represents a direct table reference or a subquery.
+type SimpleTableExpr interface {
+	iSimpleTableExpr()
+	Node
+}
+
+func (*Table) iSimpleTableExpr()    {}
+func (*Subquery) iSimpleTableExpr() {}
+
+// Subquery represents a subquery.
+type Subquery struct {
+	Select SelectStatement
+}
+
+// ToString returns the string representation of the node.
+func (node *Subquery) ToString() string {
+	return fmt.Sprintf("(%s)", node.Select.ToString())
+}
+
+// ParenTableExpr represents a parenthesized list of TableExpr.
+type ParenTableExpr struct {
+	TableExprList TableExprList
+}
+
+// ToString returns the string representation of the node.
+func (node *ParenTableExpr) ToString() string {
+	return fmt.Sprintf("(%v)", node.TableExprList.ToString())
+}
+
+// JoinTableExpr represents a TableExpr that's a JOIN operation.
+type JoinTableExpr struct {
+	LeftExpr     TableExpr
+	JoinOperator string
+	RightExpr    TableExpr
+	On           Expr
+	Using        ColumnList
+}
+
+// Kinds of JoinOperator.
+const (
+	JoinStr             = "join"
+	CrossJoinStr        = "cross join"
+	LeftJoinStr         = "left join"
+	RightJoinStr        = "right join"
+	NaturalJoinStr      = "natural join"
+	NaturalLeftJoinStr  = "natural left join"
+	NaturalRightJoinStr = "natural right join"
+)
+
+// ToString returns the string representation of the node.
+func (node *JoinTableExpr) ToString() string {
+	if node.On != nil {
+		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.ToString(), node.JoinOperator, node.RightExpr.ToString(), node.On.ToString())
+	}
+
+	if node.Using != nil {
+		return fmt.Sprintf("%s %s %s using %s", node.LeftExpr.ToString(), node.JoinOperator, node.RightExpr.ToString(), node.Using.ToString())
+	}
+
+	return fmt.Sprintf("%s %s %s", node.LeftExpr.ToString(), node.JoinOperator, node.RightExpr.ToString())
 }
 
 // Where represents a WHERE or HAVING clause.
@@ -596,6 +701,19 @@ func (c *Column) ToString() string {
 	return c.Name
 }
 
+// ColumnList is a list of columns.
+type ColumnList []*Column
+
+// ToString returns the string representation of the node.
+func (c ColumnList) ToString() string {
+	var strs []string
+	for _, e := range c {
+		strs = append(strs, e.ToString())
+	}
+
+	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
+}
+
 // Exprs represents a list of expressions.
 type Exprs []Expr
 
@@ -603,7 +721,7 @@ type Exprs []Expr
 func (c Exprs) ToString() string {
 	var strs []string
 	for _, e := range c {
-		strs = append(strs, e.ToString()) // note the = instead of :=
+		strs = append(strs, e.ToString())
 	}
 
 	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
