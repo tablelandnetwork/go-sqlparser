@@ -54,6 +54,7 @@ var keywords = map[string]int{
 	"JOIN":     JOIN,
 	"ON":       ON,
 	"USING":    USING,
+	"EXISTS":   EXISTS,
 }
 
 const EOF = 0
@@ -74,6 +75,8 @@ type Lexer struct {
 	// If BETWEEN was seen, we emit a different token for AND.
 	hasSeenBetween bool
 
+	lastToken int
+
 	ast *AST
 }
 
@@ -81,7 +84,11 @@ func (l *Lexer) Error(e string) {
 	l.err = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
 }
 
-func (l *Lexer) Lex(lval *yySymType) int {
+func (l *Lexer) Lex(lval *yySymType) (token int) {
+	defer func() {
+		l.lastToken = token
+	}()
+
 	l.skipWhitespace()
 
 	if l.ch == 0 {
@@ -120,6 +127,10 @@ func (l *Lexer) Lex(lval *yySymType) int {
 				} else {
 					token = ANDOP
 				}
+			}
+
+			if l.lastToken == IS && token == NOT {
+				token = ISNOT
 			}
 
 			l.literal = literal

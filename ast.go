@@ -382,6 +382,8 @@ func (*BetweenExpr) iExpr() {}
 func (*CaseExpr) iExpr()    {}
 func (*Column) iExpr()      {}
 func (Exprs) iExpr()        {}
+func (*Subquery) iExpr()    {}
+func (*ExistsExpr) iExpr()  {}
 
 // NullValue represents null values.
 type NullValue struct{}
@@ -725,4 +727,14 @@ func (c Exprs) ToString() string {
 	}
 
 	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
+}
+
+// ExistsExpr represents a EXISTS expression.
+type ExistsExpr struct {
+	Subquery *Subquery
+}
+
+// ToString returns the string representation of the node.
+func (node *ExistsExpr) ToString() string {
+	return fmt.Sprintf("exists %s", node.Subquery.ToString())
 }

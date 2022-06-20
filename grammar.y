@@ -27,6 +27,7 @@ const MaxColumnNameLength = 64
   tableExpr TableExpr
   joinTableExpr *JoinTableExpr
   columnList ColumnList
+  subquery *Subquery
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -35,7 +36,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL
+%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -43,7 +44,7 @@ const MaxColumnNameLength = 64
 %left <empty> OR
 %left <empty> ANDOP
 %right <empty> NOT
-%left <empty> IS MATCH GLOB REGEXP LIKE BETWEEN IN ISNULL NOTNULL NE '=' 
+%left <empty> IS ISNOT MATCH GLOB REGEXP LIKE BETWEEN IN ISNULL NOTNULL NE '=' 
 %left <empty> '<' '>' LE GE INEQUALITY
 %right <empty> ESCAPE 
 %left '&' '|' LSHIFT RSHIFT
@@ -54,7 +55,7 @@ const MaxColumnNameLength = 64
 %right <empty> '~' UNARY
 
 %type <selectStmt> select_stmt
-%type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt
+%type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt exists_subquery
 %type <exprs> expr_list group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt
 %type <column> column_name as_column_opt col_alias
@@ -73,6 +74,7 @@ const MaxColumnNameLength = 64
 %type <tableExpr> table_expr
 %type <joinTableExpr> join_clause join_constraint
 %type <columnList> column_name_list
+%type <subquery> subquery
 
 %%
 start: 
@@ -471,7 +473,7 @@ expr:
   {  
     $$ = &IsExpr{Left: $1, Right: $3}
   }
-| expr IS NOT expr
+| expr IS ISNOT expr
   {  
     $$ = &IsExpr{Left: $1, Right: &NotExpr{Expr: $4}}
   }
@@ -501,7 +503,15 @@ expr:
   }
 | '(' expr_list ')'
   {
-      $$ = $2
+    $$ = $2
+  }
+| subquery 
+  {
+    $$ = $1 
+  }
+| exists_subquery
+  {
+    $$ = $1
   }
 | function_call_keyword
 ;
@@ -617,6 +627,17 @@ cmp_inequality_op:
   }
 ;
 
+// is_op:
+//   IS
+//   {
+//     $$ = IsStr
+//   }
+// | IS NOT
+//   {
+//     $$ = IsNotStr
+//   }
+// ;
+
 like_op:
     LIKE
     {
@@ -645,6 +666,24 @@ convert_type:
 | REAL { $$ = RealStr}
 | INTEGER { $$ = IntegerStr}
 | NUMERIC { $$ = NumericStr}
+;
+
+subquery:
+  '(' select_stmt ')'
+  {
+    $$ = &Subquery{Select: $2}
+  }
+;
+
+exists_subquery:
+  EXISTS subquery
+  {
+    $$ = &ExistsExpr{Subquery: $2}
+  }
+| NOT EXISTS subquery
+  {
+    $$ = &NotExpr{Expr: &ExistsExpr{Subquery: $3}}
+  }
 ;
 
 function_call_keyword:

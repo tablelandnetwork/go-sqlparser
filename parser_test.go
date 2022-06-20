@@ -2257,6 +2257,102 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "subquery",
+			stmt:     "SELECT * FROM t1 WHERE (SELECT 1 FROM t2)",
+			deparsed: "select * from t1 where (select 1 from t2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{Expr: &Table{Name: "t1"}},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &Subquery{
+							Select: &Select{
+								SelectColumnList: SelectColumnList{
+									&AliasedSelectColumn{
+										Expr: &Value{Type: IntValue, Value: []byte("1")},
+									},
+								},
+								From: TableExprList{
+									&AliasedTableExpr{Expr: &Table{Name: "t2"}},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "exists",
+			stmt:     "SELECT * FROM t1 WHERE EXISTS (SELECT 1 FROM t2)",
+			deparsed: "select * from t1 where exists (select 1 from t2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{Expr: &Table{Name: "t1"}},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &ExistsExpr{
+							&Subquery{
+								Select: &Select{
+									SelectColumnList: SelectColumnList{
+										&AliasedSelectColumn{
+											Expr: &Value{Type: IntValue, Value: []byte("1")},
+										},
+									},
+									From: TableExprList{
+										&AliasedTableExpr{Expr: &Table{Name: "t2"}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "not-exists",
+			stmt:     "SELECT * FROM t1 WHERE NOT EXISTS (SELECT 1 FROM t2)",
+			deparsed: "select * from t1 where not exists (select 1 from t2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&StarSelectColumn{},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{Expr: &Table{Name: "t1"}},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &NotExpr{
+							Expr: &ExistsExpr{
+								&Subquery{
+									Select: &Select{
+										SelectColumnList: SelectColumnList{
+											&AliasedSelectColumn{
+												Expr: &Value{Type: IntValue, Value: []byte("1")},
+											},
+										},
+										From: TableExprList{
+											&AliasedTableExpr{Expr: &Table{Name: "t2"}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
