@@ -28,6 +28,7 @@ const MaxColumnNameLength = 64
   joinTableExpr *JoinTableExpr
   columnList ColumnList
   subquery *Subquery
+  colTuple ColTuple
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -75,6 +76,7 @@ const MaxColumnNameLength = 64
 %type <joinTableExpr> join_clause join_constraint
 %type <columnList> column_name_list
 %type <subquery> subquery
+%type <colTuple> col_tuple
 
 %%
 start: 
@@ -505,6 +507,14 @@ expr:
   {
     $$ = $2
   }
+| expr IN col_tuple
+  {
+    $$ = &CmpExpr{Left: $1, Operator: InStr, Right: $3}
+  }
+| expr NOT IN col_tuple
+  {
+    $$ = &CmpExpr{Left: $1, Operator: NotInStr, Right: $4}
+  }
 | subquery 
   {
     $$ = $1 
@@ -627,17 +637,6 @@ cmp_inequality_op:
   }
 ;
 
-// is_op:
-//   IS
-//   {
-//     $$ = IsStr
-//   }
-// | IS NOT
-//   {
-//     $$ = IsNotStr
-//   }
-// ;
-
 like_op:
     LIKE
     {
@@ -666,6 +665,21 @@ convert_type:
 | REAL { $$ = RealStr}
 | INTEGER { $$ = IntegerStr}
 | NUMERIC { $$ = NumericStr}
+;
+
+col_tuple:
+  '(' ')'
+  {
+    $$ = Exprs{}
+  }
+| subquery
+  {
+    $$ = $1
+  }
+| '(' expr_list ')'
+  {
+    $$ = $2
+  }
 ;
 
 subquery:

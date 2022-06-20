@@ -2353,6 +2353,200 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "in empty",
+			stmt:     "SELECT a FROM t1 WHERE a IN ()",
+			deparsed: "select a from t1 where a in ()",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t1"},
+						},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: InStr,
+							Left:     &Column{Name: "a"},
+							Right:    Exprs{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "in multiple values",
+			stmt:     "SELECT a FROM t1 WHERE a IN (1, 2)",
+			deparsed: "select a from t1 where a in (1, 2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t1"},
+						},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: InStr,
+							Left:     &Column{Name: "a"},
+							Right: Exprs{
+								&Value{Type: IntValue, Value: []byte("1")},
+								&Value{Type: IntValue, Value: []byte("2")},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "in subselect",
+			stmt:     "SELECT a FROM t1 WHERE a IN (SELECT a FROM t2)",
+			deparsed: "select a from t1 where a in (select a from t2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t1"},
+						},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: InStr,
+							Left:     &Column{Name: "a"},
+							Right: &Subquery{
+								Select: &Select{
+									SelectColumnList: SelectColumnList{
+										&AliasedSelectColumn{
+											Expr: &Column{Name: "a"},
+										},
+									},
+									From: TableExprList{
+										&AliasedTableExpr{
+											Expr: &Table{Name: "t2"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "not in empty",
+			stmt:     "SELECT a FROM t1 WHERE a NOT IN ()",
+			deparsed: "select a from t1 where a not in ()",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t1"},
+						},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: NotInStr,
+							Left:     &Column{Name: "a"},
+							Right:    Exprs{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "not in multiple values",
+			stmt:     "SELECT a FROM t1 WHERE a NOT IN (1, 2)",
+			deparsed: "select a from t1 where a not in (1, 2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t1"},
+						},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: NotInStr,
+							Left:     &Column{Name: "a"},
+							Right: Exprs{
+								&Value{Type: IntValue, Value: []byte("1")},
+								&Value{Type: IntValue, Value: []byte("2")},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "not in subselect",
+			stmt:     "SELECT a FROM t1 WHERE a NOT IN (SELECT a FROM t2)",
+			deparsed: "select a from t1 where a not in (select a from t2)",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "a"},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t1"},
+						},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: NotInStr,
+							Left:     &Column{Name: "a"},
+							Right: &Subquery{
+								Select: &Select{
+									SelectColumnList: SelectColumnList{
+										&AliasedSelectColumn{
+											Expr: &Column{Name: "a"},
+										},
+									},
+									From: TableExprList{
+										&AliasedTableExpr{
+											Expr: &Table{Name: "t2"},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

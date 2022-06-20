@@ -738,3 +738,13 @@ type ExistsExpr struct {
 func (node *ExistsExpr) ToString() string {
 	return fmt.Sprintf("exists %s", node.Subquery.ToString())
 }
+
+// ColTuple represents a list of column values for IN operator.
+// It can be ValTuple or Subquery.
+type ColTuple interface {
+	iColTuple()
+	Expr
+}
+
+func (Exprs) iColTuple()     {}
+func (*Subquery) iColTuple() {}
