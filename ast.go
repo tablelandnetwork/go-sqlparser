@@ -35,7 +35,8 @@ type Statement interface {
 	Node
 }
 
-func (*Select) iStatement() {}
+func (*Select) iStatement()      {}
+func (*CreateTable) iStatement() {}
 
 // SelectStatement any SELECT statement.
 type SelectStatement interface {
@@ -791,4 +792,152 @@ func (node Identifier) String() string {
 // IsEmpty returns if the identifier is empty.
 func (node Identifier) IsEmpty() bool {
 	return node == ""
+}
+
+// CreateTable represents a CREATE TABLE statement.
+type CreateTable struct {
+	Name        *Table
+	Columns     []*ColumnDef
+	Constraints []*TableConstraint
+
+	// This is the only TableOption supported in the AST.
+	// The grammar cannot parse this option.
+	// It is used to toggle the strict mode directiy in the AST.
+	StrictMode bool
+}
+
+// String returns the string representation of the node.
+func (node *CreateTable) String() string {
+	columns := []string{}
+	for _, column := range node.Columns {
+		columns = append(columns, column.String())
+	}
+	column := strings.Join(columns, ", ")
+	if len(node.Constraints) > 0 {
+		constraints := []string{}
+		for _, constraint := range node.Constraints {
+			constraints = append(constraints, constraint.String())
+		}
+		column += "," + strings.Join(constraints, ",")
+	}
+
+	if node.StrictMode {
+		return fmt.Sprintf("CREATE TABLE %s (%s) strict", node.Name.String(), column)
+	} else {
+		return fmt.Sprintf("CREATE TABLE %s (%s)", node.Name.String(), column)
+	}
+}
+
+// ColumnDef represents the column definition of a CREATE TABLE statement.
+type ColumnDef struct {
+	Name        *Column
+	Type        string
+	Constraints []ColumnConstraint
+}
+
+// String returns the string representation of the node.
+func (node *ColumnDef) String() string {
+	constraint := ""
+	if len(node.Constraints) > 0 {
+		constraints := []string{}
+		for _, constraint := range node.Constraints {
+			constraints = append(constraints, constraint.String())
+		}
+		constraint = " " + strings.Join(constraints, " ")
+	}
+	return fmt.Sprintf("%s %s%s", node.Name, node.Type, constraint)
+}
+
+// Types for ColumnDef type.
+const (
+	TypeIntStr     = "INT"
+	TypeIntegerStr = "INTEGER"
+	TypeRealStr    = "REAL"
+	TypeTextStr    = "TEXT"
+	TypeBlobStr    = "BLOB"
+	TypeAnyStr     = "ANY"
+)
+
+// ColumnConstraint is used for parsing column constraint info from SQL.
+type ColumnConstraint interface {
+	iColumnConstraint()
+	Node
+}
+
+func (*ColumnConstraintPrimaryKey) iColumnConstraint() {}
+func (*ColumnConstraintNotNull) iColumnConstraint()    {}
+
+// func (*ColumnConstraintNotNull) iColumnConstraint() {}
+// func (*ColumnConstraintDefaultValue) iColumnConstraint() {}
+// func (*ColumnConstraintUniq) iColumnConstraint() {}
+// func (*ColumnConstraintNull) iColumnConstraint() {}
+// func (*ColumnConstraintGenerated) iColumnConstraint() {}
+
+type ColumnConstraintPrimaryKey struct {
+	Order string
+	//ConflictClause *ConflictClause
+}
+
+// String returns the string representation of the node.
+func (node *ColumnConstraintPrimaryKey) String() string {
+	if node.Order == ColumnConstraintPrimaryKeyOrderEmpty {
+		return "PRIMARY KEY"
+	}
+	return fmt.Sprintf("PRIMARY KEY %s", node.Order)
+}
+
+const (
+	ColumnConstraintPrimaryKeyOrderEmpty = ""
+	ColumnConstraintPrimaryKeyOrderAsc   = "ASC"
+	ColumnConstraintPrimaryKeyOrderDesc  = "DESC"
+)
+
+type ColumnConstraintNotNull struct {
+	//ConflictClause *ConflictClause
+}
+
+// String returns the string representation of the node.
+func (node *ColumnConstraintNotNull) String() string {
+	return "NOT NULL"
+}
+
+// TableConstraint is constraint for table definition.
+type TableConstraint struct {
+	Type TableConstraintType
+	Name string
+	// Used for PRIMARY KEY, UNIQUE, ......
+	Keys []Identifier
+}
+
+func (node TableConstraint) String() string {
+	keys := []string{}
+	for _, key := range node.Keys {
+		keys = append(keys, fmt.Sprintf("`%v`", key))
+	}
+	name := ""
+	if node.Name != "" {
+		name = fmt.Sprintf("`%s`", node.Name)
+	}
+	return fmt.Sprintf("%s %s (%s)", node.Type.String(), name, strings.Join(keys, ", "))
+}
+
+type TableConstraintType int
+
+const (
+	TableConstraintNoTableConstraint TableConstraintType = iota
+	TableConstraintPrimaryKey
+	TableConstraintUniq
+	TableConstraintCheck
+)
+
+func (t TableConstraintType) String() string {
+	switch t {
+	case TableConstraintPrimaryKey:
+		return "PRIMARY KEY"
+	case TableConstraintUniq:
+		return "UNIQUE"
+	case TableConstraintCheck:
+		return "CHECK"
+	}
+	return ""
 }

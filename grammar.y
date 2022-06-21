@@ -31,15 +31,21 @@ const MaxColumnNameLength = 64
   colTuple ColTuple
   statement Statement
   identifier Identifier
+  createTableStmt *CreateTable
+  columnDefList []*ColumnDef
+  columnDef *ColumnDef
+  columnConstraint ColumnConstraint
+  columnConstraints []ColumnConstraint
 }
 
-%token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
+%token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
 %token ERROR 
 %token <empty> TRUE FALSE NULL AND
 %token <empty> '(' ',' ')' '.' ';'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
+%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -59,9 +65,10 @@ const MaxColumnNameLength = 64
 
 %type <statement> stmt
 %type <selectStmt> select_stmt
+%type <createTableStmt> create_table_stmt
 %type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery
 %type <exprs> expr_list expr_list_opt group_by_opt
-%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt
+%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order
 %type <column> column_name 
 %type <identifier> as_column_opt col_alias as_table_opt table_alias
 %type <SelectColumn> select_column
@@ -82,6 +89,10 @@ const MaxColumnNameLength = 64
 %type <subquery> subquery
 %type <colTuple> col_tuple
 %type <bool> distinct_function_opt
+%type <columnDefList> column_def_list
+%type <columnDef> column_def
+%type <columnConstraint> column_constraint
+%type <columnConstraints> column_constraints column_constraints_opt
 
 %%
 start: 
@@ -90,6 +101,10 @@ start:
 
 stmt:
   select_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+| create_table_stmt semicolon_opt
   {
     $$ = $1
   }
@@ -562,7 +577,7 @@ literal_value:
   {
     $$ = &Value{Type: FloatValue, Value: $1}
   }
-| BLOB
+| BLOBVAL
   {
     $$ = &Value{Type: BlobValue, Value: $1}
   }
@@ -833,6 +848,86 @@ else_expr_opt:
   {
     $$ = $2
   }
+;
 
+create_table_stmt:
+  CREATE TABLE table_name '(' column_def_list ')'
+  {
+    $$ = &CreateTable{Name: $3, Columns: $5}
+  }
+;
+
+column_def_list:
+  column_def
+  {
+    $$ = []*ColumnDef{$1}
+  }
+| column_def_list ',' column_def
+  {
+    $$ = append($1, $3)
+  }
+;
+
+column_def:
+  column_name type_name column_constraints_opt
+  {
+    $$ = &ColumnDef{Name: $1, Type: $2, Constraints: $3}
+  }
+;
+
+type_name:
+  INT { $$ = TypeIntStr}
+| INTEGER { $$ = TypeIntegerStr}
+| REAL { $$ = TypeRealStr}
+| TEXT { $$ = TypeTextStr}
+| BLOB { $$ = TypeBlobStr}
+| ANY { $$ = TypeAnyStr}
+;
+
+column_constraints_opt:
+  {
+    $$ = []ColumnConstraint{}
+  }
+| column_constraints
+  {
+    $$ = $1
+  }
+;
+
+column_constraints:
+  column_constraint
+  {
+    $$ = []ColumnConstraint{$1}
+  }
+| column_constraints column_constraint
+  {
+    $$ = append($1, $2)
+  }
+;
+
+column_constraint:
+  PRIMARY KEY primary_key_order
+  {
+    $$ = &ColumnConstraintPrimaryKey{Order: $3}
+  }
+|  NOT NULL
+  {
+    $$ = &ColumnConstraintNotNull{}
+  }
+;
+
+primary_key_order:
+  {
+    $$ = ColumnConstraintPrimaryKeyOrderEmpty
+  }
+|  ASC
+  {
+    $$ = ColumnConstraintPrimaryKeyOrderAsc
+  }
+| DESC
+  {
+    $$ = ColumnConstraintPrimaryKeyOrderDesc
+  }
+;
 %%
 

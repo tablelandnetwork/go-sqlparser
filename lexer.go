@@ -56,6 +56,13 @@ var keywords = map[string]int{
 	"USING":    USING,
 	"EXISTS":   EXISTS,
 	"FILTER":   FILTER,
+	"BLOB":     BLOB,
+	"INT":      INT,
+	"ANY":      ANY,
+	"CREATE":   CREATE,
+	"TABLE":    TABLE,
+	"PRIMARY":  PRIMARY,
+	"KEY":      KEY,
 }
 
 const EOF = 0
@@ -310,7 +317,7 @@ func (l *Lexer) readBlob() (int, []byte) {
 
 	if l.ch == '\'' {
 		l.readByte()
-		return BLOB, buf.Bytes()
+		return BLOBVAL, buf.Bytes()
 	}
 
 	return ERROR, buf.Bytes()
