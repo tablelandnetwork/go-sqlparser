@@ -1,6 +1,7 @@
 package sqlparser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -1682,10 +1683,11 @@ func TestSelectStatement(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name        string
-		stmt        string
-		deparsed    string
-		expectedAST *AST
+		name           string
+		stmt           string
+		deparsed       string
+		expectedAST    *AST
+		expectedErrMsg string
 	}
 
 	tests := []testCase{
@@ -2547,6 +2549,173 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "function call",
+			stmt:     "SELECT count(c1) FROM table",
+			deparsed: "select count(c1) from table",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Name: &Column{Name: "count"},
+								Args: Exprs{
+									&Column{Name: "c1"},
+								},
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "function call filter",
+			stmt:     "SELECT max(ID) FILTER(WHERE ID > 2) FROM table",
+			deparsed: "select max(ID) filter(where ID > 2) from table",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Name: &Column{Name: "max"},
+								Args: Exprs{
+									&Column{Name: "ID"},
+								},
+								Filter: &Where{
+									Type: WhereStr,
+									Expr: &CmpExpr{
+										Operator: GreaterThanStr,
+										Left:     &Column{Name: "ID"},
+										Right:    &Value{Type: IntValue, Value: []byte("2")},
+									},
+								},
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "function call",
+			stmt:     "SELECT count(c1) FROM table",
+			deparsed: "select count(c1) from table",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Name: &Column{Name: "count"},
+								Args: Exprs{
+									&Column{Name: "c1"},
+								},
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "function call star",
+			stmt:     "SELECT count(*) FROM table",
+			deparsed: "select count(*) from table",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Name: &Column{Name: "count"},
+								Args: nil,
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "function does not exist star",
+			stmt:           "SELECT foo(*) FROM table",
+			deparsed:       "select foo(*) from table",
+			expectedAST:    nil,
+			expectedErrMsg: "function 'foo' does not exist",
+		},
+		{
+			name:     "function call distinct",
+			stmt:     "SELECT count(distinct c1) FROM table",
+			deparsed: "select count(distinct c1) from table",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Distinct: true,
+								Name:     &Column{Name: "count"},
+								Args: Exprs{
+									&Column{Name: "c1"},
+								},
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:           "function does not exist",
+			stmt:           "SELECT foo(ID) FILTER(WHERE ID > 2) FROM table",
+			deparsed:       "select foo(ID) filter(where ID > 2) from table",
+			expectedAST:    nil,
+			expectedErrMsg: "function 'foo' does not exist",
+		},
+		{
+			name:     "function call like with escape",
+			stmt:     "SELECT like(a, b, c) FROM table",
+			deparsed: "select like(a, b, c) from table",
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Name: &Column{Name: "like"},
+								Args: Exprs{
+									&Column{Name: "a"},
+									&Column{Name: "b"},
+									&Column{Name: "c"},
+								},
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "table"},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -2554,6 +2723,78 @@ func TestSelectStatement(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
+				if tc.expectedErrMsg == "" {
+					require.NoError(t, err)
+					require.Equal(t, tc.expectedAST, ast)
+					require.Equal(t, tc.deparsed, ast.ToString())
+				} else {
+					require.Contains(t, err.Error(), tc.expectedErrMsg)
+				}
+			}
+		}(tc))
+	}
+}
+
+func TestAllowedFunctions(t *testing.T) {
+	t.Parallel()
+
+	genFunctionCallAndArgs := func(fname string) (string, Exprs) {
+		switch fname {
+		case "like":
+			return "like(a, b)", Exprs{
+				&Column{Name: "a"},
+				&Column{Name: "b"},
+			}
+		case "glob":
+			return "glob(a, b)", Exprs{
+				&Column{Name: "a"},
+				&Column{Name: "b"},
+			}
+		default:
+			return fmt.Sprintf("%s(*)", fname), nil
+		}
+	}
+
+	type testCase struct {
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+	}
+
+	tests := []testCase{}
+	for allowedFunction, _ := range AllowedFunctions {
+		functionCall, args := genFunctionCallAndArgs(allowedFunction)
+		tests = append(tests, testCase{
+			name:     allowedFunction,
+			stmt:     fmt.Sprintf("select %s from t", functionCall),
+			deparsed: fmt.Sprintf("select %s from t", functionCall),
+			expectedAST: &AST{
+				Root: &Select{
+					SelectColumnList: SelectColumnList{
+						&AliasedSelectColumn{
+							Expr: &FuncExpr{
+								Name: &Column{Name: allowedFunction},
+								Args: args,
+							},
+						},
+					},
+					From: TableExprList{
+						&AliasedTableExpr{
+							Expr: &Table{Name: "t"},
+						},
+					},
+				},
+			},
+		})
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.ToString())

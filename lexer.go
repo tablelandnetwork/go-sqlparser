@@ -55,6 +55,7 @@ var keywords = map[string]int{
 	"ON":       ON,
 	"USING":    USING,
 	"EXISTS":   EXISTS,
+	"FILTER":   FILTER,
 }
 
 const EOF = 0
@@ -81,7 +82,10 @@ type Lexer struct {
 }
 
 func (l *Lexer) Error(e string) {
-	l.err = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
+	// this means the err was not set by a specific error type in the parser
+	if l.err == nil {
+		l.err = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
+	}
 }
 
 func (l *Lexer) Lex(lval *yySymType) (token int) {

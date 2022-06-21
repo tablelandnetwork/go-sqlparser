@@ -37,7 +37,7 @@ const MaxColumnNameLength = 64
 %token <empty> '(' ',' ')' '.'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS
+%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -56,14 +56,14 @@ const MaxColumnNameLength = 64
 %right <empty> '~' UNARY
 
 %type <selectStmt> select_stmt
-%type <expr> expr literal_value function_call_keyword expr_opt else_expr_opt exists_subquery
-%type <exprs> expr_list group_by_opt
+%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery
+%type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt
 %type <column> column_name as_column_opt col_alias
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
 %type <table> table_name as_table_opt table_alias
-%type <where> where_opt having_opt
+%type <where> where_opt having_opt filter_opt
 %type <convertType> convert_type
 %type <when> when 
 %type <whens> when_expr_list
@@ -77,6 +77,7 @@ const MaxColumnNameLength = 64
 %type <columnList> column_name_list
 %type <subquery> subquery
 %type <colTuple> col_tuple
+%type <bool> distinct_function_opt
 
 %%
 start: 
@@ -523,7 +524,12 @@ expr:
   {
     $$ = $1
   }
+| CAST '(' expr AS convert_type ')'
+  {
+    $$ = &ConvertExpr{Expr: $3, Type: $5}
+  }
 | function_call_keyword
+| function_call_generic
 ;
 
 literal_value:
@@ -701,9 +707,46 @@ exists_subquery:
 ;
 
 function_call_keyword:
-  CAST '(' expr AS convert_type ')'
+  GLOB '(' expr ',' expr ')'
   {
-    $$ = &ConvertExpr{Expr: $3, Type: $5}
+    $$ = &FuncExpr{Name: &Column{Name: "glob"}, Args: Exprs{$3, $5}} 
+  }
+| LIKE '(' expr ',' expr ')'
+  {
+    $$ = &FuncExpr{Name: &Column{Name: "like"}, Args: Exprs{$3, $5}} 
+  }
+| LIKE '(' expr ',' expr ',' expr ')'
+  {
+    $$ = &FuncExpr{Name: &Column{Name: "like"}, Args: Exprs{$3, $5, $7}} 
+  }
+;
+
+function_call_generic:
+  IDENTIFIER '(' distinct_function_opt expr_list_opt ')' filter_opt
+  {
+    if _, ok := AllowedFunctions[string($1)]; !ok {
+      yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist,", string($1)))
+      return 1
+    }
+    $$ = &FuncExpr{Name: &Column{Name: string($1)}, Distinct: $3, Args: $4, Filter: $6}
+  }
+| IDENTIFIER '(' '*' ')' filter_opt
+  {
+    if _, ok := AllowedFunctions[string($1)]; !ok {
+      yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist", string($1)))
+      return 1
+    }
+    $$ = &FuncExpr{Name: &Column{Name: string($1)}, Distinct: false, Args: nil, Filter: $5}
+  }
+;
+
+distinct_function_opt:
+  {
+    $$ = false
+  }
+| DISTINCT 
+  {
+    $$ = true
   }
 ;
 
@@ -716,6 +759,27 @@ expr_list:
   {
     $$ = append($1, $3)
   }
+;
+
+expr_list_opt:
+  {
+    $$ = nil
+  }
+| expr_list
+  {
+    $$ = $1
+  }
+;
+
+filter_opt:
+  {
+    $$ = nil
+  }
+| FILTER '(' WHERE expr ')'
+  {
+    $$ = &Where{Type: WhereStr, Expr: $4}
+  }
+;
 
 expr_opt:
   {
@@ -725,7 +789,7 @@ expr_opt:
   {
     $$ = $1
   }
-  ;
+;
 
 when:
   WHEN expr THEN expr

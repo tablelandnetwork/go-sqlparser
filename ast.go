@@ -384,6 +384,7 @@ func (*Column) iExpr()      {}
 func (Exprs) iExpr()        {}
 func (*Subquery) iExpr()    {}
 func (*ExistsExpr) iExpr()  {}
+func (*FuncExpr) iExpr()    {}
 
 // NullValue represents null values.
 type NullValue struct{}
@@ -748,3 +749,33 @@ type ColTuple interface {
 
 func (Exprs) iColTuple()     {}
 func (*Subquery) iColTuple() {}
+
+// FuncExpr represents a function call.
+type FuncExpr struct {
+	Name     *Column
+	Distinct bool
+	Args     Exprs
+	Filter   *Where
+}
+
+// ToString returns the string representation of the node.
+func (node *FuncExpr) ToString() string {
+	var distinct string
+	if node.Distinct {
+		distinct = "distinct "
+	}
+
+	var filter string
+	if node.Filter != nil {
+		filter = fmt.Sprintf(" filter(%s)", node.Filter.ToString()[1:])
+	}
+
+	var argsStr string
+	if node.Args != nil {
+		argsStr = node.Args.ToString()
+	} else {
+		argsStr = "(*)"
+	}
+
+	return fmt.Sprintf("%s%s%s", node.Name.ToString(), argsStr[:1]+distinct+argsStr[1:], filter)
+}
