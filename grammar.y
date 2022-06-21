@@ -30,6 +30,7 @@ const MaxColumnNameLength = 64
   subquery *Subquery
   colTuple ColTuple
   statement Statement
+  identifier Identifier
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
@@ -61,10 +62,11 @@ const MaxColumnNameLength = 64
 %type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt
-%type <column> column_name as_column_opt col_alias
+%type <column> column_name 
+%type <identifier> as_column_opt col_alias as_table_opt table_alias
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
-%type <table> table_name as_table_opt table_alias
+%type <table> table_name
 %type <where> where_opt having_opt filter_opt
 %type <convertType> convert_type
 %type <when> when 
@@ -154,7 +156,7 @@ select_column:
 
 as_column_opt:
   {
-    $$ = nil
+    $$ = Identifier("")
   }
 | col_alias
   {
@@ -168,11 +170,11 @@ as_column_opt:
 col_alias:
   IDENTIFIER
   {
-    $$ = &Column{Name: string($1)}
+    $$ = Identifier(string($1))
   }
 | STRING
   {
-    $$ = &Column{Name: string($1)}
+    $$ = Identifier(string($1[1:len($1)-1]))
   }
 ;
 
@@ -219,7 +221,7 @@ table_expr:
 
 as_table_opt:
   {
-    $$ = nil
+    $$ = Identifier("")
   }
 | table_alias
   {
@@ -233,11 +235,11 @@ as_table_opt:
 table_alias:
   IDENTIFIER
   {
-    $$ = &Table{Name: string($1)}
+    $$ = Identifier(string($1))
   }
 | STRING
   {
-    $$ = &Table{Name: string($1)}
+    $$ = Identifier(string($1))
   }
 ;
 
@@ -387,7 +389,7 @@ limit_opt:
 table_name:
   IDENTIFIER
   { 
-    $$ = &Table{Name : string($1)} 
+    $$ = &Table{Name : Identifier(string($1))} 
   }
 ;
 
@@ -589,7 +591,7 @@ column_name:
       yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
       return 1
     }
-    $$ = &Column{Name : string($1)} 
+    $$ = &Column{Name : Identifier(string($1))} 
   }
 ;
 
@@ -724,15 +726,15 @@ exists_subquery:
 function_call_keyword:
   GLOB '(' expr ',' expr ')'
   {
-    $$ = &FuncExpr{Name: &Column{Name: "glob"}, Args: Exprs{$3, $5}} 
+    $$ = &FuncExpr{Name: Identifier("glob"), Args: Exprs{$3, $5}} 
   }
 | LIKE '(' expr ',' expr ')'
   {
-    $$ = &FuncExpr{Name: &Column{Name: "like"}, Args: Exprs{$3, $5}} 
+    $$ = &FuncExpr{Name: Identifier("like"), Args: Exprs{$3, $5}} 
   }
 | LIKE '(' expr ',' expr ',' expr ')'
   {
-    $$ = &FuncExpr{Name: &Column{Name: "like"}, Args: Exprs{$3, $5, $7}} 
+    $$ = &FuncExpr{Name: Identifier("like"), Args: Exprs{$3, $5, $7}} 
   }
 ;
 
@@ -743,7 +745,7 @@ function_call_generic:
       yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist,", string($1)))
       return 1
     }
-    $$ = &FuncExpr{Name: &Column{Name: string($1)}, Distinct: $3, Args: $4, Filter: $6}
+    $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: $3, Args: $4, Filter: $6}
   }
 | IDENTIFIER '(' '*' ')' filter_opt
   {
@@ -751,7 +753,7 @@ function_call_generic:
       yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist", string($1)))
       return 1
     }
-    $$ = &FuncExpr{Name: &Column{Name: string($1)}, Distinct: false, Args: nil, Filter: $5}
+    $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: false, Args: nil, Filter: $5}
   }
 ;
 

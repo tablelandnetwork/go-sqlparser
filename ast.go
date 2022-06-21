@@ -60,7 +60,7 @@ type Select struct {
 	OrderBy          OrderBy
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Select) String() string {
 	return fmt.Sprintf(
 		"select %s%s from %s%s%s%s%s%s",
@@ -84,7 +84,7 @@ const (
 // SelectColumnList represents a list of columns of a SELECT.
 type SelectColumnList []SelectColumn
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node SelectColumnList) String() string {
 	var colsStr []string
 	for _, col := range node {
@@ -108,7 +108,7 @@ type StarSelectColumn struct {
 	TableRef *Table
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *StarSelectColumn) String() string {
 	if node.TableRef != nil {
 		return fmt.Sprintf("%s.*", node.TableRef.String())
@@ -119,12 +119,12 @@ func (node *StarSelectColumn) String() string {
 // AliasedSelectColumn defines an aliased SELECT column.
 type AliasedSelectColumn struct {
 	Expr Expr
-	As   *Column
+	As   Identifier
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *AliasedSelectColumn) String() string {
-	if node.As != nil {
+	if !node.As.IsEmpty() {
 		return fmt.Sprintf("%s as %s", node.Expr.String(), node.As.String())
 	}
 
@@ -144,7 +144,7 @@ func (*JoinTableExpr) iTableExpr()    {}
 // TableExprList represents a list of table expressions.
 type TableExprList []TableExpr
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node TableExprList) String() string {
 	if len(node) == 0 {
 		return ""
@@ -162,12 +162,12 @@ func (node TableExprList) String() string {
 // If As is empty, no alias was used.
 type AliasedTableExpr struct {
 	Expr SimpleTableExpr
-	As   *Table
+	As   Identifier
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *AliasedTableExpr) String() string {
-	if node.As == nil {
+	if node.As.IsEmpty() {
 		return node.Expr.String()
 	}
 
@@ -188,7 +188,7 @@ type Subquery struct {
 	Select SelectStatement
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Subquery) String() string {
 	return fmt.Sprintf("(%s)", node.Select.String())
 }
@@ -198,7 +198,7 @@ type ParenTableExpr struct {
 	TableExprList TableExprList
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *ParenTableExpr) String() string {
 	return fmt.Sprintf("(%v)", node.TableExprList.String())
 }
@@ -223,7 +223,7 @@ const (
 	NaturalRightJoinStr = "natural right join"
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *JoinTableExpr) String() string {
 	if node.On != nil {
 		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.On.String())
@@ -257,7 +257,7 @@ func NewWhere(typ string, expr Expr) *Where {
 	return &Where{Type: typ, Expr: expr}
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Where) String() string {
 	if node == nil || node.Expr == nil {
 		return ""
@@ -268,7 +268,7 @@ func (node *Where) String() string {
 // GroupBy represents a GROUP BY clause.
 type GroupBy Exprs
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node GroupBy) String() string {
 	if len(node) == 0 {
 		return ""
@@ -284,7 +284,7 @@ func (node GroupBy) String() string {
 // OrderBy represents an ORDER BY clause.
 type OrderBy []*OrderingTerm
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node OrderBy) String() string {
 	if len(node) == 0 {
 		return ""
@@ -320,7 +320,7 @@ const (
 	NullsLast
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *OrderingTerm) String() string {
 	if node, ok := node.Expr.(*NullValue); ok {
 		return node.String()
@@ -345,7 +345,7 @@ type Limit struct {
 	Offset Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Limit) String() string {
 	if node == nil {
 		return ""
@@ -389,7 +389,7 @@ func (*FuncExpr) iExpr()    {}
 // NullValue represents null values.
 type NullValue struct{}
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *NullValue) String() string {
 	return "null"
 }
@@ -397,7 +397,7 @@ func (node *NullValue) String() string {
 // BoolValue represents booleans.
 type BoolValue bool
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node BoolValue) String() string {
 	if node {
 		return "true"
@@ -424,7 +424,7 @@ const (
 	BlobValue
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Value) String() string {
 	var value string
 	switch node.Type {
@@ -452,7 +452,7 @@ const (
 	TildaStr  = "~"
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *UnaryExpr) String() string {
 	if expr, ok := node.Expr.(*UnaryExpr); ok {
 		return fmt.Sprintf("%s %s", node.Operator, expr.String())
@@ -482,7 +482,7 @@ const (
 	JSONUnquoteExtractOp = "->>"
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *BinaryExpr) String() string {
 	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
 }
@@ -514,7 +514,7 @@ const (
 	NotGlobStr      = "not glob"
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *CmpExpr) String() string {
 	if node.Escape != nil {
 		return fmt.Sprintf("%s %s %s escape %s", node.Left.String(), node.Operator, node.Right.String(), node.Escape.String())
@@ -528,7 +528,7 @@ type AndExpr struct {
 	Left, Right Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *AndExpr) String() string {
 	if node == nil {
 		return ""
@@ -541,7 +541,7 @@ type OrExpr struct {
 	Left, Right Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *OrExpr) String() string {
 	if node == nil {
 		return ""
@@ -554,7 +554,7 @@ type NotExpr struct {
 	Expr Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *NotExpr) String() string {
 	if node == nil {
 		return ""
@@ -567,7 +567,7 @@ type IsExpr struct {
 	Left, Right Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *IsExpr) String() string {
 	return fmt.Sprintf("%s is %s", node.Left.String(), node.Right.String())
 }
@@ -577,7 +577,7 @@ type IsNullExpr struct {
 	Expr Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *IsNullExpr) String() string {
 	return fmt.Sprintf("%s isnull", node.Expr.String())
 }
@@ -587,7 +587,7 @@ type NotNullExpr struct {
 	Expr Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *NotNullExpr) String() string {
 	return fmt.Sprintf("%s notnull", node.Expr.String())
 }
@@ -598,7 +598,7 @@ type CollateExpr struct {
 	CollationName string
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *CollateExpr) String() string {
 	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName)
 }
@@ -620,7 +620,7 @@ const (
 	IntegerStr = ConvertType("integer")
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *ConvertExpr) String() string {
 	return fmt.Sprintf("cast (%s as %s)", node.Expr.String(), string(node.Type))
 }
@@ -638,7 +638,7 @@ const (
 	NotBetweenStr = "not between"
 )
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *BetweenExpr) String() string {
 	return fmt.Sprintf("%s %s %s and %s", node.Left.String(), node.Operator, node.From.String(), node.To.String())
 }
@@ -649,7 +649,7 @@ type When struct {
 	Value     Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *When) String() string {
 	return fmt.Sprintf("when %v then %v", node.Condition.String(), node.Value.String())
 }
@@ -661,7 +661,7 @@ type CaseExpr struct {
 	Else  Expr
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *CaseExpr) String() string {
 	var b strings.Builder
 	b.WriteString("case ")
@@ -682,32 +682,32 @@ func (node *CaseExpr) String() string {
 
 // Table represents a table.
 type Table struct {
-	Name string
+	Name Identifier
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Table) String() string {
-	return node.Name
+	return node.Name.String()
 }
 
 // Column represents a column.
 type Column struct {
-	Name     string
+	Name     Identifier
 	TableRef *Table
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *Column) String() string {
 	if node.TableRef != nil {
 		return fmt.Sprintf("%s.%s", node.TableRef.String(), node.Name)
 	}
-	return node.Name
+	return node.Name.String()
 }
 
 // ColumnList is a list of columns.
 type ColumnList []*Column
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node ColumnList) String() string {
 	var strs []string
 	for _, col := range node {
@@ -720,7 +720,7 @@ func (node ColumnList) String() string {
 // Exprs represents a list of expressions.
 type Exprs []Expr
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node Exprs) String() string {
 	var strs []string
 	for _, expr := range node {
@@ -735,7 +735,7 @@ type ExistsExpr struct {
 	Subquery *Subquery
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *ExistsExpr) String() string {
 	return fmt.Sprintf("exists %s", node.Subquery.String())
 }
@@ -752,13 +752,13 @@ func (*Subquery) iColTuple() {}
 
 // FuncExpr represents a function call.
 type FuncExpr struct {
-	Name     *Column
+	Name     Identifier
 	Distinct bool
 	Args     Exprs
 	Filter   *Where
 }
 
-// ToString returns the string representation of the node.
+// String returns the string representation of the node.
 func (node *FuncExpr) String() string {
 	var distinct string
 	if node.Distinct {
@@ -778,4 +778,17 @@ func (node *FuncExpr) String() string {
 	}
 
 	return fmt.Sprintf("%s%s%s", node.Name.String(), argsStr[:1]+distinct+argsStr[1:], filter)
+}
+
+// Identifier represents a Column, Table and Function name identifier.
+type Identifier string
+
+// String returns the string representation of the node.
+func (node Identifier) String() string {
+	return string(node)
+}
+
+// IsEmpty returns if the identifier is empty.
+func (node Identifier) IsEmpty() bool {
+	return node == ""
 }

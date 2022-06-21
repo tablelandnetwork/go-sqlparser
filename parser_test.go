@@ -1725,8 +1725,8 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{Expr: &Column{Name: "a"}},
 						&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "table"}}},
-						&AliasedSelectColumn{Expr: &Column{Name: "column"}, As: &Column{Name: "c1"}},
-						&AliasedSelectColumn{Expr: &Column{Name: "column2"}, As: &Column{Name: "c2"}},
+						&AliasedSelectColumn{Expr: &Column{Name: "column"}, As: "c1"},
+						&AliasedSelectColumn{Expr: &Column{Name: "column2"}, As: "c2"},
 						&StarSelectColumn{},
 					},
 					From: TableExprList{
@@ -2042,7 +2042,7 @@ func TestSelectStatement(t *testing.T) {
 					From: TableExprList{
 						&AliasedTableExpr{
 							Expr: &Table{Name: "table"},
-							As:   &Table{Name: "t"},
+							As:   "t",
 						},
 					},
 				},
@@ -2060,7 +2060,7 @@ func TestSelectStatement(t *testing.T) {
 					From: TableExprList{
 						&AliasedTableExpr{
 							Expr: &Table{Name: "table"},
-							As:   &Table{Name: "t"},
+							As:   "t",
 						},
 					},
 				},
@@ -2076,7 +2076,7 @@ func TestSelectStatement(t *testing.T) {
 						&StarSelectColumn{TableRef: &Table{Name: "a"}},
 						&AliasedSelectColumn{
 							Expr: &Column{Name: "column1", TableRef: &Table{Name: "b"}},
-							As:   &Column{Name: "c1"},
+							As:   "c1",
 						},
 					},
 					From: TableExprList{
@@ -2141,7 +2141,7 @@ func TestSelectStatement(t *testing.T) {
 									},
 								},
 							},
-							As: &Table{Name: "subquery"},
+							As: "subquery",
 						},
 					},
 				},
@@ -2170,7 +2170,7 @@ func TestSelectStatement(t *testing.T) {
 									},
 								},
 							},
-							As: &Table{Name: "subquery"},
+							As: "subquery",
 						},
 					},
 				},
@@ -2558,7 +2558,7 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
-								Name: &Column{Name: "count"},
+								Name: "count",
 								Args: Exprs{
 									&Column{Name: "c1"},
 								},
@@ -2582,7 +2582,7 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
-								Name: &Column{Name: "max"},
+								Name: "max",
 								Args: Exprs{
 									&Column{Name: "ID"},
 								},
@@ -2614,7 +2614,7 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
-								Name: &Column{Name: "count"},
+								Name: "count",
 								Args: Exprs{
 									&Column{Name: "c1"},
 								},
@@ -2638,7 +2638,7 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
-								Name: &Column{Name: "count"},
+								Name: "count",
 								Args: nil,
 							},
 						},
@@ -2668,7 +2668,7 @@ func TestSelectStatement(t *testing.T) {
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
 								Distinct: true,
-								Name:     &Column{Name: "count"},
+								Name:     "count",
 								Args: Exprs{
 									&Column{Name: "c1"},
 								},
@@ -2699,7 +2699,7 @@ func TestSelectStatement(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
-								Name: &Column{Name: "like"},
+								Name: "like",
 								Args: Exprs{
 									&Column{Name: "a"},
 									&Column{Name: "b"},
@@ -2774,7 +2774,7 @@ func TestAllowedFunctions(t *testing.T) {
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{
 							Expr: &FuncExpr{
-								Name: &Column{Name: allowedFunction},
+								Name: Identifier(allowedFunction),
 								Args: args,
 							},
 						},

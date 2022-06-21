@@ -32,6 +32,7 @@ type yySymType struct {
 	subquery         *Subquery
 	colTuple         ColTuple
 	statement        Statement
+	identifier       Identifier
 }
 
 const IDENTIFIER = 57346
@@ -358,18 +359,18 @@ var yyPact = [...]int16{
 var yyPgo = [...]uint8{
 	0, 245, 11, 0, 244, 243, 242, 241, 240, 237,
 	6, 236, 233, 230, 229, 228, 227, 226, 225, 2,
-	224, 43, 85, 223, 22, 4, 7, 221, 220, 3,
+	224, 43, 4, 7, 85, 223, 22, 221, 220, 3,
 	219, 9, 218, 217, 216, 214, 1, 213, 14, 212,
 	15, 13, 5, 211, 33, 10, 208, 207, 206,
 }
 
 var yyR1 = [...]int8{
-	0, 47, 1, 48, 48, 2, 18, 18, 18, 23,
-	23, 22, 22, 22, 20, 20, 20, 21, 21, 39,
-	39, 38, 38, 40, 40, 40, 40, 25, 25, 25,
-	26, 26, 41, 41, 42, 42, 42, 27, 27, 12,
+	0, 47, 1, 48, 48, 2, 18, 18, 18, 25,
+	25, 24, 24, 24, 20, 20, 20, 21, 21, 39,
+	39, 38, 38, 40, 40, 40, 40, 22, 22, 22,
+	23, 23, 41, 41, 42, 42, 42, 27, 27, 12,
 	12, 28, 28, 34, 34, 35, 35, 36, 17, 17,
-	17, 37, 37, 37, 33, 33, 33, 33, 24, 3,
+	17, 37, 37, 37, 33, 33, 33, 33, 26, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
@@ -403,28 +404,28 @@ var yyR2 = [...]int8{
 
 var yyChk = [...]int16{
 	-1000, -47, -1, -2, 32, -48, 19, -18, 46, 47,
-	-23, -22, 80, -3, -24, -4, -19, 79, 78, 87,
+	-25, -24, 80, -3, -26, -4, -19, 79, 78, 87,
 	27, 15, -44, -9, 25, -5, -6, 4, 5, 6,
 	8, 9, 7, 11, 12, 13, 48, 55, 59, 61,
 	-39, 16, 33, -20, 78, 79, 80, 81, 82, 74,
 	75, 76, 77, 83, 84, 85, -13, -14, -15, 54,
 	53, 56, 64, 65, 55, -16, 86, 63, -21, 26,
 	67, 66, 60, 59, 58, 68, 69, 70, 71, 61,
-	62, 4, 5, 18, -3, -24, -3, -3, -7, -3,
+	62, 4, 5, 18, -3, -26, -3, -3, -7, -3,
 	-10, -2, -3, 15, 15, -44, 15, 48, 15, 15,
-	-27, 34, -22, -38, -41, -40, -24, 15, 4, -3,
+	-27, 34, -24, -38, -41, -40, -26, 15, 4, -3,
 	-3, -3, -3, -3, -3, -3, -3, -3, -3, -3,
 	-3, -3, -3, -3, -3, -3, -3, 57, 13, 63,
 	60, 59, 58, 61, 62, -3, 4, -45, 15, -44,
 	-21, 80, -19, 4, 18, -32, -31, 28, 17, 16,
 	17, -3, -46, 80, 46, -44, -3, -3, -12, 35,
-	-3, 16, 50, 50, -25, -26, 26, 4, 5, -2,
+	-3, 16, 50, 50, -22, -23, 26, 4, 5, -2,
 	-38, -41, 73, -3, -45, 14, 17, -10, -8, -31,
 	30, -3, -3, 26, -11, -10, 17, 16, 16, -28,
-	37, 36, -40, -40, -40, -26, 17, 17, 17, -3,
+	37, 36, -40, -40, -40, -23, 17, 17, 17, -3,
 	-3, 17, 31, -3, 29, -30, 20, 24, 23, 21,
 	22, 17, -29, 49, -3, -3, -34, 40, -3, -10,
-	-42, 51, 52, -42, -25, -3, 17, -29, 15, 17,
+	-42, 51, 52, -42, -22, -3, 17, -29, 15, 17,
 	17, 16, -33, 38, 36, -3, 15, 34, -3, -3,
 	-35, -36, -3, -43, -19, -3, 17, 16, 39, 16,
 	-17, 41, 42, 17, 16, 17, -3, -3, -36, -37,
@@ -892,7 +893,7 @@ yydefault:
 	case 12:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.SelectColumn = &AliasedSelectColumn{Expr: yyDollar[1].expr, As: yyDollar[2].column}
+			yyVAL.SelectColumn = &AliasedSelectColumn{Expr: yyDollar[1].expr, As: yyDollar[2].identifier}
 		}
 	case 13:
 		yyDollar = yyS[yypt-3 : yypt+1]
@@ -902,27 +903,27 @@ yydefault:
 	case 14:
 		yyDollar = yyS[yypt-0 : yypt+1]
 		{
-			yyVAL.column = nil
+			yyVAL.identifier = Identifier("")
 		}
 	case 15:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.column = yyDollar[1].column
+			yyVAL.identifier = yyDollar[1].identifier
 		}
 	case 16:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.column = yyDollar[2].column
+			yyVAL.identifier = yyDollar[2].identifier
 		}
 	case 17:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.column = &Column{Name: string(yyDollar[1].bytes)}
+			yyVAL.identifier = Identifier(string(yyDollar[1].bytes))
 		}
 	case 18:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.column = &Column{Name: string(yyDollar[1].bytes)}
+			yyVAL.identifier = Identifier(string(yyDollar[1].bytes[1 : len(yyDollar[1].bytes)-1]))
 		}
 	case 19:
 		yyDollar = yyS[yypt-2 : yypt+1]
@@ -947,12 +948,12 @@ yydefault:
 	case 23:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.tableExpr = &AliasedTableExpr{Expr: yyDollar[1].table, As: yyDollar[2].table}
+			yyVAL.tableExpr = &AliasedTableExpr{Expr: yyDollar[1].table, As: yyDollar[2].identifier}
 		}
 	case 24:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			yyVAL.tableExpr = &AliasedTableExpr{Expr: &Subquery{Select: yyDollar[2].selectStmt}, As: yyDollar[4].table}
+			yyVAL.tableExpr = &AliasedTableExpr{Expr: &Subquery{Select: yyDollar[2].selectStmt}, As: yyDollar[4].identifier}
 		}
 	case 25:
 		yyDollar = yyS[yypt-3 : yypt+1]
@@ -967,27 +968,27 @@ yydefault:
 	case 27:
 		yyDollar = yyS[yypt-0 : yypt+1]
 		{
-			yyVAL.table = nil
+			yyVAL.identifier = Identifier("")
 		}
 	case 28:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.table = yyDollar[1].table
+			yyVAL.identifier = yyDollar[1].identifier
 		}
 	case 29:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
-			yyVAL.table = yyDollar[2].table
+			yyVAL.identifier = yyDollar[2].identifier
 		}
 	case 30:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.table = &Table{Name: string(yyDollar[1].bytes)}
+			yyVAL.identifier = Identifier(string(yyDollar[1].bytes))
 		}
 	case 31:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.table = &Table{Name: string(yyDollar[1].bytes)}
+			yyVAL.identifier = Identifier(string(yyDollar[1].bytes))
 		}
 	case 32:
 		yyDollar = yyS[yypt-4 : yypt+1]
@@ -1136,7 +1137,7 @@ yydefault:
 	case 58:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.table = &Table{Name: string(yyDollar[1].bytes)}
+			yyVAL.table = &Table{Name: Identifier(string(yyDollar[1].bytes))}
 		}
 	case 59:
 		yyDollar = yyS[yypt-1 : yypt+1]
@@ -1380,7 +1381,7 @@ yydefault:
 				yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
 				return 1
 			}
-			yyVAL.column = &Column{Name: string(yyDollar[1].bytes)}
+			yyVAL.column = &Column{Name: Identifier(string(yyDollar[1].bytes))}
 		}
 	case 108:
 		yyDollar = yyS[yypt-1 : yypt+1]
@@ -1530,17 +1531,17 @@ yydefault:
 	case 137:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Name: &Column{Name: "glob"}, Args: Exprs{yyDollar[3].expr, yyDollar[5].expr}}
+			yyVAL.expr = &FuncExpr{Name: Identifier("glob"), Args: Exprs{yyDollar[3].expr, yyDollar[5].expr}}
 		}
 	case 138:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Name: &Column{Name: "like"}, Args: Exprs{yyDollar[3].expr, yyDollar[5].expr}}
+			yyVAL.expr = &FuncExpr{Name: Identifier("like"), Args: Exprs{yyDollar[3].expr, yyDollar[5].expr}}
 		}
 	case 139:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			yyVAL.expr = &FuncExpr{Name: &Column{Name: "like"}, Args: Exprs{yyDollar[3].expr, yyDollar[5].expr, yyDollar[7].expr}}
+			yyVAL.expr = &FuncExpr{Name: Identifier("like"), Args: Exprs{yyDollar[3].expr, yyDollar[5].expr, yyDollar[7].expr}}
 		}
 	case 140:
 		yyDollar = yyS[yypt-6 : yypt+1]
@@ -1549,7 +1550,7 @@ yydefault:
 				yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist,", string(yyDollar[1].bytes)))
 				return 1
 			}
-			yyVAL.expr = &FuncExpr{Name: &Column{Name: string(yyDollar[1].bytes)}, Distinct: yyDollar[3].bool, Args: yyDollar[4].exprs, Filter: yyDollar[6].where}
+			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].bytes)), Distinct: yyDollar[3].bool, Args: yyDollar[4].exprs, Filter: yyDollar[6].where}
 		}
 	case 141:
 		yyDollar = yyS[yypt-5 : yypt+1]
@@ -1558,7 +1559,7 @@ yydefault:
 				yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist", string(yyDollar[1].bytes)))
 				return 1
 			}
-			yyVAL.expr = &FuncExpr{Name: &Column{Name: string(yyDollar[1].bytes)}, Distinct: false, Args: nil, Filter: yyDollar[5].where}
+			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].bytes)), Distinct: false, Args: nil, Filter: yyDollar[5].where}
 		}
 	case 142:
 		yyDollar = yyS[yypt-0 : yypt+1]

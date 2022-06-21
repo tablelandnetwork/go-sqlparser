@@ -19,7 +19,7 @@ state 1
 state 2
 	start:  stmt.    (1)
 
-	.  reduce 1 (src line 85)
+	.  reduce 1 (src line 87)
 
 
 state 3
@@ -27,7 +27,7 @@ state 3
 	semicolon_opt: .    (3)
 
 	';'  shift 6
-	.  reduce 3 (src line 96)
+	.  reduce 3 (src line 98)
 
 	semicolon_opt  goto 5
 
@@ -37,20 +37,20 @@ state 4
 
 	DISTINCT  shift 8
 	ALL  shift 9
-	.  reduce 6 (src line 117)
+	.  reduce 6 (src line 119)
 
 	distinct_opt  goto 7
 
 state 5
 	stmt:  select_stmt semicolon_opt.    (2)
 
-	.  reduce 2 (src line 89)
+	.  reduce 2 (src line 91)
 
 
 state 6
 	semicolon_opt:  ';'.    (4)
 
-	.  reduce 4 (src line 98)
+	.  reduce 4 (src line 100)
 
 
 state 7
@@ -92,13 +92,13 @@ state 7
 state 8
 	distinct_opt:  DISTINCT.    (7)
 
-	.  reduce 7 (src line 121)
+	.  reduce 7 (src line 123)
 
 
 state 9
 	distinct_opt:  ALL.    (8)
 
-	.  reduce 8 (src line 125)
+	.  reduce 8 (src line 127)
 
 
 state 10
@@ -114,13 +114,13 @@ state 10
 state 11
 	select_column_list:  select_column.    (9)
 
-	.  reduce 9 (src line 131)
+	.  reduce 9 (src line 133)
 
 
 state 12
 	select_column:  '*'.    (11)
 
-	.  reduce 11 (src line 141)
+	.  reduce 11 (src line 143)
 
 
 state 13
@@ -188,7 +188,7 @@ state 13
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 14 (src line 155)
+	.  reduce 14 (src line 157)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -208,13 +208,13 @@ state 14
 state 15
 	expr:  literal_value.    (59)
 
-	.  reduce 59 (src line 394)
+	.  reduce 59 (src line 396)
 
 
 state 16
 	expr:  column_name.    (60)
 
-	.  reduce 60 (src line 396)
+	.  reduce 60 (src line 398)
 
 
 state 17
@@ -339,7 +339,7 @@ state 20
 	'+'  shift 18
 	'-'  shift 17
 	'~'  shift 19
-	.  reduce 150 (src line 799)
+	.  reduce 150 (src line 801)
 
 	expr  goto 89
 	literal_value  goto 15
@@ -391,13 +391,13 @@ state 21
 state 22
 	expr:  subquery.    (94)
 
-	.  reduce 94 (src line 534)
+	.  reduce 94 (src line 536)
 
 
 state 23
 	expr:  exists_subquery.    (95)
 
-	.  reduce 95 (src line 538)
+	.  reduce 95 (src line 540)
 
 
 state 24
@@ -410,13 +410,13 @@ state 24
 state 25
 	expr:  function_call_keyword.    (97)
 
-	.  reduce 97 (src line 546)
+	.  reduce 97 (src line 548)
 
 
 state 26
 	expr:  function_call_generic.    (98)
 
-	.  reduce 98 (src line 547)
+	.  reduce 98 (src line 549)
 
 
 state 27
@@ -426,56 +426,56 @@ state 27
 	function_call_generic:  IDENTIFIER.'(' '*' ')' filter_opt 
 
 	'('  shift 94
-	'.'  reduce 58 (src line 387)
-	.  reduce 107 (src line 585)
+	'.'  reduce 58 (src line 389)
+	.  reduce 107 (src line 587)
 
 
 state 28
 	literal_value:  STRING.    (99)
 
-	.  reduce 99 (src line 550)
+	.  reduce 99 (src line 552)
 
 
 state 29
 	literal_value:  INTEGRAL.    (100)
 
-	.  reduce 100 (src line 555)
+	.  reduce 100 (src line 557)
 
 
 state 30
 	literal_value:  FLOAT.    (101)
 
-	.  reduce 101 (src line 559)
+	.  reduce 101 (src line 561)
 
 
 state 31
 	literal_value:  BLOB.    (102)
 
-	.  reduce 102 (src line 563)
+	.  reduce 102 (src line 565)
 
 
 state 32
 	literal_value:  HEXNUM.    (103)
 
-	.  reduce 103 (src line 567)
+	.  reduce 103 (src line 569)
 
 
 state 33
 	literal_value:  TRUE.    (104)
 
-	.  reduce 104 (src line 571)
+	.  reduce 104 (src line 573)
 
 
 state 34
 	literal_value:  FALSE.    (105)
 
-	.  reduce 105 (src line 575)
+	.  reduce 105 (src line 577)
 
 
 state 35
 	literal_value:  NULL.    (106)
 
-	.  reduce 106 (src line 579)
+	.  reduce 106 (src line 581)
 
 
 state 36
@@ -513,7 +513,7 @@ state 40
 	where_opt: .    (37)
 
 	WHERE  shift 101
-	.  reduce 37 (src line 283)
+	.  reduce 37 (src line 285)
 
 	where_opt  goto 100
 
@@ -568,7 +568,7 @@ state 42
 state 43
 	select_column:  expr as_column_opt.    (12)
 
-	.  reduce 12 (src line 146)
+	.  reduce 12 (src line 148)
 
 
 state 44
@@ -1171,13 +1171,13 @@ state 61
 state 62
 	expr:  expr ISNULL.    (85)
 
-	.  reduce 85 (src line 498)
+	.  reduce 85 (src line 500)
 
 
 state 63
 	expr:  expr NOTNULL.    (86)
 
-	.  reduce 86 (src line 502)
+	.  reduce 86 (src line 504)
 
 
 state 64
@@ -1251,7 +1251,7 @@ state 67
 state 68
 	as_column_opt:  col_alias.    (15)
 
-	.  reduce 15 (src line 159)
+	.  reduce 15 (src line 161)
 
 
 state 69
@@ -1266,79 +1266,79 @@ state 69
 state 70
 	cmp_op:  '='.    (110)
 
-	.  reduce 110 (src line 607)
+	.  reduce 110 (src line 609)
 
 
 state 71
 	cmp_op:  NE.    (111)
 
-	.  reduce 111 (src line 612)
+	.  reduce 111 (src line 614)
 
 
 state 72
 	cmp_op:  REGEXP.    (112)
 
-	.  reduce 112 (src line 616)
+	.  reduce 112 (src line 618)
 
 
 state 73
 	cmp_op:  GLOB.    (114)
 
-	.  reduce 114 (src line 624)
+	.  reduce 114 (src line 626)
 
 
 state 74
 	cmp_op:  MATCH.    (116)
 
-	.  reduce 116 (src line 632)
+	.  reduce 116 (src line 634)
 
 
 state 75
 	cmp_inequality_op:  '<'.    (118)
 
-	.  reduce 118 (src line 642)
+	.  reduce 118 (src line 644)
 
 
 state 76
 	cmp_inequality_op:  '>'.    (119)
 
-	.  reduce 119 (src line 647)
+	.  reduce 119 (src line 649)
 
 
 state 77
 	cmp_inequality_op:  LE.    (120)
 
-	.  reduce 120 (src line 651)
+	.  reduce 120 (src line 653)
 
 
 state 78
 	cmp_inequality_op:  GE.    (121)
 
-	.  reduce 121 (src line 655)
+	.  reduce 121 (src line 657)
 
 
 state 79
 	like_op:  LIKE.    (122)
 
-	.  reduce 122 (src line 661)
+	.  reduce 122 (src line 663)
 
 
 state 80
 	between_op:  BETWEEN.    (124)
 
-	.  reduce 124 (src line 672)
+	.  reduce 124 (src line 674)
 
 
 state 81
 	col_alias:  IDENTIFIER.    (17)
 
-	.  reduce 17 (src line 168)
+	.  reduce 17 (src line 170)
 
 
 state 82
 	col_alias:  STRING.    (18)
 
-	.  reduce 18 (src line 173)
+	.  reduce 18 (src line 175)
 
 
 state 83
@@ -1381,7 +1381,7 @@ state 84
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	.  reduce 78 (src line 466)
+	.  reduce 78 (src line 468)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1425,7 +1425,7 @@ state 86
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	.  reduce 79 (src line 474)
+	.  reduce 79 (src line 476)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1462,7 +1462,7 @@ state 87
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	.  reduce 80 (src line 478)
+	.  reduce 80 (src line 480)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1539,7 +1539,7 @@ state 89
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 151 (src line 803)
+	.  reduce 151 (src line 805)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1623,7 +1623,7 @@ state 92
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 144 (src line 768)
+	.  reduce 144 (src line 770)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1670,14 +1670,14 @@ state 94
 
 	DISTINCT  shift 154
 	'*'  shift 153
-	.  reduce 142 (src line 758)
+	.  reduce 142 (src line 760)
 
 	distinct_function_opt  goto 152
 
 state 95
 	exists_subquery:  EXISTS subquery.    (135)
 
-	.  reduce 135 (src line 713)
+	.  reduce 135 (src line 715)
 
 
 state 96
@@ -1768,7 +1768,7 @@ state 100
 	group_by_opt: .    (39)
 
 	GROUP  shift 159
-	.  reduce 39 (src line 293)
+	.  reduce 39 (src line 295)
 
 	group_by_opt  goto 158
 
@@ -1808,7 +1808,7 @@ state 101
 state 102
 	select_column_list:  select_column_list ',' select_column.    (10)
 
-	.  reduce 10 (src line 136)
+	.  reduce 10 (src line 138)
 
 
 state 103
@@ -1816,7 +1816,7 @@ state 103
 	table_expr_list:  table_expr_list.',' table_expr 
 
 	','  shift 161
-	.  reduce 19 (src line 179)
+	.  reduce 19 (src line 181)
 
 
 state 104
@@ -1824,7 +1824,7 @@ state 104
 	join_clause:  join_clause.JOIN table_expr join_constraint 
 
 	JOIN  shift 162
-	.  reduce 20 (src line 184)
+	.  reduce 20 (src line 186)
 
 
 state 105
@@ -1832,7 +1832,7 @@ state 105
 	join_clause:  table_expr.JOIN table_expr join_constraint 
 
 	JOIN  shift 163
-	.  reduce 21 (src line 190)
+	.  reduce 21 (src line 192)
 
 
 state 106
@@ -1842,7 +1842,7 @@ state 106
 	IDENTIFIER  shift 167
 	STRING  shift 168
 	AS  shift 166
-	.  reduce 27 (src line 220)
+	.  reduce 27 (src line 222)
 
 	as_table_opt  goto 164
 	table_alias  goto 165
@@ -1866,7 +1866,7 @@ state 107
 state 108
 	table_name:  IDENTIFIER.    (58)
 
-	.  reduce 58 (src line 387)
+	.  reduce 58 (src line 389)
 
 
 state 109
@@ -1906,7 +1906,7 @@ state 109
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 62 (src line 402)
+	.  reduce 62 (src line 404)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1950,7 +1950,7 @@ state 110
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 63 (src line 406)
+	.  reduce 63 (src line 408)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -1991,7 +1991,7 @@ state 111
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 64 (src line 410)
+	.  reduce 64 (src line 412)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2032,7 +2032,7 @@ state 112
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 65 (src line 414)
+	.  reduce 65 (src line 416)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2073,7 +2073,7 @@ state 113
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 66 (src line 418)
+	.  reduce 66 (src line 420)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2119,7 +2119,7 @@ state 114
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 67 (src line 422)
+	.  reduce 67 (src line 424)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2165,7 +2165,7 @@ state 115
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 68 (src line 426)
+	.  reduce 68 (src line 428)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2211,7 +2211,7 @@ state 116
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 69 (src line 430)
+	.  reduce 69 (src line 432)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2257,7 +2257,7 @@ state 117
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 70 (src line 434)
+	.  reduce 70 (src line 436)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2295,7 +2295,7 @@ state 118
 	expr:  expr.NOT IN col_tuple 
 
 	COLLATE  shift 66
-	.  reduce 71 (src line 438)
+	.  reduce 71 (src line 440)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2333,7 +2333,7 @@ state 119
 	expr:  expr.NOT IN col_tuple 
 
 	COLLATE  shift 66
-	.  reduce 72 (src line 442)
+	.  reduce 72 (src line 444)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2371,7 +2371,7 @@ state 120
 	expr:  expr.NOT IN col_tuple 
 
 	COLLATE  shift 66
-	.  reduce 73 (src line 446)
+	.  reduce 73 (src line 448)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2425,7 +2425,7 @@ state 121
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 74 (src line 450)
+	.  reduce 74 (src line 452)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2475,7 +2475,7 @@ state 122
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 75 (src line 454)
+	.  reduce 75 (src line 456)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2531,7 +2531,7 @@ state 123
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 76 (src line 458)
+	.  reduce 76 (src line 460)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2597,7 +2597,7 @@ state 124
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 81 (src line 482)
+	.  reduce 81 (src line 484)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2664,7 +2664,7 @@ state 125
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 82 (src line 486)
+	.  reduce 82 (src line 488)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2718,7 +2718,7 @@ state 126
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 83 (src line 490)
+	.  reduce 83 (src line 492)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -2761,7 +2761,7 @@ state 127
 state 128
 	expr:  expr NOT NULL.    (87)
 
-	.  reduce 87 (src line 506)
+	.  reduce 87 (src line 508)
 
 
 state 129
@@ -2776,31 +2776,31 @@ state 129
 state 130
 	cmp_op:  NOT REGEXP.    (113)
 
-	.  reduce 113 (src line 620)
+	.  reduce 113 (src line 622)
 
 
 state 131
 	cmp_op:  NOT GLOB.    (115)
 
-	.  reduce 115 (src line 628)
+	.  reduce 115 (src line 630)
 
 
 state 132
 	cmp_op:  NOT MATCH.    (117)
 
-	.  reduce 117 (src line 636)
+	.  reduce 117 (src line 638)
 
 
 state 133
 	like_op:  NOT LIKE.    (123)
 
-	.  reduce 123 (src line 666)
+	.  reduce 123 (src line 668)
 
 
 state 134
 	between_op:  NOT BETWEEN.    (125)
 
-	.  reduce 125 (src line 677)
+	.  reduce 125 (src line 679)
 
 
 state 135
@@ -2875,13 +2875,13 @@ state 135
 state 136
 	expr:  expr COLLATE IDENTIFIER.    (90)
 
-	.  reduce 90 (src line 518)
+	.  reduce 90 (src line 520)
 
 
 state 137
 	expr:  expr IN col_tuple.    (92)
 
-	.  reduce 92 (src line 526)
+	.  reduce 92 (src line 528)
 
 
 state 138
@@ -2926,31 +2926,31 @@ state 138
 state 139
 	col_tuple:  subquery.    (132)
 
-	.  reduce 132 (src line 696)
+	.  reduce 132 (src line 698)
 
 
 state 140
 	as_column_opt:  AS col_alias.    (16)
 
-	.  reduce 16 (src line 163)
+	.  reduce 16 (src line 165)
 
 
 state 141
 	select_column:  table_name '.' '*'.    (13)
 
-	.  reduce 13 (src line 150)
+	.  reduce 13 (src line 152)
 
 
 state 142
 	expr:  table_name '.' column_name.    (61)
 
-	.  reduce 61 (src line 397)
+	.  reduce 61 (src line 399)
 
 
 state 143
 	column_name:  IDENTIFIER.    (107)
 
-	.  reduce 107 (src line 585)
+	.  reduce 107 (src line 587)
 
 
 state 144
@@ -2968,7 +2968,7 @@ state 145
 
 	WHEN  shift 147
 	ELSE  shift 180
-	.  reduce 155 (src line 826)
+	.  reduce 155 (src line 828)
 
 	else_expr_opt  goto 178
 	when  goto 179
@@ -2976,7 +2976,7 @@ state 145
 state 146
 	when_expr_list:  when.    (153)
 
-	.  reduce 153 (src line 816)
+	.  reduce 153 (src line 818)
 
 
 state 147
@@ -3015,7 +3015,7 @@ state 147
 state 148
 	expr:  '(' expr_list ')'.    (91)
 
-	.  reduce 91 (src line 522)
+	.  reduce 91 (src line 524)
 
 
 state 149
@@ -3054,7 +3054,7 @@ state 149
 state 150
 	subquery:  '(' select_stmt ')'.    (134)
 
-	.  reduce 134 (src line 706)
+	.  reduce 134 (src line 708)
 
 
 state 151
@@ -3149,7 +3149,7 @@ state 152
 	'+'  shift 18
 	'-'  shift 17
 	'~'  shift 19
-	.  reduce 146 (src line 779)
+	.  reduce 146 (src line 781)
 
 	expr  goto 92
 	literal_value  goto 15
@@ -3172,13 +3172,13 @@ state 153
 state 154
 	distinct_function_opt:  DISTINCT.    (143)
 
-	.  reduce 143 (src line 762)
+	.  reduce 143 (src line 764)
 
 
 state 155
 	exists_subquery:  NOT EXISTS subquery.    (136)
 
-	.  reduce 136 (src line 718)
+	.  reduce 136 (src line 720)
 
 
 state 156
@@ -3325,7 +3325,7 @@ state 158
 	having_opt: .    (41)
 
 	HAVING  shift 190
-	.  reduce 41 (src line 303)
+	.  reduce 41 (src line 305)
 
 	having_opt  goto 189
 
@@ -3397,7 +3397,7 @@ state 160
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 38 (src line 287)
+	.  reduce 38 (src line 289)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -3437,13 +3437,13 @@ state 163
 state 164
 	table_expr:  table_name as_table_opt.    (23)
 
-	.  reduce 23 (src line 201)
+	.  reduce 23 (src line 203)
 
 
 state 165
 	as_table_opt:  table_alias.    (28)
 
-	.  reduce 28 (src line 224)
+	.  reduce 28 (src line 226)
 
 
 state 166
@@ -3458,13 +3458,13 @@ state 166
 state 167
 	table_alias:  IDENTIFIER.    (30)
 
-	.  reduce 30 (src line 233)
+	.  reduce 30 (src line 235)
 
 
 state 168
 	table_alias:  STRING.    (31)
 
-	.  reduce 31 (src line 238)
+	.  reduce 31 (src line 240)
 
 
 state 169
@@ -3572,7 +3572,7 @@ state 173
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 84 (src line 494)
+	.  reduce 84 (src line 496)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -3582,7 +3582,7 @@ state 173
 state 174
 	expr:  expr NOT IN col_tuple.    (93)
 
-	.  reduce 93 (src line 530)
+	.  reduce 93 (src line 532)
 
 
 state 175
@@ -3621,7 +3621,7 @@ state 175
 state 176
 	col_tuple:  '(' ')'.    (131)
 
-	.  reduce 131 (src line 691)
+	.  reduce 131 (src line 693)
 
 
 state 177
@@ -3643,7 +3643,7 @@ state 178
 state 179
 	when_expr_list:  when_expr_list when.    (154)
 
-	.  reduce 154 (src line 821)
+	.  reduce 154 (src line 823)
 
 
 state 180
@@ -3809,7 +3809,7 @@ state 182
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 145 (src line 773)
+	.  reduce 145 (src line 775)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -3840,7 +3840,7 @@ state 185
 	expr_list_opt:  expr_list.    (147)
 
 	','  shift 149
-	.  reduce 147 (src line 783)
+	.  reduce 147 (src line 785)
 
 
 state 186
@@ -3848,7 +3848,7 @@ state 186
 	filter_opt: .    (148)
 
 	FILTER  shift 213
-	.  reduce 148 (src line 789)
+	.  reduce 148 (src line 791)
 
 	filter_opt  goto 212
 
@@ -3924,7 +3924,7 @@ state 189
 	order_by_opt: .    (43)
 
 	ORDER  shift 217
-	.  reduce 43 (src line 313)
+	.  reduce 43 (src line 315)
 
 	order_by_opt  goto 216
 
@@ -3998,7 +3998,7 @@ state 191
 state 192
 	table_expr_list:  table_expr_list ',' table_expr.    (22)
 
-	.  reduce 22 (src line 195)
+	.  reduce 22 (src line 197)
 
 
 state 193
@@ -4007,7 +4007,7 @@ state 193
 
 	ON  shift 221
 	USING  shift 222
-	.  reduce 34 (src line 269)
+	.  reduce 34 (src line 271)
 
 	join_constraint  goto 220
 
@@ -4017,14 +4017,14 @@ state 194
 
 	ON  shift 221
 	USING  shift 222
-	.  reduce 34 (src line 269)
+	.  reduce 34 (src line 271)
 
 	join_constraint  goto 223
 
 state 195
 	as_table_opt:  AS table_alias.    (29)
 
-	.  reduce 29 (src line 228)
+	.  reduce 29 (src line 230)
 
 
 state 196
@@ -4034,7 +4034,7 @@ state 196
 	IDENTIFIER  shift 167
 	STRING  shift 168
 	AS  shift 166
-	.  reduce 27 (src line 220)
+	.  reduce 27 (src line 222)
 
 	as_table_opt  goto 224
 	table_alias  goto 165
@@ -4042,13 +4042,13 @@ state 196
 state 197
 	table_expr:  '(' table_expr_list ')'.    (25)
 
-	.  reduce 25 (src line 210)
+	.  reduce 25 (src line 212)
 
 
 state 198
 	table_expr:  '(' join_clause ')'.    (26)
 
-	.  reduce 26 (src line 214)
+	.  reduce 26 (src line 216)
 
 
 state 199
@@ -4098,7 +4098,7 @@ state 199
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 77 (src line 462)
+	.  reduce 77 (src line 464)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -4152,7 +4152,7 @@ state 200
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 88 (src line 510)
+	.  reduce 88 (src line 512)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -4162,13 +4162,13 @@ state 200
 state 201
 	col_tuple:  '(' expr_list ')'.    (133)
 
-	.  reduce 133 (src line 700)
+	.  reduce 133 (src line 702)
 
 
 state 202
 	expr:  CASE expr_opt when_expr_list else_expr_opt END.    (89)
 
-	.  reduce 89 (src line 514)
+	.  reduce 89 (src line 516)
 
 
 state 203
@@ -4232,7 +4232,7 @@ state 203
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 156 (src line 830)
+	.  reduce 156 (src line 832)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -4282,31 +4282,31 @@ state 205
 state 206
 	convert_type:  NONE.    (126)
 
-	.  reduce 126 (src line 683)
+	.  reduce 126 (src line 685)
 
 
 state 207
 	convert_type:  TEXT.    (127)
 
-	.  reduce 127 (src line 685)
+	.  reduce 127 (src line 687)
 
 
 state 208
 	convert_type:  REAL.    (128)
 
-	.  reduce 128 (src line 686)
+	.  reduce 128 (src line 688)
 
 
 state 209
 	convert_type:  INTEGER.    (129)
 
-	.  reduce 129 (src line 687)
+	.  reduce 129 (src line 689)
 
 
 state 210
 	convert_type:  NUMERIC.    (130)
 
-	.  reduce 130 (src line 688)
+	.  reduce 130 (src line 690)
 
 
 state 211
@@ -4314,14 +4314,14 @@ state 211
 	filter_opt: .    (148)
 
 	FILTER  shift 213
-	.  reduce 148 (src line 789)
+	.  reduce 148 (src line 791)
 
 	filter_opt  goto 227
 
 state 212
 	function_call_generic:  IDENTIFIER '(' '*' ')' filter_opt.    (141)
 
-	.  reduce 141 (src line 748)
+	.  reduce 141 (src line 750)
 
 
 state 213
@@ -4476,7 +4476,7 @@ state 216
 	limit_opt: .    (54)
 
 	LIMIT  shift 233
-	.  reduce 54 (src line 369)
+	.  reduce 54 (src line 371)
 
 	limit_opt  goto 232
 
@@ -4548,7 +4548,7 @@ state 218
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 42 (src line 307)
+	.  reduce 42 (src line 309)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -4560,13 +4560,13 @@ state 219
 	expr_list:  expr_list.',' expr 
 
 	','  shift 149
-	.  reduce 40 (src line 297)
+	.  reduce 40 (src line 299)
 
 
 state 220
 	join_clause:  join_clause JOIN table_expr join_constraint.    (33)
 
-	.  reduce 33 (src line 256)
+	.  reduce 33 (src line 258)
 
 
 state 221
@@ -4612,13 +4612,13 @@ state 222
 state 223
 	join_clause:  table_expr JOIN table_expr join_constraint.    (32)
 
-	.  reduce 32 (src line 244)
+	.  reduce 32 (src line 246)
 
 
 state 224
 	table_expr:  '(' select_stmt ')' as_table_opt.    (24)
 
-	.  reduce 24 (src line 206)
+	.  reduce 24 (src line 208)
 
 
 state 225
@@ -4682,7 +4682,7 @@ state 225
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 152 (src line 809)
+	.  reduce 152 (src line 811)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -4692,13 +4692,13 @@ state 225
 state 226
 	expr:  CAST '(' expr AS convert_type ')'.    (96)
 
-	.  reduce 96 (src line 542)
+	.  reduce 96 (src line 544)
 
 
 state 227
 	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt ')' filter_opt.    (140)
 
-	.  reduce 140 (src line 739)
+	.  reduce 140 (src line 741)
 
 
 state 228
@@ -4711,13 +4711,13 @@ state 228
 state 229
 	function_call_keyword:  GLOB '(' expr ',' expr ')'.    (137)
 
-	.  reduce 137 (src line 724)
+	.  reduce 137 (src line 726)
 
 
 state 230
 	function_call_keyword:  LIKE '(' expr ',' expr ')'.    (138)
 
-	.  reduce 138 (src line 729)
+	.  reduce 138 (src line 731)
 
 
 state 231
@@ -4756,7 +4756,7 @@ state 231
 state 232
 	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt limit_opt.    (5)
 
-	.  reduce 5 (src line 102)
+	.  reduce 5 (src line 104)
 
 
 state 233
@@ -4890,7 +4890,7 @@ state 235
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 35 (src line 273)
+	.  reduce 35 (src line 275)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -5073,7 +5073,7 @@ state 239
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 55 (src line 373)
+	.  reduce 55 (src line 375)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -5085,13 +5085,13 @@ state 240
 	order_list:  order_list.',' ordering_term 
 
 	','  shift 249
-	.  reduce 44 (src line 317)
+	.  reduce 44 (src line 319)
 
 
 state 241
 	order_list:  ordering_term.    (45)
 
-	.  reduce 45 (src line 323)
+	.  reduce 45 (src line 325)
 
 
 state 242
@@ -5158,7 +5158,7 @@ state 242
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 48 (src line 341)
+	.  reduce 48 (src line 343)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -5178,7 +5178,7 @@ state 243
 state 244
 	column_name_list:  column_name.    (108)
 
-	.  reduce 108 (src line 596)
+	.  reduce 108 (src line 598)
 
 
 state 245
@@ -5253,7 +5253,7 @@ state 245
 state 246
 	function_call_keyword:  LIKE '(' expr ',' expr ',' expr ')'.    (139)
 
-	.  reduce 139 (src line 733)
+	.  reduce 139 (src line 735)
 
 
 state 247
@@ -5361,26 +5361,26 @@ state 250
 	nulls: .    (51)
 
 	NULLS  shift 260
-	.  reduce 51 (src line 355)
+	.  reduce 51 (src line 357)
 
 	nulls  goto 259
 
 state 251
 	asc_desc_opt:  ASC.    (49)
 
-	.  reduce 49 (src line 345)
+	.  reduce 49 (src line 347)
 
 
 state 252
 	asc_desc_opt:  DESC.    (50)
 
-	.  reduce 50 (src line 349)
+	.  reduce 50 (src line 351)
 
 
 state 253
 	join_constraint:  USING '(' column_name_list ')'.    (36)
 
-	.  reduce 36 (src line 277)
+	.  reduce 36 (src line 279)
 
 
 state 254
@@ -5394,7 +5394,7 @@ state 254
 state 255
 	filter_opt:  FILTER '(' WHERE expr ')'.    (149)
 
-	.  reduce 149 (src line 793)
+	.  reduce 149 (src line 795)
 
 
 state 256
@@ -5458,7 +5458,7 @@ state 256
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 56 (src line 377)
+	.  reduce 56 (src line 379)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -5526,7 +5526,7 @@ state 257
 	JSON_EXTRACT_OP  shift 54
 	JSON_UNQUOTE_EXTRACT_OP  shift 55
 	COLLATE  shift 66
-	.  reduce 57 (src line 381)
+	.  reduce 57 (src line 383)
 
 	cmp_op  goto 56
 	cmp_inequality_op  goto 57
@@ -5536,13 +5536,13 @@ state 257
 state 258
 	order_list:  order_list ',' ordering_term.    (46)
 
-	.  reduce 46 (src line 328)
+	.  reduce 46 (src line 330)
 
 
 state 259
 	ordering_term:  expr asc_desc_opt nulls.    (47)
 
-	.  reduce 47 (src line 334)
+	.  reduce 47 (src line 336)
 
 
 state 260
@@ -5557,26 +5557,26 @@ state 260
 state 261
 	column_name_list:  column_name_list ',' column_name.    (109)
 
-	.  reduce 109 (src line 601)
+	.  reduce 109 (src line 603)
 
 
 state 262
 	nulls:  NULLS FIRST.    (52)
 
-	.  reduce 52 (src line 359)
+	.  reduce 52 (src line 361)
 
 
 state 263
 	nulls:  NULLS LAST.    (53)
 
-	.  reduce 53 (src line 363)
+	.  reduce 53 (src line 365)
 
 
 88 terminals, 49 nonterminals
 157 grammar rules, 264/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 98 working sets used
-memory: parser 713/240000
+memory: parser 702/240000
 209 extra closures
 2017 shift entries, 2 exceptions
 129 goto entries

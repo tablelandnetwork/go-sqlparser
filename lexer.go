@@ -76,16 +76,15 @@ type Lexer struct {
 	// If BETWEEN was seen, we emit a different token for AND.
 	hasSeenBetween bool
 
+	// This is used to make the NOT keyword unambigous.
+	// When the NOT token is seen right after the IS token, we emit the ISNOT token (instead of of the NOT).
 	lastToken int
 
 	ast *AST
 }
 
 func (l *Lexer) Error(e string) {
-	// this means the err was not set by a specific error type in the parser
-	if l.err == nil {
-		l.err = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
-	}
+	l.err = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
 }
 
 func (l *Lexer) Lex(lval *yySymType) (token int) {
