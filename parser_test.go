@@ -2763,7 +2763,7 @@ func TestAllowedFunctions(t *testing.T) {
 	}
 
 	tests := []testCase{}
-	for allowedFunction, _ := range AllowedFunctions {
+	for allowedFunction := range AllowedFunctions {
 		functionCall, args := genFunctionCallAndArgs(allowedFunction)
 		tests = append(tests, testCase{
 			name:     allowedFunction,
