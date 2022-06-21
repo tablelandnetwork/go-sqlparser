@@ -29,12 +29,13 @@ const MaxColumnNameLength = 64
   columnList ColumnList
   subquery *Subquery
   colTuple ColTuple
+  statement Statement
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOB
 %token ERROR 
 %token <empty> TRUE FALSE NULL AND
-%token <empty> '(' ',' ')' '.'
+%token <empty> '(' ',' ')' '.' ';'
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
@@ -55,6 +56,7 @@ const MaxColumnNameLength = 64
 %left <empty> COLLATE
 %right <empty> '~' UNARY
 
+%type <statement> stmt
 %type <selectStmt> select_stmt
 %type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery
 %type <exprs> expr_list expr_list_opt group_by_opt
@@ -81,7 +83,20 @@ const MaxColumnNameLength = 64
 
 %%
 start: 
-  select_stmt { yylex.(*Lexer).ast = &AST{$1} }
+  stmt { yylex.(*Lexer).ast = &AST{$1} }
+;
+
+stmt:
+  select_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+;
+
+semicolon_opt:
+  {}
+| ';' 
+  {}
 ;
 
 select_stmt:
