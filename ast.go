@@ -9,7 +9,7 @@ import (
 
 // Node represents a node in the AST.
 type Node interface {
-	ToString() string
+	String() string
 }
 
 // AST represents the root Node of the AST.
@@ -17,11 +17,11 @@ type AST struct {
 	Root Statement
 }
 
-func (node *AST) ToString() string {
+func (node *AST) String() string {
 	if node.Root == nil {
 		return ""
 	}
-	return node.Root.ToString()
+	return node.Root.String()
 }
 
 func (ast *AST) PrettyPrint() {
@@ -61,17 +61,17 @@ type Select struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *Select) ToString() string {
+func (node *Select) String() string {
 	return fmt.Sprintf(
 		"select %s%s from %s%s%s%s%s%s",
 		node.Distinct,
-		node.SelectColumnList.ToString(),
-		node.From.ToString(),
-		node.Where.ToString(),
-		node.GroupBy.ToString(),
-		node.Having.ToString(),
-		node.OrderBy.ToString(),
-		node.Limit.ToString(),
+		node.SelectColumnList.String(),
+		node.From.String(),
+		node.Where.String(),
+		node.GroupBy.String(),
+		node.Having.String(),
+		node.OrderBy.String(),
+		node.Limit.String(),
 	)
 }
 
@@ -85,10 +85,10 @@ const (
 type SelectColumnList []SelectColumn
 
 // ToString returns the string representation of the node.
-func (node SelectColumnList) ToString() string {
+func (node SelectColumnList) String() string {
 	var colsStr []string
 	for _, col := range node {
-		colsStr = append(colsStr, col.ToString())
+		colsStr = append(colsStr, col.String())
 	}
 
 	return strings.Join(colsStr, ", ")
@@ -109,9 +109,9 @@ type StarSelectColumn struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *StarSelectColumn) ToString() string {
+func (node *StarSelectColumn) String() string {
 	if node.TableRef != nil {
-		return fmt.Sprintf("%s.*", node.TableRef.ToString())
+		return fmt.Sprintf("%s.*", node.TableRef.String())
 	}
 	return "*"
 }
@@ -123,12 +123,12 @@ type AliasedSelectColumn struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *AliasedSelectColumn) ToString() string {
+func (node *AliasedSelectColumn) String() string {
 	if node.As != nil {
-		return fmt.Sprintf("%s as %s", node.Expr.ToString(), node.As.ToString())
+		return fmt.Sprintf("%s as %s", node.Expr.String(), node.As.String())
 	}
 
-	return node.Expr.ToString()
+	return node.Expr.String()
 }
 
 // TableExpr represents an expression referenced by FROM.
@@ -145,13 +145,13 @@ func (*JoinTableExpr) iTableExpr()    {}
 type TableExprList []TableExpr
 
 // ToString returns the string representation of the node.
-func (node TableExprList) ToString() string {
+func (node TableExprList) String() string {
 	if len(node) == 0 {
 		return ""
 	}
 	var strs []string
 	for _, e := range node {
-		strs = append(strs, e.ToString())
+		strs = append(strs, e.String())
 	}
 
 	return strings.Join(strs, ", ")
@@ -166,12 +166,12 @@ type AliasedTableExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *AliasedTableExpr) ToString() string {
+func (node *AliasedTableExpr) String() string {
 	if node.As == nil {
-		return node.Expr.ToString()
+		return node.Expr.String()
 	}
 
-	return fmt.Sprintf("%s as %s", node.Expr.ToString(), node.As.ToString())
+	return fmt.Sprintf("%s as %s", node.Expr.String(), node.As.String())
 }
 
 // SimpleTableExpr represents a direct table reference or a subquery.
@@ -189,8 +189,8 @@ type Subquery struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *Subquery) ToString() string {
-	return fmt.Sprintf("(%s)", node.Select.ToString())
+func (node *Subquery) String() string {
+	return fmt.Sprintf("(%s)", node.Select.String())
 }
 
 // ParenTableExpr represents a parenthesized list of TableExpr.
@@ -199,8 +199,8 @@ type ParenTableExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *ParenTableExpr) ToString() string {
-	return fmt.Sprintf("(%v)", node.TableExprList.ToString())
+func (node *ParenTableExpr) String() string {
+	return fmt.Sprintf("(%v)", node.TableExprList.String())
 }
 
 // JoinTableExpr represents a TableExpr that's a JOIN operation.
@@ -224,16 +224,16 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *JoinTableExpr) ToString() string {
+func (node *JoinTableExpr) String() string {
 	if node.On != nil {
-		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.ToString(), node.JoinOperator, node.RightExpr.ToString(), node.On.ToString())
+		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.On.String())
 	}
 
 	if node.Using != nil {
-		return fmt.Sprintf("%s %s %s using %s", node.LeftExpr.ToString(), node.JoinOperator, node.RightExpr.ToString(), node.Using.ToString())
+		return fmt.Sprintf("%s %s %s using %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.Using.String())
 	}
 
-	return fmt.Sprintf("%s %s %s", node.LeftExpr.ToString(), node.JoinOperator, node.RightExpr.ToString())
+	return fmt.Sprintf("%s %s %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String())
 }
 
 // Where represents a WHERE or HAVING clause.
@@ -258,24 +258,24 @@ func NewWhere(typ string, expr Expr) *Where {
 }
 
 // ToString returns the string representation of the node.
-func (node *Where) ToString() string {
+func (node *Where) String() string {
 	if node == nil || node.Expr == nil {
 		return ""
 	}
-	return fmt.Sprintf(" %s %s", node.Type, node.Expr.ToString())
+	return fmt.Sprintf(" %s %s", node.Type, node.Expr.String())
 }
 
 // GroupBy represents a GROUP BY clause.
 type GroupBy Exprs
 
 // ToString returns the string representation of the node.
-func (node GroupBy) ToString() string {
+func (node GroupBy) String() string {
 	if len(node) == 0 {
 		return ""
 	}
 	var strs []string
 	for _, e := range node {
-		strs = append(strs, e.ToString())
+		strs = append(strs, e.String())
 	}
 
 	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
@@ -285,13 +285,13 @@ func (node GroupBy) ToString() string {
 type OrderBy []*OrderingTerm
 
 // ToString returns the string representation of the node.
-func (node OrderBy) ToString() string {
+func (node OrderBy) String() string {
 	if len(node) == 0 {
 		return ""
 	}
 	var strs []string
 	for _, e := range node {
-		strs = append(strs, e.ToString())
+		strs = append(strs, e.String())
 	}
 
 	return fmt.Sprintf(" order by %s", strings.Join(strs, ", "))
@@ -321,9 +321,9 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *OrderingTerm) ToString() string {
+func (node *OrderingTerm) String() string {
 	if node, ok := node.Expr.(*NullValue); ok {
-		return node.ToString()
+		return node.String()
 	}
 
 	var nullsStr string
@@ -336,7 +336,7 @@ func (node *OrderingTerm) ToString() string {
 		nullsStr = " nulls last"
 	}
 
-	return fmt.Sprintf("%s %s%s", node.Expr.ToString(), node.Direction, nullsStr)
+	return fmt.Sprintf("%s %s%s", node.Expr.String(), node.Direction, nullsStr)
 }
 
 // Limit represents the LIMIT clause.
@@ -346,16 +346,16 @@ type Limit struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *Limit) ToString() string {
+func (node *Limit) String() string {
 	if node == nil {
 		return ""
 	}
 
 	if node.Offset == nil {
-		return fmt.Sprintf(" limit %s", node.Limit.ToString())
+		return fmt.Sprintf(" limit %s", node.Limit.String())
 	}
 
-	return fmt.Sprintf(" limit %s offset %s", node.Limit.ToString(), node.Offset.ToString())
+	return fmt.Sprintf(" limit %s offset %s", node.Limit.String(), node.Offset.String())
 }
 
 // Expr represents an expr node in the AST.
@@ -390,7 +390,7 @@ func (*FuncExpr) iExpr()    {}
 type NullValue struct{}
 
 // ToString returns the string representation of the node.
-func (node *NullValue) ToString() string {
+func (node *NullValue) String() string {
 	return "null"
 }
 
@@ -398,7 +398,7 @@ func (node *NullValue) ToString() string {
 type BoolValue bool
 
 // ToString returns the string representation of the node.
-func (node BoolValue) ToString() string {
+func (node BoolValue) String() string {
 	if node {
 		return "true"
 	}
@@ -425,7 +425,7 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *Value) ToString() string {
+func (node *Value) String() string {
 	var value string
 	switch node.Type {
 	case StrValue:
@@ -453,11 +453,11 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *UnaryExpr) ToString() string {
+func (node *UnaryExpr) String() string {
 	if expr, ok := node.Expr.(*UnaryExpr); ok {
-		return fmt.Sprintf("%s %s", node.Operator, expr.ToString())
+		return fmt.Sprintf("%s %s", node.Operator, expr.String())
 	}
-	return fmt.Sprintf("%s%s", node.Operator, node.Expr.ToString())
+	return fmt.Sprintf("%s%s", node.Operator, node.Expr.String())
 }
 
 // BinaryExpr represents a binary value expression.
@@ -483,8 +483,8 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *BinaryExpr) ToString() string {
-	return fmt.Sprintf("%s %s %s", node.Left.ToString(), node.Operator, node.Right.ToString())
+func (node *BinaryExpr) String() string {
+	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
 }
 
 // CmpExpr represents the comparison of two expressions.
@@ -515,12 +515,12 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *CmpExpr) ToString() string {
+func (node *CmpExpr) String() string {
 	if node.Escape != nil {
-		return fmt.Sprintf("%s %s %s escape %s", node.Left.ToString(), node.Operator, node.Right.ToString(), node.Escape.ToString())
+		return fmt.Sprintf("%s %s %s escape %s", node.Left.String(), node.Operator, node.Right.String(), node.Escape.String())
 	}
 
-	return fmt.Sprintf("%s %s %s", node.Left.ToString(), node.Operator, node.Right.ToString())
+	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
 }
 
 // AndExpr represents an AND expression.
@@ -529,11 +529,11 @@ type AndExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *AndExpr) ToString() string {
+func (node *AndExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return fmt.Sprintf("%s and %s", node.Left.ToString(), node.Right.ToString())
+	return fmt.Sprintf("%s and %s", node.Left.String(), node.Right.String())
 }
 
 // OrExpr represents an OR expression.
@@ -542,11 +542,11 @@ type OrExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *OrExpr) ToString() string {
+func (node *OrExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return fmt.Sprintf("%s or %s", node.Left.ToString(), node.Right.ToString())
+	return fmt.Sprintf("%s or %s", node.Left.String(), node.Right.String())
 }
 
 // NotExpr represents an NOT expression.
@@ -555,11 +555,11 @@ type NotExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *NotExpr) ToString() string {
+func (node *NotExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return fmt.Sprintf("not %s", node.Expr.ToString())
+	return fmt.Sprintf("not %s", node.Expr.String())
 }
 
 // IsExpr represents a IS expression
@@ -568,8 +568,8 @@ type IsExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *IsExpr) ToString() string {
-	return fmt.Sprintf("%s is %s", node.Left.ToString(), node.Right.ToString())
+func (node *IsExpr) String() string {
+	return fmt.Sprintf("%s is %s", node.Left.String(), node.Right.String())
 }
 
 // IsNullExpr represents a IS expression
@@ -578,8 +578,8 @@ type IsNullExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *IsNullExpr) ToString() string {
-	return fmt.Sprintf("%s isnull", node.Expr.ToString())
+func (node *IsNullExpr) String() string {
+	return fmt.Sprintf("%s isnull", node.Expr.String())
 }
 
 // NotNullExpr represents a IS expression
@@ -588,8 +588,8 @@ type NotNullExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *NotNullExpr) ToString() string {
-	return fmt.Sprintf("%s notnull", node.Expr.ToString())
+func (node *NotNullExpr) String() string {
+	return fmt.Sprintf("%s notnull", node.Expr.String())
 }
 
 // CollateExpr the COLLATE operator
@@ -599,8 +599,8 @@ type CollateExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *CollateExpr) ToString() string {
-	return fmt.Sprintf("%s collate %s", node.Expr.ToString(), node.CollationName)
+func (node *CollateExpr) String() string {
+	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName)
 }
 
 // ConvertExpr represents a CAST expression.
@@ -621,8 +621,8 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *ConvertExpr) ToString() string {
-	return fmt.Sprintf("cast (%s as %s)", node.Expr.ToString(), string(node.Type))
+func (node *ConvertExpr) String() string {
+	return fmt.Sprintf("cast (%s as %s)", node.Expr.String(), string(node.Type))
 }
 
 // BetweenExpr represents a BETWEEN or a NOT BETWEEN expression.
@@ -639,8 +639,8 @@ const (
 )
 
 // ToString returns the string representation of the node.
-func (node *BetweenExpr) ToString() string {
-	return fmt.Sprintf("%s %s %s and %s", node.Left.ToString(), node.Operator, node.From.ToString(), node.To.ToString())
+func (node *BetweenExpr) String() string {
+	return fmt.Sprintf("%s %s %s and %s", node.Left.String(), node.Operator, node.From.String(), node.To.String())
 }
 
 // When represents a WHEN sub-expression.
@@ -650,8 +650,8 @@ type When struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *When) ToString() string {
-	return fmt.Sprintf("when %v then %v", node.Condition.ToString(), node.Value.ToString())
+func (node *When) String() string {
+	return fmt.Sprintf("when %v then %v", node.Condition.String(), node.Value.String())
 }
 
 // CaseExpr represents a CASE expression.
@@ -662,19 +662,19 @@ type CaseExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *CaseExpr) ToString() string {
+func (node *CaseExpr) String() string {
 	var b strings.Builder
 	b.WriteString("case ")
 	if node.Expr != nil {
-		b.WriteString(fmt.Sprintf("%s ", node.Expr.ToString()))
+		b.WriteString(fmt.Sprintf("%s ", node.Expr.String()))
 	}
 
 	for _, when := range node.Whens {
-		b.WriteString(fmt.Sprintf("%s ", when.ToString()))
+		b.WriteString(fmt.Sprintf("%s ", when.String()))
 	}
 
 	if node.Else != nil {
-		b.WriteString(fmt.Sprintf("else %s ", node.Else.ToString()))
+		b.WriteString(fmt.Sprintf("else %s ", node.Else.String()))
 	}
 	b.WriteString("end")
 	return b.String()
@@ -686,7 +686,7 @@ type Table struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *Table) ToString() string {
+func (node *Table) String() string {
 	return node.Name
 }
 
@@ -697,9 +697,9 @@ type Column struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *Column) ToString() string {
+func (node *Column) String() string {
 	if node.TableRef != nil {
-		return fmt.Sprintf("%s.%s", node.TableRef.ToString(), node.Name)
+		return fmt.Sprintf("%s.%s", node.TableRef.String(), node.Name)
 	}
 	return node.Name
 }
@@ -708,10 +708,10 @@ func (node *Column) ToString() string {
 type ColumnList []*Column
 
 // ToString returns the string representation of the node.
-func (node ColumnList) ToString() string {
+func (node ColumnList) String() string {
 	var strs []string
 	for _, col := range node {
-		strs = append(strs, col.ToString())
+		strs = append(strs, col.String())
 	}
 
 	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
@@ -721,10 +721,10 @@ func (node ColumnList) ToString() string {
 type Exprs []Expr
 
 // ToString returns the string representation of the node.
-func (node Exprs) ToString() string {
+func (node Exprs) String() string {
 	var strs []string
 	for _, expr := range node {
-		strs = append(strs, expr.ToString())
+		strs = append(strs, expr.String())
 	}
 
 	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
@@ -736,8 +736,8 @@ type ExistsExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *ExistsExpr) ToString() string {
-	return fmt.Sprintf("exists %s", node.Subquery.ToString())
+func (node *ExistsExpr) String() string {
+	return fmt.Sprintf("exists %s", node.Subquery.String())
 }
 
 // ColTuple represents a list of column values for IN operator.
@@ -759,7 +759,7 @@ type FuncExpr struct {
 }
 
 // ToString returns the string representation of the node.
-func (node *FuncExpr) ToString() string {
+func (node *FuncExpr) String() string {
 	var distinct string
 	if node.Distinct {
 		distinct = "distinct "
@@ -767,15 +767,15 @@ func (node *FuncExpr) ToString() string {
 
 	var filter string
 	if node.Filter != nil {
-		filter = fmt.Sprintf(" filter(%s)", node.Filter.ToString()[1:])
+		filter = fmt.Sprintf(" filter(%s)", node.Filter.String()[1:])
 	}
 
 	var argsStr string
 	if node.Args != nil {
-		argsStr = node.Args.ToString()
+		argsStr = node.Args.String()
 	} else {
 		argsStr = "(*)"
 	}
 
-	return fmt.Sprintf("%s%s%s", node.Name.ToString(), argsStr[:1]+distinct+argsStr[1:], filter)
+	return fmt.Sprintf("%s%s%s", node.Name.String(), argsStr[:1]+distinct+argsStr[1:], filter)
 }

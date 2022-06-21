@@ -371,7 +371,7 @@ func TestValueLiteral(t *testing.T) {
 
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedAST, ast)
-				require.Equal(t, tc.deparsed, ast.ToString())
+				require.Equal(t, tc.deparsed, ast.String())
 			}
 		}(tc))
 	}
@@ -462,7 +462,7 @@ func TestColumnName(t *testing.T) {
 				if tc.expectedAST != nil {
 					require.NoError(t, err)
 					require.Equal(t, tc.expectedAST, ast)
-					require.Equal(t, tc.deparsed, ast.ToString())
+					require.Equal(t, tc.deparsed, ast.String())
 				} else {
 					require.Error(t, err)
 				}
@@ -1673,7 +1673,7 @@ func TestExpr(t *testing.T) {
 				ast, err := Parse(tc.expr)
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedAST, ast)
-				require.Equal(t, tc.deparsed, ast.ToString())
+				require.Equal(t, tc.deparsed, ast.String())
 			}
 		}(tc))
 	}
@@ -2726,7 +2726,7 @@ func TestSelectStatement(t *testing.T) {
 				if tc.expectedErrMsg == "" {
 					require.NoError(t, err)
 					require.Equal(t, tc.expectedAST, ast)
-					require.Equal(t, tc.deparsed, ast.ToString())
+					require.Equal(t, tc.deparsed, ast.String())
 				} else {
 					require.Contains(t, err.Error(), tc.expectedErrMsg)
 				}
@@ -2797,7 +2797,7 @@ func TestAllowedFunctions(t *testing.T) {
 
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedAST, ast)
-				require.Equal(t, tc.deparsed, ast.ToString())
+				require.Equal(t, tc.deparsed, ast.String())
 			}
 		}(tc))
 	}
