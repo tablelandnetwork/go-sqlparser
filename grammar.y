@@ -45,7 +45,7 @@ const MaxColumnNameLength = 64
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
-%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY
+%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -569,11 +569,11 @@ literal_value:
   {
     $$ = &Value{Type: StrValue, Value: $1[1:len($1)-1]}
   }
-|  INTEGRAL
+| INTEGRAL
   {
     $$ = &Value{Type: IntValue, Value: $1}
   }
-|  FLOAT
+| FLOAT
   {
     $$ = &Value{Type: FloatValue, Value: $1}
   }
@@ -581,11 +581,11 @@ literal_value:
   {
     $$ = &Value{Type: BlobValue, Value: $1}
   }
-|  HEXNUM
+| HEXNUM
   {
     $$ = &Value{Type: HexNumValue, Value: $1}
   }
-|  TRUE
+| TRUE
   {
     $$ = BoolValue(true)
   }
@@ -913,6 +913,14 @@ column_constraint:
 |  NOT NULL
   {
     $$ = &ColumnConstraintNotNull{}
+  }
+|  UNIQUE
+  {
+    $$ = &ColumnConstraintUnique{}
+  }
+| CHECK '(' expr ')'
+  {
+    $$ = &ColumnConstraintCheck{Expr: $3}
   }
 ;
 

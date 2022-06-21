@@ -866,11 +866,10 @@ type ColumnConstraint interface {
 
 func (*ColumnConstraintPrimaryKey) iColumnConstraint() {}
 func (*ColumnConstraintNotNull) iColumnConstraint()    {}
+func (*ColumnConstraintUnique) iColumnConstraint()     {}
+func (*ColumnConstraintCheck) iColumnConstraint()      {}
 
-// func (*ColumnConstraintNotNull) iColumnConstraint() {}
 // func (*ColumnConstraintDefaultValue) iColumnConstraint() {}
-// func (*ColumnConstraintUniq) iColumnConstraint() {}
-// func (*ColumnConstraintNull) iColumnConstraint() {}
 // func (*ColumnConstraintGenerated) iColumnConstraint() {}
 
 type ColumnConstraintPrimaryKey struct {
@@ -899,6 +898,24 @@ type ColumnConstraintNotNull struct {
 // String returns the string representation of the node.
 func (node *ColumnConstraintNotNull) String() string {
 	return "NOT NULL"
+}
+
+type ColumnConstraintUnique struct {
+	//ConflictClause *ConflictClause
+}
+
+// String returns the string representation of the node.
+func (node *ColumnConstraintUnique) String() string {
+	return "UNIQUE"
+}
+
+type ColumnConstraintCheck struct {
+	Expr Expr
+}
+
+// String returns the string representation of the node.
+func (node *ColumnConstraintCheck) String() string {
+	return fmt.Sprintf("CHECK(%s)", node.Expr.String())
 }
 
 // TableConstraint is constraint for table definition.

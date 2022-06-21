@@ -2925,6 +2925,50 @@ func TestCreateTable(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "create table unique",
+			stmt:     "CREATE TABLE test (id INT UNIQUE);",
+			deparsed: "CREATE TABLE test (id INT UNIQUE)",
+			expectedAST: &AST{
+				Root: &CreateTable{
+					Name: &Table{Name: "test"},
+					Columns: []*ColumnDef{
+						{
+							Name: &Column{Name: "id"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintUnique{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "create table check",
+			stmt:     "CREATE TABLE test (id INT CHECK(a > 2));",
+			deparsed: "CREATE TABLE test (id INT CHECK(a > 2))",
+			expectedAST: &AST{
+				Root: &CreateTable{
+					Name: &Table{Name: "test"},
+					Columns: []*ColumnDef{
+						{
+							Name: &Column{Name: "id"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintCheck{
+									&CmpExpr{
+										Operator: GreaterThanStr,
+										Left:     &Column{Name: "a"},
+										Right:    &Value{Type: IntValue, Value: []byte("2")},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

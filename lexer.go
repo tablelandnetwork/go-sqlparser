@@ -63,6 +63,8 @@ var keywords = map[string]int{
 	"TABLE":    TABLE,
 	"PRIMARY":  PRIMARY,
 	"KEY":      KEY,
+	"UNIQUE":   UNIQUE,
+	"CHECK":    CHECK,
 }
 
 const EOF = 0
