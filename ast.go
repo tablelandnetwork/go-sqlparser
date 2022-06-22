@@ -873,16 +873,22 @@ func (*ColumnConstraintGenerated) iColumnConstraint()  {}
 
 // ColumnConstraintPrimaryKey represents a PRIMARY KEY column constraint for CREATE TABLE.
 type ColumnConstraintPrimaryKey struct {
+	Name  Identifier
 	Order string
 	//ConflictClause *ConflictClause
 }
 
 // String returns the string representation of the node.
 func (node *ColumnConstraintPrimaryKey) String() string {
-	if node.Order == ColumnConstraintPrimaryKeyOrderEmpty {
-		return "PRIMARY KEY"
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
 	}
-	return fmt.Sprintf("PRIMARY KEY %s", node.Order)
+
+	if node.Order == ColumnConstraintPrimaryKeyOrderEmpty {
+		return fmt.Sprintf("%sPRIMARY KEY", constraintName)
+	}
+	return fmt.Sprintf("%sPRIMARY KEY %s", constraintName, node.Order)
 }
 
 const (
@@ -893,50 +899,71 @@ const (
 
 // ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
 type ColumnConstraintNotNull struct {
+	Name Identifier
 	//ConflictClause *ConflictClause
 }
 
 // String returns the string representation of the node.
 func (node *ColumnConstraintNotNull) String() string {
-	return "NOT NULL"
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+	}
+	return fmt.Sprintf("%sNOT NULL", constraintName)
 }
 
 // ColumnConstraintUnique represents a UNIQUE column constraint for CREATE TABLE.
 type ColumnConstraintUnique struct {
+	Name Identifier
 	//ConflictClause *ConflictClause
 }
 
 // String returns the string representation of the node.
 func (node *ColumnConstraintUnique) String() string {
-	return "UNIQUE"
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+	}
+	return fmt.Sprintf("%sUNIQUE", constraintName)
 }
 
 // ColumnConstraintCheck represents a CHECK column constraint for CREATE TABLE.
 type ColumnConstraintCheck struct {
+	Name Identifier
 	Expr Expr
 }
 
 // String returns the string representation of the node.
 func (node *ColumnConstraintCheck) String() string {
-	return fmt.Sprintf("CHECK(%s)", node.Expr.String())
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+	}
+	return fmt.Sprintf("%sCHECK(%s)", constraintName, node.Expr.String())
 }
 
 // ColumnConstraintDefault represents a DEFAULT column constraint for CREATE TABLE.
 type ColumnConstraintDefault struct {
+	Name        Identifier
 	Expr        Expr
 	Parenthesis bool
 }
 
 // String returns the string representation of the node.
 func (node *ColumnConstraintDefault) String() string {
-	if node.Parenthesis {
-		return fmt.Sprintf("DEFAULT (%s)", node.Expr.String())
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
 	}
-	return fmt.Sprintf("DEFAULT %s", node.Expr.String())
+	if node.Parenthesis {
+		return fmt.Sprintf("%sDEFAULT (%s)", constraintName, node.Expr.String())
+	}
+	return fmt.Sprintf("%sDEFAULT %s", constraintName, node.Expr.String())
 }
 
 // ColumnConstraintGenerated represents a GENERATED ALWAYS column constraint for CREATE TABLE.
 type ColumnConstraintGenerated struct {
+	Name Identifier
 	Expr Expr
 
 	// the GENERATED ALWAYS keywords are optional in the grammar.
@@ -948,11 +975,15 @@ type ColumnConstraintGenerated struct {
 
 // String returns the string representation of the node.
 func (node *ColumnConstraintGenerated) String() string {
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+	}
 	var b strings.Builder
 	if node.GeneratedAlways {
-		b.WriteString(fmt.Sprintf("GENERATED ALWAYS AS (%s)", node.Expr.String()))
+		b.WriteString(fmt.Sprintf("%sGENERATED ALWAYS AS (%s)", constraintName, node.Expr.String()))
 	} else {
-		b.WriteString(fmt.Sprintf("AS (%s)", node.Expr.String()))
+		b.WriteString(fmt.Sprintf("%sAS (%s)", constraintName, node.Expr.String()))
 	}
 
 	if node.IsStored {

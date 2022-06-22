@@ -46,7 +46,7 @@ const MaxColumnNameLength = 64
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
-%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL
+%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -71,7 +71,7 @@ const MaxColumnNameLength = 64
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order
 %type <column> column_name 
-%type <identifier> as_column_opt col_alias as_table_opt table_alias
+%type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
 %type <table> table_name
@@ -900,41 +900,51 @@ column_constraints:
 ;
 
 column_constraint:
-  PRIMARY KEY primary_key_order
+  constraint_name PRIMARY KEY primary_key_order
   {
-    $$ = &ColumnConstraintPrimaryKey{Order: $3}
+    $$ = &ColumnConstraintPrimaryKey{Name: $1, Order: $4}
   }
-|  NOT NULL
+| constraint_name NOT NULL
   {
-    $$ = &ColumnConstraintNotNull{}
+    $$ = &ColumnConstraintNotNull{Name: $1}
   }
-|  UNIQUE
+| constraint_name UNIQUE
   {
-    $$ = &ColumnConstraintUnique{}
+    $$ = &ColumnConstraintUnique{Name: $1}
   }
-| CHECK '(' expr ')'
+| constraint_name CHECK '(' expr ')'
   {
-    $$ = &ColumnConstraintCheck{Expr: $3}
+    $$ = &ColumnConstraintCheck{Name: $1, Expr: $4}
   }
-| DEFAULT '(' expr ')'
+| constraint_name DEFAULT '(' expr ')'
   {
-    $$ = &ColumnConstraintDefault{Expr: $3, Parenthesis: true}
+    $$ = &ColumnConstraintDefault{Name: $1, Expr: $4, Parenthesis: true}
   }
-| DEFAULT literal_value
+| constraint_name DEFAULT literal_value
   {
-    $$ = &ColumnConstraintDefault{Expr: $2}
+    $$ = &ColumnConstraintDefault{Name: $1, Expr: $3}
   }
-| DEFAULT signed_number
+| constraint_name DEFAULT signed_number
   {
-    $$ = &ColumnConstraintDefault{Expr: $2}
+    $$ = &ColumnConstraintDefault{Name: $1, Expr: $3}
   }
-| GENERATED ALWAYS AS '(' expr ')' is_stored
+| constraint_name GENERATED ALWAYS AS '(' expr ')' is_stored
   {
-    $$ = &ColumnConstraintGenerated{Expr: $5, GeneratedAlways: true, IsStored: $7}
+    $$ = &ColumnConstraintGenerated{Name: $1, Expr: $6, GeneratedAlways: true, IsStored: $8}
   }
-| AS '(' expr ')' is_stored
+| constraint_name AS '(' expr ')' is_stored
   {
-    $$ = &ColumnConstraintGenerated{Expr: $3, GeneratedAlways: false, IsStored: $5}
+    $$ = &ColumnConstraintGenerated{Name: $1, Expr: $4, GeneratedAlways: false, IsStored: $6}
+  }
+;
+
+constraint_name:
+  {
+    $$ = Identifier("")
+  }
+| CONSTRAINT IDENTIFIER 
+  {
+    $$ = Identifier(string($2))
   }
 ;
 
