@@ -798,7 +798,7 @@ func (node Identifier) IsEmpty() bool {
 type CreateTable struct {
 	Name        *Table
 	Columns     []*ColumnDef
-	Constraints []*TableConstraint
+	Constraints []TableConstraint
 
 	// This is the only TableOption supported in the AST.
 	// The grammar cannot parse this option.
@@ -818,11 +818,11 @@ func (node *CreateTable) String() string {
 		for _, constraint := range node.Constraints {
 			constraints = append(constraints, constraint.String())
 		}
-		column += "," + strings.Join(constraints, ",")
+		column += ", " + strings.Join(constraints, ", ")
 	}
 
 	if node.StrictMode {
-		return fmt.Sprintf("CREATE TABLE %s (%s) strict", node.Name.String(), column)
+		return fmt.Sprintf("CREATE TABLE %s (%s) STRICT", node.Name.String(), column)
 	} else {
 		return fmt.Sprintf("CREATE TABLE %s (%s)", node.Name.String(), column)
 	}
@@ -993,43 +993,59 @@ func (node *ColumnConstraintGenerated) String() string {
 	return b.String()
 }
 
-// TableConstraint is constraint for table definition.
-type TableConstraint struct {
-	Type TableConstraintType
-	Name string
-	// Used for PRIMARY KEY, UNIQUE, ......
-	Keys []Identifier
+type TableConstraint interface {
+	iTableConstraint()
+	Node
 }
 
-func (node TableConstraint) String() string {
-	keys := []string{}
-	for _, key := range node.Keys {
-		keys = append(keys, fmt.Sprintf("`%v`", key))
-	}
-	name := ""
-	if node.Name != "" {
-		name = fmt.Sprintf("`%s`", node.Name)
-	}
-	return fmt.Sprintf("%s %s (%s)", node.Type.String(), name, strings.Join(keys, ", "))
+func (*TableConstraintPrimaryKey) iTableConstraint() {}
+func (*TableConstraintUnique) iTableConstraint()     {}
+func (*TableConstraintCheck) iTableConstraint()      {}
+
+// TableConstraintPrimaryKey is a PRIMARY KEY constraint for table definition.
+type TableConstraintPrimaryKey struct {
+	Name    Identifier
+	Columns ColumnList
 }
 
-type TableConstraintType int
-
-const (
-	TableConstraintNoTableConstraint TableConstraintType = iota
-	TableConstraintPrimaryKey
-	TableConstraintUniq
-	TableConstraintCheck
-)
-
-func (t TableConstraintType) String() string {
-	switch t {
-	case TableConstraintPrimaryKey:
-		return "PRIMARY KEY"
-	case TableConstraintUniq:
-		return "UNIQUE"
-	case TableConstraintCheck:
-		return "CHECK"
+// String returns the string representation of the node.
+func (node *TableConstraintPrimaryKey) String() string {
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
 	}
-	return ""
+
+	return fmt.Sprintf("%sPRIMARY KEY %s", constraintName, node.Columns.String())
+}
+
+// TableConstraintUnique is a UNIQUE constraint for table definition.
+type TableConstraintUnique struct {
+	Name    Identifier
+	Columns ColumnList
+}
+
+// String returns the string representation of the node.
+func (node *TableConstraintUnique) String() string {
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+	}
+
+	return fmt.Sprintf("%sUNIQUE %s", constraintName, node.Columns.String())
+}
+
+// TableConstraintCheck is a CHECK constraint for table definition.
+type TableConstraintCheck struct {
+	Name Identifier
+	Expr Expr
+}
+
+// String returns the string representation of the node.
+func (node *TableConstraintCheck) String() string {
+	var constraintName string
+	if !node.Name.IsEmpty() {
+		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+	}
+
+	return fmt.Sprintf("%sCHECK(%s)", constraintName, node.Expr.String())
 }

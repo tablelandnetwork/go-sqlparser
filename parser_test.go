@@ -2820,7 +2820,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 					},
@@ -2833,7 +2834,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						{Name: &Column{Name: "b"}, Type: TypeIntegerStr, Constraints: []ColumnConstraint{}},
@@ -2851,7 +2853,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (id INT PRIMARY KEY, a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -2871,7 +2874,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (id INT PRIMARY KEY ASC, a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -2891,7 +2895,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (id INT PRIMARY KEY DESC, a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -2911,7 +2916,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -2940,7 +2946,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -2968,7 +2975,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (id INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -3007,7 +3015,8 @@ func TestCreateTable(t *testing.T) {
 			deparsed: "CREATE TABLE test (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Name:        &Table{Name: "test"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "a"},
@@ -3061,12 +3070,13 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table check",
+			name:     "create table generated",
 			stmt:     "CREATE TABLE t1(a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
 			deparsed: "CREATE TABLE t1 (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)), e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "t1"},
+					Name:        &Table{Name: "t1"},
+					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "a"},
@@ -3155,6 +3165,55 @@ func TestCreateTable(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "create table table constraints",
+			stmt:     "CREATE TABLE test (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
+			deparsed: "CREATE TABLE test (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0))",
+			expectedAST: &AST{
+				Root: &CreateTable{
+					Name: &Table{Name: "test"},
+					Columns: []*ColumnDef{
+						{
+							Name: &Column{Name: "id"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintNotNull{
+									Name: "nm",
+								},
+							},
+						},
+						{
+							Name:        &Column{Name: "id2"},
+							Type:        TypeIntStr,
+							Constraints: []ColumnConstraint{},
+						},
+					},
+					Constraints: []TableConstraint{
+						&TableConstraintPrimaryKey{
+							Name: "pk",
+							Columns: ColumnList{
+								&Column{Name: "id"},
+							},
+						},
+						&TableConstraintUnique{
+							Name: "un",
+							Columns: ColumnList{
+								&Column{Name: "id"},
+								&Column{Name: "id2"},
+							},
+						},
+						&TableConstraintCheck{
+							Name: "c",
+							Expr: &CmpExpr{
+								Operator: GreaterThanStr,
+								Left:     &Column{Name: "id"},
+								Right:    &Value{Type: IntValue, Value: []byte("0")},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -3169,4 +3228,14 @@ func TestCreateTable(t *testing.T) {
 			}
 		}(tc))
 	}
+}
+
+func TestCreateTableStrict(t *testing.T) {
+	t.Parallel()
+	ast, err := Parse("CREATE TABLE t (a INT);")
+	require.NoError(t, err)
+
+	ast.Root.(*CreateTable).StrictMode = true
+
+	require.Equal(t, "CREATE TABLE t (a INT) STRICT", ast.String())
 }

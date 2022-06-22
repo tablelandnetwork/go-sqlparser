@@ -37,6 +37,8 @@ const MaxColumnNameLength = 64
   columnConstraint ColumnConstraint
   columnConstraints []ColumnConstraint
   value *Value
+  tableConstraint TableConstraint
+  tableConstraints []TableConstraint
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -95,6 +97,8 @@ const MaxColumnNameLength = 64
 %type <columnConstraint> column_constraint
 %type <columnConstraints> column_constraints column_constraints_opt
 %type <value> numeric_literal
+%type <tableConstraint> table_constraint
+%type <tableConstraints> table_constraint_list table_constraint_list_opt
 
 %%
 start: 
@@ -845,9 +849,9 @@ else_expr_opt:
 ;
 
 create_table_stmt:
-  CREATE TABLE table_name '(' column_def_list ')'
+  CREATE TABLE table_name '(' column_def_list table_constraint_list_opt ')'
   {
-    $$ = &CreateTable{Name: $3, Columns: $5}
+    $$ = &CreateTable{Name: $3, Columns: $5, Constraints: $6}
   }
 ;
 
@@ -1002,5 +1006,42 @@ is_stored:
     $$ = false
   }
 ;
+
+table_constraint_list_opt:
+  {
+    $$ = []TableConstraint{}
+  }
+| table_constraint_list
+  {
+    $$ = $1
+  }
+;
+
+table_constraint_list:
+  ',' table_constraint
+  {
+    $$ = []TableConstraint{$2}
+  }
+| table_constraint_list ','  table_constraint
+  {
+    $$ = append($1, $3)
+  }
+;
+
+table_constraint:
+  constraint_name PRIMARY KEY '(' column_name_list ')'
+  {
+    $$ = &TableConstraintPrimaryKey{Name: $1, Columns: $5}
+  }
+| constraint_name UNIQUE '(' column_name_list ')'
+  {
+    $$ = &TableConstraintUnique{Name: $1, Columns: $4}
+  }
+| constraint_name CHECK '(' expr ')'
+  {
+    $$ = &TableConstraintCheck{Name: $1, Expr: $4}
+  }
+;
+
 %%
 
