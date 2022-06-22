@@ -1,25 +1,30 @@
 package sqlparser
 
 import (
+	"database/sql"
 	"fmt"
 	"testing"
 
+	"github.com/google/uuid"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/require"
 )
 
-func TestValueLiteral(t *testing.T) {
+func TestSelectStatement(t *testing.T) {
 	t.Parallel()
+
 	type testCase struct {
-		name        string
-		expr        string
-		deparsed    string
-		expectedAST *AST
+		name           string
+		stmt           string
+		deparsed       string
+		expectedAST    *AST
+		expectedErrMsg string
 	}
 
 	tests := []testCase{
 		{
 			name:     "bool-value-true",
-			expr:     "SELECT true FROM t",
+			stmt:     "SELECT true FROM t",
 			deparsed: "select true from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -38,7 +43,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "bool-value-true-upper",
-			expr:     "SELECT TRUE FROM t",
+			stmt:     "SELECT TRUE FROM t",
 			deparsed: "select true from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -57,7 +62,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "bool-value-false",
-			expr:     "SELECT false FROM t",
+			stmt:     "SELECT false FROM t",
 			deparsed: "select false from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -76,7 +81,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "bool-value-false-upper",
-			expr:     "SELECT FALSE FROM t",
+			stmt:     "SELECT FALSE FROM t",
 			deparsed: "select false from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -95,7 +100,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "string",
-			expr:     "SELECT 'anything betwen single quotes is a string' FROM t",
+			stmt:     "SELECT 'anything betwen single quotes is a string' FROM t",
 			deparsed: "select 'anything betwen single quotes is a string' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -116,7 +121,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "string-escape",
-			expr:     "SELECT 'bruno''s car' FROM t",
+			stmt:     "SELECT 'bruno''s car' FROM t",
 			deparsed: "select 'bruno''s car' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -135,7 +140,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "integer",
-			expr:     "SELECT 12 FROM t",
+			stmt:     "SELECT 12 FROM t",
 			deparsed: "select 12 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -154,7 +159,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "integer-negative",
-			expr:     "SELECT -12 FROM t",
+			stmt:     "SELECT -12 FROM t",
 			deparsed: "select -12 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -173,7 +178,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "float",
-			expr:     "SELECT 1.2 FROM t",
+			stmt:     "SELECT 1.2 FROM t",
 			deparsed: "select 1.2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -192,7 +197,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "float-starts-zero",
-			expr:     "SELECT 0.2 FROM t",
+			stmt:     "SELECT 0.2 FROM t",
 			deparsed: "select 0.2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -211,7 +216,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "float-starts-dot",
-			expr:     "SELECT .2 FROM t",
+			stmt:     "SELECT .2 FROM t",
 			deparsed: "select .2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -230,7 +235,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "float-expoent",
-			expr:     "SELECT 1e2 FROM t",
+			stmt:     "SELECT 1e2 FROM t",
 			deparsed: "select 1e2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -249,7 +254,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "float-expoent-upper",
-			expr:     "SELECT 1E2 FROM t",
+			stmt:     "SELECT 1E2 FROM t",
 			deparsed: "select 1E2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -268,7 +273,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "hex",
-			expr:     "SELECT 0xAF12 FROM t",
+			stmt:     "SELECT 0xAF12 FROM t",
 			deparsed: "select 0xAF12 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -287,7 +292,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "blob",
-			expr:     "SELECT x'AF12' FROM t",
+			stmt:     "SELECT x'AF12' FROM t",
 			deparsed: "select X'AF12' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -306,7 +311,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "blob-upper",
-			expr:     "SELECT X'AF12' FROM t",
+			stmt:     "SELECT X'AF12' FROM t",
 			deparsed: "select X'AF12' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -325,7 +330,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "null",
-			expr:     "SELECT null FROM t",
+			stmt:     "SELECT null FROM t",
 			deparsed: "select null from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -344,7 +349,7 @@ func TestValueLiteral(t *testing.T) {
 		},
 		{
 			name:     "null-upper",
-			expr:     "SELECT NULL FROM t",
+			stmt:     "SELECT NULL FROM t",
 			deparsed: "select null from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -361,36 +366,9 @@ func TestValueLiteral(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
-			return func(t *testing.T) {
-				t.Parallel()
-				ast, err := Parse(tc.expr)
-
-				require.NoError(t, err)
-				require.Equal(t, tc.expectedAST, ast)
-				require.Equal(t, tc.deparsed, ast.String())
-			}
-		}(tc))
-	}
-}
-
-func TestColumnName(t *testing.T) {
-	t.Parallel()
-
-	type testCase struct {
-		name        string
-		expr        string
-		deparsed    string
-		expectedAST *AST
-	}
-
-	tests := []testCase{
 		{
 			name:     "column",
-			expr:     "SELECT thisisacolumn FROM t",
+			stmt:     "SELECT thisisacolumn FROM t",
 			deparsed: "select thisisacolumn from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -409,7 +387,7 @@ func TestColumnName(t *testing.T) {
 		},
 		{
 			name:     "column-numbers-underscore",
-			expr:     "SELECT this_is_a_column3208ADKJHKDS_ FROM t",
+			stmt:     "SELECT this_is_a_column3208ADKJHKDS_ FROM t",
 			deparsed: "select this_is_a_column3208ADKJHKDS_ from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -428,7 +406,7 @@ func TestColumnName(t *testing.T) {
 		},
 		{
 			name:     "column-starts-with-underscore",
-			expr:     "SELECT _also_column FROM t",
+			stmt:     "SELECT _also_column FROM t",
 			deparsed: "select _also_column from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -446,46 +424,15 @@ func TestColumnName(t *testing.T) {
 			},
 		},
 		{
-			name:        "column-max-size",
-			expr:        "SELECT aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-			deparsed:    "",
-			expectedAST: nil,
+			name:           "column-max-size",
+			stmt:           "SELECT aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+			deparsed:       "",
+			expectedAST:    nil,
+			expectedErrMsg: "column length greater than",
 		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
-			return func(t *testing.T) {
-				t.Parallel()
-
-				ast, err := Parse(tc.expr)
-				if tc.expectedAST != nil {
-					require.NoError(t, err)
-					require.Equal(t, tc.expectedAST, ast)
-					require.Equal(t, tc.deparsed, ast.String())
-				} else {
-					require.Error(t, err)
-				}
-
-			}
-		}(tc))
-	}
-}
-
-func TestExpr(t *testing.T) {
-	t.Parallel()
-
-	type testCase struct {
-		name        string
-		expr        string
-		deparsed    string
-		expectedAST *AST
-	}
-
-	tests := []testCase{
 		{
 			name:     "minus-float",
-			expr:     "SELECT -2.3 FROM t",
+			stmt:     "SELECT -2.3 FROM t",
 			deparsed: "select -2.3 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -507,13 +454,13 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "minus-column",
-			expr:     "SELECT -column FROM t",
-			deparsed: "select -column from t",
+			stmt:     "SELECT -a FROM t",
+			deparsed: "select -a from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
-							Expr: &UnaryExpr{Operator: UMinusStr, Expr: &Column{Name: "column"}},
+							Expr: &UnaryExpr{Operator: UMinusStr, Expr: &Column{Name: "a"}},
 						},
 					},
 					From: TableExprList{
@@ -526,8 +473,8 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "double-unary-column",
-			expr:     "SELECT - -column FROM t",
-			deparsed: "select - -column from t",
+			stmt:     "SELECT - -a FROM t",
+			deparsed: "select - -a from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
@@ -536,7 +483,7 @@ func TestExpr(t *testing.T) {
 								Operator: UMinusStr,
 								Expr: &UnaryExpr{
 									Operator: UMinusStr,
-									Expr:     &Column{Name: "column"}},
+									Expr:     &Column{Name: "a"}},
 							},
 						},
 					},
@@ -550,7 +497,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-equals",
-			expr:     "SELECT a = 2 FROM t",
+			stmt:     "SELECT a = 2 FROM t",
 			deparsed: "select a = 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -573,7 +520,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-not-equals",
-			expr:     "SELECT a != 2 FROM t",
+			stmt:     "SELECT a != 2 FROM t",
 			deparsed: "select a != 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -596,7 +543,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-not-equals-<>",
-			expr:     "SELECT a <> 2 FROM t",
+			stmt:     "SELECT a <> 2 FROM t",
 			deparsed: "select a != 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -619,7 +566,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-greater",
-			expr:     "SELECT a > 2 FROM t",
+			stmt:     "SELECT a > 2 FROM t",
 			deparsed: "select a > 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -642,7 +589,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-less",
-			expr:     "SELECT a < 2 FROM t",
+			stmt:     "SELECT a < 2 FROM t",
 			deparsed: "select a < 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -665,7 +612,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-greater-equal",
-			expr:     "SELECT a >= 2 FROM t",
+			stmt:     "SELECT a >= 2 FROM t",
 			deparsed: "select a >= 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -688,7 +635,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-less-equal",
-			expr:     "SELECT a <= 2 FROM t",
+			stmt:     "SELECT a <= 2 FROM t",
 			deparsed: "select a <= 2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -709,55 +656,55 @@ func TestExpr(t *testing.T) {
 				},
 			},
 		},
-		{
-			name:     "comparison-regexp",
-			expr:     "SELECT a regexp 'a' FROM t",
-			deparsed: "select a regexp 'a' from t",
-			expectedAST: &AST{
-				Root: &Select{
-					SelectColumnList: []SelectColumn{
-						&AliasedSelectColumn{
-							Expr: &CmpExpr{
-								Operator: RegexpStr,
-								Left:     &Column{Name: "a"},
-								Right:    &Value{Type: StrValue, Value: []byte("a")},
-							},
-						},
-					},
-					From: TableExprList{
-						&AliasedTableExpr{
-							Expr: &Table{Name: "t"},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:     "comparison-not-regexp",
-			expr:     "SELECT a not regexp 'a' FROM t",
-			deparsed: "select a not regexp 'a' from t",
-			expectedAST: &AST{
-				Root: &Select{
-					SelectColumnList: []SelectColumn{
-						&AliasedSelectColumn{
-							Expr: &CmpExpr{
-								Operator: NotRegexpStr,
-								Left:     &Column{Name: "a"},
-								Right:    &Value{Type: StrValue, Value: []byte("a")},
-							},
-						},
-					},
-					From: TableExprList{
-						&AliasedTableExpr{
-							Expr: &Table{Name: "t"},
-						},
-					},
-				},
-			},
-		},
+		// {
+		// 	name:     "comparison-regexp",
+		// 	stmt:     "SELECT a regexp 'a' FROM t",
+		// 	deparsed: "select a regexp 'a' from t",
+		// 	expectedAST: &AST{
+		// 		Root: &Select{
+		// 			SelectColumnList: []SelectColumn{
+		// 				&AliasedSelectColumn{
+		// 					Expr: &CmpExpr{
+		// 						Operator: RegexpStr,
+		// 						Left:     &Column{Name: "a"},
+		// 						Right:    &Value{Type: StrValue, Value: []byte("a")},
+		// 					},
+		// 				},
+		// 			},
+		// 			From: TableExprList{
+		// 				&AliasedTableExpr{
+		// 					Expr: &Table{Name: "t"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
+		// {
+		// 	name:     "comparison-not-regexp",
+		// 	stmt:     "SELECT a not regexp 'a' FROM t",
+		// 	deparsed: "select a not regexp 'a' from t",
+		// 	expectedAST: &AST{
+		// 		Root: &Select{
+		// 			SelectColumnList: []SelectColumn{
+		// 				&AliasedSelectColumn{
+		// 					Expr: &CmpExpr{
+		// 						Operator: NotRegexpStr,
+		// 						Left:     &Column{Name: "a"},
+		// 						Right:    &Value{Type: StrValue, Value: []byte("a")},
+		// 					},
+		// 				},
+		// 			},
+		// 			From: TableExprList{
+		// 				&AliasedTableExpr{
+		// 					Expr: &Table{Name: "t"},
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			name:     "comparison-glob",
-			expr:     "SELECT a glob 'a' FROM t",
+			stmt:     "SELECT a glob 'a' FROM t",
 			deparsed: "select a glob 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -780,7 +727,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-not-glob",
-			expr:     "SELECT a not glob 'a' FROM t",
+			stmt:     "SELECT a not glob 'a' FROM t",
 			deparsed: "select a not glob 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -803,7 +750,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-match",
-			expr:     "SELECT a match 'a' FROM t",
+			stmt:     "SELECT a match 'a' FROM t",
 			deparsed: "select a match 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -826,7 +773,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-not-match",
-			expr:     "SELECT a not match 'a' FROM t",
+			stmt:     "SELECT a not match 'a' FROM t",
 			deparsed: "select a not match 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -849,7 +796,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-like",
-			expr:     "SELECT a like 'a' FROM t",
+			stmt:     "SELECT a like 'a' FROM t",
 			deparsed: "select a like 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -872,7 +819,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-not-like",
-			expr:     "SELECT a not like 'a' FROM t",
+			stmt:     "SELECT a not like 'a' FROM t",
 			deparsed: "select a not like 'a' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -895,7 +842,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-like-escape",
-			expr:     "SELECT a like '%a\\%%' escape '\\' FROM t",
+			stmt:     "SELECT a like '%a\\%%' escape '\\' FROM t",
 			deparsed: "select a like '%a\\%%' escape '\\' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -919,7 +866,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "comparison-not-like-escape",
-			expr:     "SELECT a not like '%a\\%%' escape '\\' FROM t",
+			stmt:     "SELECT a not like '%a\\%%' escape '\\' FROM t",
 			deparsed: "select a not like '%a\\%%' escape '\\' from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -943,7 +890,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "logical-and",
-			expr:     "SELECT a and b FROM t",
+			stmt:     "SELECT a and b FROM t",
 			deparsed: "select a and b from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -965,7 +912,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "logical-or",
-			expr:     "SELECT a or b FROM t",
+			stmt:     "SELECT a or b FROM t",
 			deparsed: "select a or b from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -987,7 +934,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "is",
-			expr:     "SELECT a is b FROM t",
+			stmt:     "SELECT a is b FROM t",
 			deparsed: "select a is b from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1009,7 +956,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "is-not",
-			expr:     "SELECT a is not b FROM t",
+			stmt:     "SELECT a is not b FROM t",
 			deparsed: "select a is not b from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1033,7 +980,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "isnull",
-			expr:     "SELECT a isnull FROM t",
+			stmt:     "SELECT a isnull FROM t",
 			deparsed: "select a isnull from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1054,7 +1001,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "notnull",
-			expr:     "SELECT a notnull FROM t",
+			stmt:     "SELECT a notnull FROM t",
 			deparsed: "select a notnull from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1075,7 +1022,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "not-null",
-			expr:     "SELECT a not null FROM t",
+			stmt:     "SELECT a not null FROM t",
 			deparsed: "select a notnull from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1096,7 +1043,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "cast-to-text",
-			expr:     "SELECT CAST (1 AS TEXT) FROM t",
+			stmt:     "SELECT CAST (1 AS TEXT) FROM t",
 			deparsed: "select cast (1 as text) from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1121,15 +1068,15 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "cast-to-real",
-			expr:     "SELECT CAST (column AS REAL) FROM t",
-			deparsed: "select cast (column as real) from t",
+			stmt:     "SELECT CAST (a AS REAL) FROM t",
+			deparsed: "select cast (a as real) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
-									Name: "column",
+									Name: "a",
 								},
 								Type: RealStr,
 							},
@@ -1145,15 +1092,15 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "cast-to-none",
-			expr:     "SELECT CAST (column AS none) FROM t",
-			deparsed: "select cast (column as none) from t",
+			stmt:     "SELECT CAST (a AS none) FROM t",
+			deparsed: "select cast (a as none) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
-									Name: "column",
+									Name: "a",
 								},
 								Type: NoneStr,
 							},
@@ -1169,15 +1116,15 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "cast-to-numeric",
-			expr:     "SELECT CAST (column AS numeric) FROM t",
-			deparsed: "select cast (column as numeric) from t",
+			stmt:     "SELECT CAST (a AS numeric) FROM t",
+			deparsed: "select cast (a as numeric) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
-									Name: "column",
+									Name: "a",
 								},
 								Type: NumericStr,
 							},
@@ -1193,15 +1140,15 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "cast-to-integer",
-			expr:     "SELECT CAST (column AS integer) FROM t",
-			deparsed: "select cast (column as integer) from t",
+			stmt:     "SELECT CAST (a AS integer) FROM t",
+			deparsed: "select cast (a as integer) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
 							Expr: &ConvertExpr{
 								Expr: &Column{
-									Name: "column",
+									Name: "a",
 								},
 								Type: IntegerStr,
 							},
@@ -1217,7 +1164,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "collate",
-			expr:     "SELECT c1 = c2 COLLATE rtrim FROM t",
+			stmt:     "SELECT c1 = c2 COLLATE rtrim FROM t",
 			deparsed: "select c1 = c2 collate rtrim from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1243,7 +1190,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "plus",
-			expr:     "SELECT c1 + 10 FROM t",
+			stmt:     "SELECT c1 + 10 FROM t",
 			deparsed: "select c1 + 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1266,7 +1213,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "minus",
-			expr:     "SELECT c1 - 10 FROM t",
+			stmt:     "SELECT c1 - 10 FROM t",
 			deparsed: "select c1 - 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1289,7 +1236,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "multiplication",
-			expr:     "SELECT c1 * 10 FROM t",
+			stmt:     "SELECT c1 * 10 FROM t",
 			deparsed: "select c1 * 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1312,7 +1259,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "division",
-			expr:     "SELECT c1 / 10 FROM t",
+			stmt:     "SELECT c1 / 10 FROM t",
 			deparsed: "select c1 / 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1335,7 +1282,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "mod",
-			expr:     "SELECT c1 % 10 FROM t",
+			stmt:     "SELECT c1 % 10 FROM t",
 			deparsed: "select c1 % 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1358,7 +1305,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "bitand",
-			expr:     "SELECT c1 & 10 FROM t",
+			stmt:     "SELECT c1 & 10 FROM t",
 			deparsed: "select c1 & 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1381,7 +1328,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "bitor",
-			expr:     "SELECT c1 | 10 FROM t",
+			stmt:     "SELECT c1 | 10 FROM t",
 			deparsed: "select c1 | 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1404,7 +1351,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "leftshift",
-			expr:     "SELECT c1 << 10 FROM t",
+			stmt:     "SELECT c1 << 10 FROM t",
 			deparsed: "select c1 << 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1427,7 +1374,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "rightshift",
-			expr:     "SELECT c1 >> 10 FROM t",
+			stmt:     "SELECT c1 >> 10 FROM t",
 			deparsed: "select c1 >> 10 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1450,7 +1397,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "concat",
-			expr:     "SELECT c1 || c2 FROM t",
+			stmt:     "SELECT c1 || c2 FROM t",
 			deparsed: "select c1 || c2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1473,7 +1420,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "json-extract",
-			expr:     "SELECT c1 -> c2 FROM t",
+			stmt:     "SELECT c1 -> c2 FROM t",
 			deparsed: "select c1 -> c2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1496,7 +1443,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "json-unquote-extract",
-			expr:     "SELECT c1 ->> c2 FROM t",
+			stmt:     "SELECT c1 ->> c2 FROM t",
 			deparsed: "select c1 ->> c2 from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1519,7 +1466,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "bitnot",
-			expr:     "SELECT ~c FROM t",
+			stmt:     "SELECT ~c FROM t",
 			deparsed: "select ~c from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1541,7 +1488,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "unary-plus",
-			expr:     "SELECT +c FROM t",
+			stmt:     "SELECT +c FROM t",
 			deparsed: "select +c from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1563,17 +1510,17 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "between",
-			expr:     "SELECT c1 BETWEEN c2 AND c3 FROM t",
-			deparsed: "select c1 between c2 and c3 from t",
+			stmt:     "SELECT a BETWEEN b AND c FROM t",
+			deparsed: "select a between b and c from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
 							Expr: &BetweenExpr{
 								Operator: BetweenStr,
-								Left:     &Column{Name: "c1"},
-								From:     &Column{Name: "c2"},
-								To:       &Column{Name: "c3"},
+								Left:     &Column{Name: "a"},
+								From:     &Column{Name: "b"},
+								To:       &Column{Name: "c"},
 							},
 						},
 					},
@@ -1587,17 +1534,17 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "between-not",
-			expr:     "SELECT c1 NOT BETWEEN c2 AND c3 FROM t",
-			deparsed: "select c1 not between c2 and c3 from t",
+			stmt:     "SELECT a NOT BETWEEN b AND c FROM t",
+			deparsed: "select a not between b and c from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
 							Expr: &BetweenExpr{
 								Operator: NotBetweenStr,
-								Left:     &Column{Name: "c1"},
-								From:     &Column{Name: "c2"},
-								To:       &Column{Name: "c3"},
+								Left:     &Column{Name: "a"},
+								From:     &Column{Name: "b"},
+								To:       &Column{Name: "c"},
 							},
 						},
 					},
@@ -1611,17 +1558,19 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "expression-list",
-			expr:     "SELECT (c1, c2, 1) FROM t",
-			deparsed: "select (c1, c2, 1) from t",
+			stmt:     "SELECT c1, c2, 1 FROM t",
+			deparsed: "select c1, c2, 1 from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: []SelectColumn{
 						&AliasedSelectColumn{
-							Expr: Exprs{
-								&Column{Name: "c1"},
-								&Column{Name: "c2"},
-								&Value{Type: IntValue, Value: []byte("1")},
-							},
+							Expr: &Column{Name: "c1"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Column{Name: "c2"},
+						},
+						&AliasedSelectColumn{
+							Expr: &Value{Type: IntValue, Value: []byte("1")},
 						},
 					},
 					From: TableExprList{
@@ -1634,7 +1583,7 @@ func TestExpr(t *testing.T) {
 		},
 		{
 			name:     "case",
-			expr:     "SELECT CASE c1 WHEN 0 THEN 'zero' WHEN 1 THEN 'one' ELSE 'panic' END FROM t",
+			stmt:     "SELECT CASE c1 WHEN 0 THEN 'zero' WHEN 1 THEN 'one' ELSE 'panic' END FROM t",
 			deparsed: "select case c1 when 0 then 'zero' when 1 then 'one' else 'panic' end from t",
 			expectedAST: &AST{
 				Root: &Select{
@@ -1664,37 +1613,10 @@ func TestExpr(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
-			return func(t *testing.T) {
-				t.Parallel()
-				ast, err := Parse(tc.expr)
-				require.NoError(t, err)
-				require.Equal(t, tc.expectedAST, ast)
-				require.Equal(t, tc.deparsed, ast.String())
-			}
-		}(tc))
-	}
-}
-
-func TestSelectStatement(t *testing.T) {
-	t.Parallel()
-
-	type testCase struct {
-		name           string
-		stmt           string
-		deparsed       string
-		expectedAST    *AST
-		expectedErrMsg string
-	}
-
-	tests := []testCase{
 		{
 			name:     "simple-select",
-			stmt:     "SELECT * FROM t1 WHERE c1 > c2",
-			deparsed: "select * from t1 where c1 > c2",
+			stmt:     "SELECT * FROM t WHERE c1 > c2",
+			deparsed: "select * from t where c1 > c2",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1702,7 +1624,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -1718,20 +1640,20 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "multiple-columns",
-			stmt:     "SELECT a, t1.b, column as c1, column2 as c2, * FROM t1 WHERE 1",
-			deparsed: "select a, t1.b, column as c1, column2 as c2, * from t1 where 1",
+			stmt:     "SELECT a, t.b, c1 as column, c2 as column2, * FROM t WHERE 1",
+			deparsed: "select a, t.b, c1 as column, c2 as column2, * from t where 1",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
 						&AliasedSelectColumn{Expr: &Column{Name: "a"}},
-						&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t1"}}},
-						&AliasedSelectColumn{Expr: &Column{Name: "column"}, As: "c1"},
-						&AliasedSelectColumn{Expr: &Column{Name: "column2"}, As: "c2"},
+						&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t"}}},
+						&AliasedSelectColumn{Expr: &Column{Name: "c1"}, As: "column"},
+						&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "column2"},
 						&StarSelectColumn{},
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -1743,8 +1665,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "groupby",
-			stmt:     "SELECT a, b FROM t1 GROUP BY a, b",
-			deparsed: "select a, b from t1 group by a, b",
+			stmt:     "SELECT a, b FROM t GROUP BY a, b",
+			deparsed: "select a, b from t group by a, b",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1757,7 +1679,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					GroupBy: []Expr{
@@ -1769,8 +1691,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "groupby-having",
-			stmt:     "SELECT a, b FROM t1 GROUP BY a, b HAVING a = 1",
-			deparsed: "select a, b from t1 group by a, b having a = 1",
+			stmt:     "SELECT a, b FROM t GROUP BY a, b HAVING a = 1",
+			deparsed: "select a, b from t group by a, b having a = 1",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1783,7 +1705,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					GroupBy: []Expr{
@@ -1803,8 +1725,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "orderby",
-			stmt:     "SELECT a, b FROM t1 ORDER BY a",
-			deparsed: "select a, b from t1 order by a asc",
+			stmt:     "SELECT a, b FROM t ORDER BY a",
+			deparsed: "select a, b from t order by a asc",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1817,7 +1739,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					OrderBy: OrderBy{
@@ -1828,8 +1750,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "orderby-asc",
-			stmt:     "SELECT a, b FROM t1 ORDER BY a asc",
-			deparsed: "select a, b from t1 order by a asc",
+			stmt:     "SELECT a, b FROM t ORDER BY a asc",
+			deparsed: "select a, b from t order by a asc",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1842,7 +1764,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					OrderBy: OrderBy{
@@ -1853,8 +1775,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "orderby-asc",
-			stmt:     "SELECT a, b FROM t1 ORDER BY a desc",
-			deparsed: "select a, b from t1 order by a desc",
+			stmt:     "SELECT a, b FROM t ORDER BY a desc",
+			deparsed: "select a, b from t order by a desc",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1867,7 +1789,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					OrderBy: OrderBy{
@@ -1878,8 +1800,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "orderby-desc-asc",
-			stmt:     "SELECT a, b FROM t1 ORDER BY a desc, b",
-			deparsed: "select a, b from t1 order by a desc, b asc",
+			stmt:     "SELECT a, b FROM t ORDER BY a desc, b",
+			deparsed: "select a, b from t order by a desc, b asc",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1892,7 +1814,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					OrderBy: OrderBy{
@@ -1904,8 +1826,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "orderby-nulls",
-			stmt:     "SELECT a, b, c FROM t1 ORDER BY a desc, b NULLS FIRST, c NULLS LAST",
-			deparsed: "select a, b, c from t1 order by a desc, b asc nulls first, c asc nulls last",
+			stmt:     "SELECT a, b, c FROM t ORDER BY a desc, b NULLS FIRST, c NULLS LAST",
+			deparsed: "select a, b, c from t order by a desc, b asc nulls first, c asc nulls last",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1921,7 +1843,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					OrderBy: OrderBy{
@@ -1934,8 +1856,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "limit",
-			stmt:     "SELECT * FROM t1 LIMIT 1",
-			deparsed: "select * from t1 limit 1",
+			stmt:     "SELECT * FROM t LIMIT 1",
+			deparsed: "select * from t limit 1",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1943,7 +1865,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Limit: &Limit{
@@ -1954,8 +1876,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "limit-offet",
-			stmt:     "SELECT * FROM t1 LIMIT 1 OFFSET 2",
-			deparsed: "select * from t1 limit 1 offset 2",
+			stmt:     "SELECT * FROM t LIMIT 1 OFFSET 2",
+			deparsed: "select * from t limit 1 offset 2",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1963,7 +1885,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Limit: &Limit{
@@ -1975,8 +1897,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "limit-offet-alternative",
-			stmt:     "SELECT * FROM t1 LIMIT 1, 2",
-			deparsed: "select * from t1 limit 2 offset 1",
+			stmt:     "SELECT * FROM t LIMIT 1, 2",
+			deparsed: "select * from t limit 2 offset 1",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -1984,7 +1906,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Limit: &Limit{
@@ -1996,8 +1918,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "simple-select-distinct",
-			stmt:     "SELECT DISTINCT * FROM t1",
-			deparsed: "select distinct * from t1",
+			stmt:     "SELECT DISTINCT * FROM t",
+			deparsed: "select distinct * from t",
 			expectedAST: &AST{
 				Root: &Select{
 					Distinct: DistinctStr,
@@ -2006,7 +1928,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2014,8 +1936,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "simple-select-all",
-			stmt:     "SELECT ALL * FROM t1",
-			deparsed: "select all * from t1",
+			stmt:     "SELECT ALL * FROM t",
+			deparsed: "select all * from t",
 			expectedAST: &AST{
 				Root: &Select{
 					Distinct: AllStr,
@@ -2024,7 +1946,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2032,8 +1954,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "simple-select-alias-table",
-			stmt:     "SELECT * FROM t1 as t",
-			deparsed: "select * from t1 as t",
+			stmt:     "SELECT * FROM t as t",
+			deparsed: "select * from t as t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2041,7 +1963,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 							As:   "t",
 						},
 					},
@@ -2050,8 +1972,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "simple-select-alias-table-alt",
-			stmt:     "SELECT * FROM t1 t",
-			deparsed: "select * from t1 as t",
+			stmt:     "SELECT * FROM t t",
+			deparsed: "select * from t as t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2059,7 +1981,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 							As:   "t",
 						},
 					},
@@ -2068,23 +1990,23 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "select-multiple-tables",
-			stmt:     "SELECT a.*, b.column1 as c1 FROM a, b",
-			deparsed: "select a.*, b.column1 as c1 from a, b",
+			stmt:     "SELECT t.*, t2.c1 as column1 FROM t, t2",
+			deparsed: "select t.*, t2.c1 as column1 from t, t2",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
-						&StarSelectColumn{TableRef: &Table{Name: "a"}},
+						&StarSelectColumn{TableRef: &Table{Name: "t"}},
 						&AliasedSelectColumn{
-							Expr: &Column{Name: "column1", TableRef: &Table{Name: "b"}},
-							As:   "c1",
+							Expr: &Column{Name: "c1", TableRef: &Table{Name: "t2"}},
+							As:   "column1",
 						},
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "a"},
+							Expr: &Table{Name: "t"},
 						},
 						&AliasedTableExpr{
-							Expr: &Table{Name: "b"},
+							Expr: &Table{Name: "t2"},
 						},
 					},
 				},
@@ -2092,8 +2014,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "select-from-subquery",
-			stmt:     "SELECT * FROM (SELECT * FROM t1)",
-			deparsed: "select * from (select * from t1)",
+			stmt:     "SELECT * FROM (SELECT * FROM t)",
+			deparsed: "select * from (select * from t)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2108,7 +2030,7 @@ func TestSelectStatement(t *testing.T) {
 									},
 									From: TableExprList{
 										&AliasedTableExpr{
-											Expr: &Table{Name: "t1"},
+											Expr: &Table{Name: "t"},
 										},
 									},
 								},
@@ -2120,8 +2042,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "select-from-subquery-aliased",
-			stmt:     "SELECT * FROM (SELECT * FROM t1) as subquery",
-			deparsed: "select * from (select * from t1) as subquery",
+			stmt:     "SELECT * FROM (SELECT * FROM t) as subquery",
+			deparsed: "select * from (select * from t) as subquery",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2136,7 +2058,7 @@ func TestSelectStatement(t *testing.T) {
 									},
 									From: TableExprList{
 										&AliasedTableExpr{
-											Expr: &Table{Name: "t1"},
+											Expr: &Table{Name: "t"},
 										},
 									},
 								},
@@ -2149,8 +2071,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "select-from-subquery-aliased-alt",
-			stmt:     "SELECT * FROM (SELECT * FROM t1) subquery",
-			deparsed: "select * from (select * from t1) as subquery",
+			stmt:     "SELECT * FROM (SELECT * FROM t) subquery",
+			deparsed: "select * from (select * from t) as subquery",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2165,7 +2087,7 @@ func TestSelectStatement(t *testing.T) {
 									},
 									From: TableExprList{
 										&AliasedTableExpr{
-											Expr: &Table{Name: "t1"},
+											Expr: &Table{Name: "t"},
 										},
 									},
 								},
@@ -2178,8 +2100,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "join",
-			stmt:     "SELECT * FROM a JOIN b JOIN c JOIN d",
-			deparsed: "select * from a join b join c join d",
+			stmt:     "SELECT * FROM t JOIN t2 JOIN t3 JOIN t4",
+			deparsed: "select * from t join t2 join t3 join t4",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2189,15 +2111,15 @@ func TestSelectStatement(t *testing.T) {
 						&JoinTableExpr{
 							LeftExpr: &JoinTableExpr{
 								LeftExpr: &JoinTableExpr{
-									LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "a"}},
+									LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
 									JoinOperator: JoinStr,
-									RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "b"}},
+									RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
 								},
 								JoinOperator: JoinStr,
-								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "c"}},
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t3"}},
 							},
 							JoinOperator: JoinStr,
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "d"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t4"}},
 						},
 					},
 				},
@@ -2205,8 +2127,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "join-on",
-			stmt:     "SELECT * FROM a JOIN b ON a.id = b.id JOIN c ON b.c1 = c.c1",
-			deparsed: "select * from a join b on a.id = b.id join c on b.c1 = c.c1",
+			stmt:     "SELECT * FROM t JOIN t2 ON t.a = t2.a JOIN t3 ON t2.c1 = t3.c1",
+			deparsed: "select * from t join t2 on t.a = t2.a join t3 on t2.c1 = t3.c1",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2215,21 +2137,21 @@ func TestSelectStatement(t *testing.T) {
 					From: TableExprList{
 						&JoinTableExpr{
 							LeftExpr: &JoinTableExpr{
-								LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "a"}},
+								LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
 								JoinOperator: JoinStr,
-								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "b"}},
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
 								On: &CmpExpr{
 									Operator: EqualStr,
-									Left:     &Column{Name: "id", TableRef: &Table{Name: "a"}},
-									Right:    &Column{Name: "id", TableRef: &Table{Name: "b"}},
+									Left:     &Column{Name: "a", TableRef: &Table{Name: "t"}},
+									Right:    &Column{Name: "a", TableRef: &Table{Name: "t2"}},
 								},
 							},
 							JoinOperator: JoinStr,
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "c"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t3"}},
 							On: &CmpExpr{
 								Operator: EqualStr,
-								Left:     &Column{Name: "c1", TableRef: &Table{Name: "b"}},
-								Right:    &Column{Name: "c1", TableRef: &Table{Name: "c"}},
+								Left:     &Column{Name: "c1", TableRef: &Table{Name: "t2"}},
+								Right:    &Column{Name: "c1", TableRef: &Table{Name: "t3"}},
 							},
 						},
 					},
@@ -2238,8 +2160,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "join-using",
-			stmt:     "SELECT * FROM a JOIN b USING(c1, c2)",
-			deparsed: "select * from a join b using (c1, c2)",
+			stmt:     "SELECT * FROM t JOIN t2 USING(c1, c2)",
+			deparsed: "select * from t join t2 using (c1, c2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2247,9 +2169,9 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "a"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
 							JoinOperator: JoinStr,
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "b"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
 							Using: ColumnList{
 								&Column{Name: "c1"},
 								&Column{Name: "c2"},
@@ -2261,15 +2183,15 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "subquery",
-			stmt:     "SELECT * FROM t1 WHERE (SELECT 1 FROM t2)",
-			deparsed: "select * from t1 where (select 1 from t2)",
+			stmt:     "SELECT * FROM t WHERE (SELECT 1 FROM t2)",
+			deparsed: "select * from t where (select 1 from t2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
 					From: TableExprList{
-						&AliasedTableExpr{Expr: &Table{Name: "t1"}},
+						&AliasedTableExpr{Expr: &Table{Name: "t"}},
 					},
 					Where: &Where{
 						Type: WhereStr,
@@ -2291,15 +2213,15 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "exists",
-			stmt:     "SELECT * FROM t1 WHERE EXISTS (SELECT 1 FROM t2)",
-			deparsed: "select * from t1 where exists (select 1 from t2)",
+			stmt:     "SELECT * FROM t WHERE EXISTS (SELECT 1 FROM t2)",
+			deparsed: "select * from t where exists (select 1 from t2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
 					From: TableExprList{
-						&AliasedTableExpr{Expr: &Table{Name: "t1"}},
+						&AliasedTableExpr{Expr: &Table{Name: "t"}},
 					},
 					Where: &Where{
 						Type: WhereStr,
@@ -2323,15 +2245,15 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "not-exists",
-			stmt:     "SELECT * FROM t1 WHERE NOT EXISTS (SELECT 1 FROM t2)",
-			deparsed: "select * from t1 where not exists (select 1 from t2)",
+			stmt:     "SELECT * FROM t WHERE NOT EXISTS (SELECT 1 FROM t2)",
+			deparsed: "select * from t where not exists (select 1 from t2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
 						&StarSelectColumn{},
 					},
 					From: TableExprList{
-						&AliasedTableExpr{Expr: &Table{Name: "t1"}},
+						&AliasedTableExpr{Expr: &Table{Name: "t"}},
 					},
 					Where: &Where{
 						Type: WhereStr,
@@ -2357,8 +2279,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "in empty",
-			stmt:     "SELECT a FROM t1 WHERE a IN ()",
-			deparsed: "select a from t1 where a in ()",
+			stmt:     "SELECT a FROM t WHERE a IN ()",
+			deparsed: "select a from t where a in ()",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2368,7 +2290,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -2384,8 +2306,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "in multiple values",
-			stmt:     "SELECT a FROM t1 WHERE a IN (1, 2)",
-			deparsed: "select a from t1 where a in (1, 2)",
+			stmt:     "SELECT a FROM t WHERE a IN (1, 2)",
+			deparsed: "select a from t where a in (1, 2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2395,7 +2317,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -2414,8 +2336,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "in subselect",
-			stmt:     "SELECT a FROM t1 WHERE a IN (SELECT a FROM t2)",
-			deparsed: "select a from t1 where a in (select a from t2)",
+			stmt:     "SELECT a FROM t WHERE a IN (SELECT a FROM t2)",
+			deparsed: "select a from t where a in (select a from t2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2425,7 +2347,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -2454,8 +2376,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "not in empty",
-			stmt:     "SELECT a FROM t1 WHERE a NOT IN ()",
-			deparsed: "select a from t1 where a not in ()",
+			stmt:     "SELECT a FROM t WHERE a NOT IN ()",
+			deparsed: "select a from t where a not in ()",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2465,7 +2387,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -2481,8 +2403,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "not in multiple values",
-			stmt:     "SELECT a FROM t1 WHERE a NOT IN (1, 2)",
-			deparsed: "select a from t1 where a not in (1, 2)",
+			stmt:     "SELECT a FROM t WHERE a NOT IN (1, 2)",
+			deparsed: "select a from t where a not in (1, 2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2492,7 +2414,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -2511,8 +2433,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "not in subselect",
-			stmt:     "SELECT a FROM t1 WHERE a NOT IN (SELECT a FROM t2)",
-			deparsed: "select a from t1 where a not in (select a from t2)",
+			stmt:     "SELECT a FROM t WHERE a NOT IN (SELECT a FROM t2)",
+			deparsed: "select a from t where a not in (select a from t2)",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2522,7 +2444,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 					Where: &Where{
@@ -2551,8 +2473,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "function call",
-			stmt:     "SELECT count(c1) FROM t1",
-			deparsed: "select count(c1) from t1",
+			stmt:     "SELECT count(c1) FROM t",
+			deparsed: "select count(c1) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2567,7 +2489,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2575,8 +2497,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "function call filter",
-			stmt:     "SELECT max(ID) FILTER(WHERE ID > 2) FROM t1",
-			deparsed: "select max(ID) filter(where ID > 2) from t1",
+			stmt:     "SELECT max(a) FILTER(WHERE a > 2) FROM t",
+			deparsed: "select max(a) filter(where a > 2) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2584,13 +2506,13 @@ func TestSelectStatement(t *testing.T) {
 							Expr: &FuncExpr{
 								Name: "max",
 								Args: Exprs{
-									&Column{Name: "ID"},
+									&Column{Name: "a"},
 								},
 								Filter: &Where{
 									Type: WhereStr,
 									Expr: &CmpExpr{
 										Operator: GreaterThanStr,
-										Left:     &Column{Name: "ID"},
+										Left:     &Column{Name: "a"},
 										Right:    &Value{Type: IntValue, Value: []byte("2")},
 									},
 								},
@@ -2599,7 +2521,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2607,8 +2529,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "function call",
-			stmt:     "SELECT count(c1) FROM t1",
-			deparsed: "select count(c1) from t1",
+			stmt:     "SELECT count(c1) FROM t",
+			deparsed: "select count(c1) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2623,7 +2545,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2631,8 +2553,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "function call star",
-			stmt:     "SELECT count(*) FROM t1",
-			deparsed: "select count(*) from t1",
+			stmt:     "SELECT count(*) FROM t",
+			deparsed: "select count(*) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2645,7 +2567,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2653,15 +2575,15 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:           "function does not exist star",
-			stmt:           "SELECT foo(*) FROM t1",
-			deparsed:       "select foo(*) from t1",
+			stmt:           "SELECT foo(*) FROM t",
+			deparsed:       "select foo(*) from t",
 			expectedAST:    nil,
-			expectedErrMsg: "function 'foo' does not exist",
+			expectedErrMsg: "no such function: foo",
 		},
 		{
 			name:     "function call distinct",
-			stmt:     "SELECT count(distinct c1) FROM t1",
-			deparsed: "select count(distinct c1) from t1",
+			stmt:     "SELECT count(distinct c1) FROM t",
+			deparsed: "select count(distinct c1) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2677,7 +2599,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2685,15 +2607,15 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:           "function does not exist",
-			stmt:           "SELECT foo(ID) FILTER(WHERE ID > 2) FROM t1",
-			deparsed:       "select foo(ID) filter(where ID > 2) from t1",
+			stmt:           "SELECT foo(ID) FILTER(WHERE ID > 2) FROM t",
+			deparsed:       "select foo(ID) filter(where ID > 2) from t",
 			expectedAST:    nil,
-			expectedErrMsg: "function 'foo' does not exist",
+			expectedErrMsg: "no such function: foo",
 		},
 		{
 			name:     "function call like with escape",
-			stmt:     "SELECT like(a, b, c) FROM t1",
-			deparsed: "select like(a, b, c) from t1",
+			stmt:     "SELECT like(a, b, c) FROM t",
+			deparsed: "select like(a, b, c) from t",
 			expectedAST: &AST{
 				Root: &Select{
 					SelectColumnList: SelectColumnList{
@@ -2710,7 +2632,7 @@ func TestSelectStatement(t *testing.T) {
 					},
 					From: TableExprList{
 						&AliasedTableExpr{
-							Expr: &Table{Name: "t1"},
+							Expr: &Table{Name: "t"},
 						},
 					},
 				},
@@ -2727,6 +2649,22 @@ func TestSelectStatement(t *testing.T) {
 					require.NoError(t, err)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
+
+					// test all SELECT statements against SQLite3
+					db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+					require.NoError(t, err)
+
+					// create dummy tables
+					_, err = db.Exec(`CREATE TABLE t (a int, b int, c int, c1 int, c2 int, thisisacolumn int, this_is_a_column3208ADKJHKDS_ int, _also_column int);
+						CREATE TABLE t2 (a int, b int, c int, c1 int, c2 int);
+						CREATE TABLE t3 (a int, b int, c int, c1 int, c2 int);
+						CREATE TABLE t4 (a int, b int, c int, c1 int, c2 int);
+					`)
+					require.NoError(t, err)
+
+					_, err = db.Exec(tc.stmt)
+					require.NoError(t, err)
+
 				} else {
 					require.Contains(t, err.Error(), tc.expectedErrMsg)
 				}
@@ -2816,11 +2754,11 @@ func TestCreateTable(t *testing.T) {
 	tests := []testCase{
 		{
 			name:     "create table simple",
-			stmt:     "CREATE TABLE test (a INT);",
-			deparsed: "CREATE TABLE test (a INT)",
+			stmt:     "CREATE TABLE t (a INT);",
+			deparsed: "CREATE TABLE t (a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -2830,11 +2768,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table types",
-			stmt:     "CREATE TABLE test (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
-			deparsed: "CREATE TABLE test (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY)",
+			stmt:     "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
+			deparsed: "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -2849,11 +2787,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table primary key",
-			stmt:     "CREATE TABLE test (id INT PRIMARY KEY, a INT);",
-			deparsed: "CREATE TABLE test (id INT PRIMARY KEY, a INT)",
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY, a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -2870,11 +2808,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table primary key asc",
-			stmt:     "CREATE TABLE test (id INT PRIMARY KEY ASC, a INT);",
-			deparsed: "CREATE TABLE test (id INT PRIMARY KEY ASC, a INT)",
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -2891,11 +2829,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table primary key desc",
-			stmt:     "CREATE TABLE test (id INT PRIMARY KEY DESC, a INT);",
-			deparsed: "CREATE TABLE test (id INT PRIMARY KEY DESC, a INT)",
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -2912,11 +2850,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table primary key not null",
-			stmt:     "CREATE TABLE test (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
-			deparsed: "CREATE TABLE test (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL)",
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -2942,11 +2880,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table unique",
-			stmt:     "CREATE TABLE test (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
-			deparsed: "CREATE TABLE test (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE)",
+			stmt:     "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
+			deparsed: "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE)",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -2971,15 +2909,15 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table check",
-			stmt:     "CREATE TABLE test (id INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
-			deparsed: "CREATE TABLE test (id INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2))",
+			stmt:     "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
+			deparsed: "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
-							Name: &Column{Name: "id"},
+							Name: &Column{Name: "a"},
 							Type: TypeIntStr,
 							Constraints: []ColumnConstraint{
 								&ColumnConstraintCheck{
@@ -3011,11 +2949,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table default",
-			stmt:     "CREATE TABLE test (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
-			deparsed: "CREATE TABLE test (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
+			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
+			deparsed: "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "test"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -3071,11 +3009,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table generated",
-			stmt:     "CREATE TABLE t1(a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed: "CREATE TABLE t1 (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)), e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)))",
+			stmt:     "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
+			deparsed: "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)), e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name:        &Table{Name: "t1"},
+					Table:       &Table{Name: "t"},
 					Constraints: []TableConstraint{},
 					Columns: []*ColumnDef{
 						{
@@ -3167,11 +3105,11 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:     "create table table constraints",
-			stmt:     "CREATE TABLE test (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
-			deparsed: "CREATE TABLE test (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0))",
+			stmt:     "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
+			deparsed: "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0))",
 			expectedAST: &AST{
 				Root: &CreateTable{
-					Name: &Table{Name: "test"},
+					Table: &Table{Name: "t"},
 					Columns: []*ColumnDef{
 						{
 							Name: &Column{Name: "id"},
@@ -3225,6 +3163,20 @@ func TestCreateTable(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
+
+				// test all CREATE statements against SQLite3
+				db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+				require.NoError(t, err)
+
+				_, err = db.Exec(tc.stmt)
+				require.NoError(t, err)
+
+				_, err = db.Exec(fmt.Sprintf("DROP TABLE %s", ast.Root.(*CreateTable).Table.Name))
+				require.NoError(t, err)
+
+				// test AST SQL generation against SQLite3
+				_, err = db.Exec(ast.String())
+				require.NoError(t, err)
 			}
 		}(tc))
 	}

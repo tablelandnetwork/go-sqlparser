@@ -542,10 +542,6 @@ expr:
   {  
     $$ = &CollateExpr{Expr : $1, CollationName: string($3)}
   }
-| '(' expr_list ')'
-  {
-    $$ = $2
-  }
 | expr IN col_tuple
   {
     $$ = &CmpExpr{Left: $1, Operator: InStr, Right: $3}
@@ -755,7 +751,7 @@ function_call_generic:
   IDENTIFIER '(' distinct_function_opt expr_list_opt ')' filter_opt
   {
     if _, ok := AllowedFunctions[string($1)]; !ok {
-      yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist,", string($1)))
+      yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string($1)))
       return 1
     }
     $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: $3, Args: $4, Filter: $6}
@@ -763,7 +759,7 @@ function_call_generic:
 | IDENTIFIER '(' '*' ')' filter_opt
   {
     if _, ok := AllowedFunctions[string($1)]; !ok {
-      yylex.Error(__yyfmt__.Sprintf("function '%s' does not exist", string($1)))
+      yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string($1)))
       return 1
     }
     $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: false, Args: nil, Filter: $5}
@@ -851,7 +847,7 @@ else_expr_opt:
 create_table_stmt:
   CREATE TABLE table_name '(' column_def_list table_constraint_list_opt ')'
   {
-    $$ = &CreateTable{Name: $3, Columns: $5, Constraints: $6}
+    $$ = &CreateTable{Table: $3, Columns: $5, Constraints: $6}
   }
 ;
 

@@ -796,7 +796,7 @@ func (node Identifier) IsEmpty() bool {
 
 // CreateTable represents a CREATE TABLE statement.
 type CreateTable struct {
-	Name        *Table
+	Table       *Table
 	Columns     []*ColumnDef
 	Constraints []TableConstraint
 
@@ -822,9 +822,9 @@ func (node *CreateTable) String() string {
 	}
 
 	if node.StrictMode {
-		return fmt.Sprintf("CREATE TABLE %s (%s) STRICT", node.Name.String(), column)
+		return fmt.Sprintf("CREATE TABLE %s (%s) STRICT", node.Table.String(), column)
 	} else {
-		return fmt.Sprintf("CREATE TABLE %s (%s)", node.Name.String(), column)
+		return fmt.Sprintf("CREATE TABLE %s (%s)", node.Table.String(), column)
 	}
 }
 
