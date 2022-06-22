@@ -2969,6 +2969,64 @@ func TestCreateTable(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "create table default",
+			stmt:     "CREATE TABLE test (a INT DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
+			deparsed: "CREATE TABLE test (a INT DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
+			expectedAST: &AST{
+				Root: &CreateTable{
+					Name: &Table{Name: "test"},
+					Columns: []*ColumnDef{
+						{
+							Name: &Column{Name: "a"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintDefault{
+									Expr: &Value{Type: IntValue, Value: []byte("0")},
+								},
+							},
+						},
+						{
+							Name: &Column{Name: "b"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintDefault{
+									Expr: &Value{Type: FloatValue, Value: []byte("-1.1")},
+								},
+							},
+						},
+						{
+							Name: &Column{Name: "c"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintDefault{
+									Expr: &Value{Type: HexNumValue, Value: []byte("0x1")},
+								},
+							},
+						},
+						{
+							Name: &Column{Name: "d"},
+							Type: TypeTextStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintDefault{
+									Expr: &Value{Type: StrValue, Value: []byte("foo")},
+								},
+							},
+						},
+						{
+							Name: &Column{Name: "e"},
+							Type: TypeTextStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintDefault{
+									Expr:        &Value{Type: StrValue, Value: []byte("foo")},
+									Parenthesis: true,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

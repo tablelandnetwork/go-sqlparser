@@ -21,7 +21,7 @@ state 1
 state 2
 	start:  stmt.    (1)
 
-	.  reduce 1 (src line 98)
+	.  reduce 1 (src line 100)
 
 
 state 3
@@ -29,7 +29,7 @@ state 3
 	semicolon_opt: .    (4)
 
 	';'  shift 8
-	.  reduce 4 (src line 113)
+	.  reduce 4 (src line 115)
 
 	semicolon_opt  goto 7
 
@@ -38,7 +38,7 @@ state 4
 	semicolon_opt: .    (4)
 
 	';'  shift 8
-	.  reduce 4 (src line 113)
+	.  reduce 4 (src line 115)
 
 	semicolon_opt  goto 9
 
@@ -48,7 +48,7 @@ state 5
 
 	DISTINCT  shift 11
 	ALL  shift 12
-	.  reduce 7 (src line 134)
+	.  reduce 7 (src line 136)
 
 	distinct_opt  goto 10
 
@@ -62,40 +62,40 @@ state 6
 state 7
 	stmt:  select_stmt semicolon_opt.    (2)
 
-	.  reduce 2 (src line 102)
+	.  reduce 2 (src line 104)
 
 
 state 8
 	semicolon_opt:  ';'.    (5)
 
-	.  reduce 5 (src line 115)
+	.  reduce 5 (src line 117)
 
 
 state 9
 	stmt:  create_table_stmt semicolon_opt.    (3)
 
-	.  reduce 3 (src line 107)
+	.  reduce 3 (src line 109)
 
 
 state 10
 	select_stmt:  SELECT distinct_opt.select_column_list from_clause where_opt group_by_opt having_opt order_by_opt limit_opt 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'*'  shift 16
@@ -112,47 +112,48 @@ state 10
 	select_column_list  goto 14
 	table_name  goto 18
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 11
 	distinct_opt:  DISTINCT.    (8)
 
-	.  reduce 8 (src line 138)
+	.  reduce 8 (src line 140)
 
 
 state 12
 	distinct_opt:  ALL.    (9)
 
-	.  reduce 9 (src line 142)
+	.  reduce 9 (src line 144)
 
 
 state 13
 	create_table_stmt:  CREATE TABLE.table_name '(' column_def_list ')' 
 
-	IDENTIFIER  shift 45
+	IDENTIFIER  shift 46
 	.  error
 
-	table_name  goto 44
+	table_name  goto 45
 
 state 14
 	select_stmt:  SELECT distinct_opt select_column_list.from_clause where_opt group_by_opt having_opt order_by_opt limit_opt 
 	select_column_list:  select_column_list.',' select_column 
 
-	','  shift 47
-	FROM  shift 48
+	','  shift 48
+	FROM  shift 49
 	.  error
 
-	from_clause  goto 46
+	from_clause  goto 47
 
 state 15
 	select_column_list:  select_column.    (10)
 
-	.  reduce 10 (src line 148)
+	.  reduce 10 (src line 150)
 
 
 state 16
 	select_column:  '*'.    (12)
 
-	.  reduce 12 (src line 158)
+	.  reduce 12 (src line 160)
 
 
 state 17
@@ -186,154 +187,122 @@ state 17
 	expr:  expr.NOT IN col_tuple 
 	as_column_opt: .    (15)
 
-	IDENTIFIER  shift 87
-	STRING  shift 88
-	AS  shift 75
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 15 (src line 172)
+	IDENTIFIER  shift 88
+	STRING  shift 89
+	AS  shift 76
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 15 (src line 174)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-	as_column_opt  goto 49
-	col_alias  goto 74
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
+	as_column_opt  goto 50
+	col_alias  goto 75
 
 state 18
 	select_column:  table_name.'.' '*' 
 	expr:  table_name.'.' column_name 
 
-	'.'  shift 89
+	'.'  shift 90
 	.  error
 
 
 state 19
 	expr:  literal_value.    (60)
 
-	.  reduce 60 (src line 411)
+	.  reduce 60 (src line 413)
 
 
 state 20
 	expr:  column_name.    (61)
 
-	.  reduce 61 (src line 413)
+	.  reduce 61 (src line 415)
 
 
 state 21
 	expr:  '-'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 90
+	expr  goto 91
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 22
 	expr:  '+'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 92
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 23
-	expr:  '~'.expr 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -345,242 +314,285 @@ state 23
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 24
-	expr:  CASE.expr_opt when_expr_list else_expr_opt END 
-	expr_opt: .    (151)
+state 23
+	expr:  '~'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
-	.  reduce 151 (src line 816)
+	.  error
 
-	expr  goto 95
+	expr  goto 94
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
-	expr_opt  goto 94
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
+
+state 24
+	expr:  CASE.expr_opt when_expr_list else_expr_opt END 
+	expr_opt: .    (149)
+
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  reduce 149 (src line 810)
+
+	expr  goto 96
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	expr_opt  goto 95
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
 
 state 25
 	expr:  '('.expr_list ')' 
 	subquery:  '('.select_stmt ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
 	SELECT  shift 5
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	select_stmt  goto 97
-	expr  goto 98
+	select_stmt  goto 98
+	expr  goto 99
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
-	expr_list  goto 96
+	expr_list  goto 97
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 26
 	expr:  subquery.    (95)
 
-	.  reduce 95 (src line 551)
+	.  reduce 95 (src line 553)
 
 
 state 27
 	expr:  exists_subquery.    (96)
 
-	.  reduce 96 (src line 555)
+	.  reduce 96 (src line 557)
 
 
 state 28
 	expr:  CAST.'(' expr AS convert_type ')' 
 
-	'('  shift 99
+	'('  shift 100
 	.  error
 
 
 state 29
 	expr:  function_call_keyword.    (98)
 
-	.  reduce 98 (src line 563)
+	.  reduce 98 (src line 565)
 
 
 state 30
 	expr:  function_call_generic.    (99)
 
-	.  reduce 99 (src line 564)
+	.  reduce 99 (src line 566)
 
 
 state 31
 	table_name:  IDENTIFIER.    (59)
-	column_name:  IDENTIFIER.    (108)
+	column_name:  IDENTIFIER.    (106)
 	function_call_generic:  IDENTIFIER.'(' distinct_function_opt expr_list_opt ')' filter_opt 
 	function_call_generic:  IDENTIFIER.'(' '*' ')' filter_opt 
 
-	'('  shift 100
-	'.'  reduce 59 (src line 404)
-	.  reduce 108 (src line 602)
+	'('  shift 101
+	'.'  reduce 59 (src line 406)
+	.  reduce 106 (src line 596)
 
 
 state 32
-	literal_value:  STRING.    (100)
+	literal_value:  numeric_literal.    (100)
 
-	.  reduce 100 (src line 567)
+	.  reduce 100 (src line 569)
 
 
 state 33
-	literal_value:  INTEGRAL.    (101)
+	literal_value:  STRING.    (101)
 
-	.  reduce 101 (src line 572)
+	.  reduce 101 (src line 574)
 
 
 state 34
-	literal_value:  FLOAT.    (102)
+	literal_value:  BLOBVAL.    (102)
 
-	.  reduce 102 (src line 576)
+	.  reduce 102 (src line 578)
 
 
 state 35
-	literal_value:  BLOBVAL.    (103)
+	literal_value:  TRUE.    (103)
 
-	.  reduce 103 (src line 580)
+	.  reduce 103 (src line 582)
 
 
 state 36
-	literal_value:  HEXNUM.    (104)
+	literal_value:  FALSE.    (104)
 
-	.  reduce 104 (src line 584)
+	.  reduce 104 (src line 586)
 
 
 state 37
-	literal_value:  TRUE.    (105)
+	literal_value:  NULL.    (105)
 
-	.  reduce 105 (src line 588)
+	.  reduce 105 (src line 590)
 
 
 state 38
-	literal_value:  FALSE.    (106)
+	exists_subquery:  EXISTS.subquery 
 
-	.  reduce 106 (src line 592)
+	'('  shift 103
+	.  error
 
+	subquery  goto 102
 
 state 39
-	literal_value:  NULL.    (107)
+	exists_subquery:  NOT.EXISTS subquery 
 
-	.  reduce 107 (src line 596)
+	EXISTS  shift 104
+	.  error
 
 
 state 40
-	exists_subquery:  EXISTS.subquery 
-
-	'('  shift 102
-	.  error
-
-	subquery  goto 101
-
-state 41
-	exists_subquery:  NOT.EXISTS subquery 
-
-	EXISTS  shift 103
-	.  error
-
-
-state 42
 	function_call_keyword:  GLOB.'(' expr ',' expr ')' 
-
-	'('  shift 104
-	.  error
-
-
-state 43
-	function_call_keyword:  LIKE.'(' expr ',' expr ')' 
-	function_call_keyword:  LIKE.'(' expr ',' expr ',' expr ')' 
 
 	'('  shift 105
 	.  error
 
 
-state 44
-	create_table_stmt:  CREATE TABLE table_name.'(' column_def_list ')' 
+state 41
+	function_call_keyword:  LIKE.'(' expr ',' expr ')' 
+	function_call_keyword:  LIKE.'(' expr ',' expr ',' expr ')' 
 
 	'('  shift 106
 	.  error
 
 
-state 45
-	table_name:  IDENTIFIER.    (59)
+state 42
+	numeric_literal:  INTEGRAL.    (182)
 
-	.  reduce 59 (src line 404)
+	.  reduce 182 (src line 959)
+
+
+state 43
+	numeric_literal:  FLOAT.    (183)
+
+	.  reduce 183 (src line 964)
+
+
+state 44
+	numeric_literal:  HEXNUM.    (184)
+
+	.  reduce 184 (src line 968)
+
+
+state 45
+	create_table_stmt:  CREATE TABLE table_name.'(' column_def_list ')' 
+
+	'('  shift 107
+	.  error
 
 
 state 46
+	table_name:  IDENTIFIER.    (59)
+
+	.  reduce 59 (src line 406)
+
+
+state 47
 	select_stmt:  SELECT distinct_opt select_column_list from_clause.where_opt group_by_opt having_opt order_by_opt limit_opt 
 	where_opt: .    (38)
 
-	WHERE  shift 108
-	.  reduce 38 (src line 300)
+	WHERE  shift 109
+	.  reduce 38 (src line 302)
 
-	where_opt  goto 107
+	where_opt  goto 108
 
-state 47
+state 48
 	select_column_list:  select_column_list ','.select_column 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'*'  shift 16
@@ -593,81 +605,49 @@ state 47
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	select_column  goto 109
+	select_column  goto 110
 	table_name  goto 18
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 48
+state 49
 	from_clause:  FROM.table_expr_list 
 	from_clause:  FROM.join_clause 
 
-	IDENTIFIER  shift 45
-	'('  shift 114
+	IDENTIFIER  shift 46
+	'('  shift 115
 	.  error
 
-	table_name  goto 113
-	table_expr_list  goto 110
-	table_expr  goto 112
-	join_clause  goto 111
-
-state 49
-	select_column:  expr as_column_opt.    (13)
-
-	.  reduce 13 (src line 163)
-
+	table_name  goto 114
+	table_expr_list  goto 111
+	table_expr  goto 113
+	join_clause  goto 112
 
 state 50
+	select_column:  expr as_column_opt.    (13)
+
+	.  reduce 13 (src line 165)
+
+
+state 51
 	expr:  expr '+'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 115
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 51
-	expr:  expr '-'.expr 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -679,28 +659,29 @@ state 51
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 52
-	expr:  expr '*'.expr 
+	expr:  expr '-'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -712,28 +693,29 @@ state 52
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 53
-	expr:  expr '/'.expr 
+	expr:  expr '*'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -745,28 +727,29 @@ state 53
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 54
-	expr:  expr '%'.expr 
+	expr:  expr '/'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -778,28 +761,29 @@ state 54
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 55
-	expr:  expr '&'.expr 
+	expr:  expr '%'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -811,28 +795,29 @@ state 55
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 56
-	expr:  expr '|'.expr 
+	expr:  expr '&'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -844,28 +829,29 @@ state 56
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 57
-	expr:  expr LSHIFT.expr 
+	expr:  expr '|'.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -877,28 +863,29 @@ state 57
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 58
-	expr:  expr RSHIFT.expr 
+	expr:  expr LSHIFT.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -910,28 +897,29 @@ state 58
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 59
-	expr:  expr CONCAT.expr 
+	expr:  expr RSHIFT.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -943,28 +931,29 @@ state 59
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 60
-	expr:  expr JSON_EXTRACT_OP.expr 
+	expr:  expr CONCAT.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -976,28 +965,29 @@ state 60
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 61
-	expr:  expr JSON_UNQUOTE_EXTRACT_OP.expr 
+	expr:  expr JSON_EXTRACT_OP.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1009,28 +999,29 @@ state 61
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 62
-	expr:  expr cmp_op.expr 
+	expr:  expr JSON_UNQUOTE_EXTRACT_OP.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1042,28 +1033,29 @@ state 62
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 63
-	expr:  expr cmp_inequality_op.expr 
+	expr:  expr cmp_op.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1075,29 +1067,29 @@ state 63
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 64
-	expr:  expr like_op.expr 
-	expr:  expr like_op.expr ESCAPE expr 
+	expr:  expr cmp_inequality_op.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1109,28 +1101,30 @@ state 64
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 65
-	expr:  expr ANDOP.expr 
+	expr:  expr like_op.expr 
+	expr:  expr like_op.expr ESCAPE expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1142,28 +1136,29 @@ state 65
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 66
-	expr:  expr OR.expr 
+	expr:  expr ANDOP.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1175,30 +1170,29 @@ state 66
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 67
-	expr:  expr IS.expr 
-	expr:  expr IS.ISNOT expr 
+	expr:  expr OR.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	ISNOT  shift 133
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1210,22 +1204,59 @@ state 67
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 68
-	expr:  expr ISNULL.    (86)
+	expr:  expr IS.expr 
+	expr:  expr IS.ISNOT expr 
 
-	.  reduce 86 (src line 515)
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	ISNOT  shift 134
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
 
+	expr  goto 133
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
 
 state 69
-	expr:  expr NOTNULL.    (87)
+	expr:  expr ISNULL.    (86)
 
-	.  reduce 87 (src line 519)
+	.  reduce 86 (src line 517)
 
 
 state 70
+	expr:  expr NOTNULL.    (87)
+
+	.  reduce 87 (src line 521)
+
+
+state 71
 	expr:  expr NOT.NULL 
 	expr:  expr NOT.IN col_tuple 
 	cmp_op:  NOT.REGEXP 
@@ -1234,169 +1265,170 @@ state 70
 	like_op:  NOT.LIKE 
 	between_op:  NOT.BETWEEN 
 
-	NULL  shift 134
-	MATCH  shift 138
-	GLOB  shift 137
-	REGEXP  shift 136
-	LIKE  shift 139
-	BETWEEN  shift 140
-	IN  shift 135
+	NULL  shift 135
+	MATCH  shift 139
+	GLOB  shift 138
+	REGEXP  shift 137
+	LIKE  shift 140
+	BETWEEN  shift 141
+	IN  shift 136
 	.  error
 
 
-state 71
+state 72
 	expr:  expr between_op.expr AND expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 141
+	expr  goto 142
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 72
-	expr:  expr COLLATE.IDENTIFIER 
-
-	IDENTIFIER  shift 142
-	.  error
-
+	numeric_literal  goto 32
 
 state 73
-	expr:  expr IN.col_tuple 
+	expr:  expr COLLATE.IDENTIFIER 
 
-	'('  shift 144
+	IDENTIFIER  shift 143
 	.  error
 
-	subquery  goto 145
-	col_tuple  goto 143
 
 state 74
-	as_column_opt:  col_alias.    (16)
+	expr:  expr IN.col_tuple 
 
-	.  reduce 16 (src line 176)
-
-
-state 75
-	as_column_opt:  AS.col_alias 
-
-	IDENTIFIER  shift 87
-	STRING  shift 88
+	'('  shift 145
 	.  error
 
-	col_alias  goto 146
+	subquery  goto 146
+	col_tuple  goto 144
+
+state 75
+	as_column_opt:  col_alias.    (16)
+
+	.  reduce 16 (src line 178)
+
 
 state 76
-	cmp_op:  '='.    (111)
+	as_column_opt:  AS.col_alias 
 
-	.  reduce 111 (src line 624)
+	IDENTIFIER  shift 88
+	STRING  shift 89
+	.  error
 
+	col_alias  goto 147
 
 state 77
-	cmp_op:  NE.    (112)
+	cmp_op:  '='.    (109)
 
-	.  reduce 112 (src line 629)
+	.  reduce 109 (src line 618)
 
 
 state 78
-	cmp_op:  REGEXP.    (113)
+	cmp_op:  NE.    (110)
 
-	.  reduce 113 (src line 633)
+	.  reduce 110 (src line 623)
 
 
 state 79
-	cmp_op:  GLOB.    (115)
+	cmp_op:  REGEXP.    (111)
 
-	.  reduce 115 (src line 641)
+	.  reduce 111 (src line 627)
 
 
 state 80
-	cmp_op:  MATCH.    (117)
+	cmp_op:  GLOB.    (113)
 
-	.  reduce 117 (src line 649)
+	.  reduce 113 (src line 635)
 
 
 state 81
-	cmp_inequality_op:  '<'.    (119)
+	cmp_op:  MATCH.    (115)
 
-	.  reduce 119 (src line 659)
+	.  reduce 115 (src line 643)
 
 
 state 82
-	cmp_inequality_op:  '>'.    (120)
+	cmp_inequality_op:  '<'.    (117)
 
-	.  reduce 120 (src line 664)
+	.  reduce 117 (src line 653)
 
 
 state 83
-	cmp_inequality_op:  LE.    (121)
+	cmp_inequality_op:  '>'.    (118)
 
-	.  reduce 121 (src line 668)
+	.  reduce 118 (src line 658)
 
 
 state 84
-	cmp_inequality_op:  GE.    (122)
+	cmp_inequality_op:  LE.    (119)
 
-	.  reduce 122 (src line 672)
+	.  reduce 119 (src line 662)
 
 
 state 85
-	like_op:  LIKE.    (123)
+	cmp_inequality_op:  GE.    (120)
 
-	.  reduce 123 (src line 678)
+	.  reduce 120 (src line 666)
 
 
 state 86
-	between_op:  BETWEEN.    (125)
+	like_op:  LIKE.    (121)
 
-	.  reduce 125 (src line 689)
+	.  reduce 121 (src line 672)
 
 
 state 87
-	col_alias:  IDENTIFIER.    (18)
+	between_op:  BETWEEN.    (123)
 
-	.  reduce 18 (src line 185)
+	.  reduce 123 (src line 683)
 
 
 state 88
-	col_alias:  STRING.    (19)
+	col_alias:  IDENTIFIER.    (18)
 
-	.  reduce 19 (src line 190)
+	.  reduce 18 (src line 187)
 
 
 state 89
+	col_alias:  STRING.    (19)
+
+	.  reduce 19 (src line 192)
+
+
+state 90
 	select_column:  table_name '.'.'*' 
 	expr:  table_name '.'.column_name 
 
-	IDENTIFIER  shift 149
-	'*'  shift 147
+	IDENTIFIER  shift 150
+	'*'  shift 148
 	.  error
 
-	column_name  goto 148
+	column_name  goto 149
 
-state 90
+state 91
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -1426,21 +1458,21 @@ state 90
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	.  reduce 79 (src line 483)
+	.  reduce 79 (src line 485)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 91
+state 92
 	expr:  table_name.'.' column_name 
 
-	'.'  shift 150
+	'.'  shift 151
 	.  error
 
 
-state 92
+state 93
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -1470,14 +1502,14 @@ state 92
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	.  reduce 80 (src line 491)
+	.  reduce 80 (src line 493)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 93
+state 94
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -1507,23 +1539,23 @@ state 93
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	.  reduce 81 (src line 495)
+	.  reduce 81 (src line 497)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 94
-	expr:  CASE expr_opt.when_expr_list else_expr_opt END 
-
-	WHEN  shift 153
-	.  error
-
-	when  goto 152
-	when_expr_list  goto 151
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 95
+	expr:  CASE expr_opt.when_expr_list else_expr_opt END 
+
+	WHEN  shift 154
+	.  error
+
+	when  goto 153
+	when_expr_list  goto 152
+
+state 96
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -1551,63 +1583,63 @@ state 95
 	expr:  expr.COLLATE IDENTIFIER 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	expr_opt:  expr.    (152)
+	expr_opt:  expr.    (150)
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 152 (src line 820)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 150 (src line 814)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 96
+state 97
 	expr:  '(' expr_list.')' 
 	expr_list:  expr_list.',' expr 
 
-	','  shift 155
-	')'  shift 154
-	.  error
-
-
-state 97
-	subquery:  '(' select_stmt.')' 
-
-	')'  shift 156
+	','  shift 156
+	')'  shift 155
 	.  error
 
 
 state 98
+	subquery:  '(' select_stmt.')' 
+
+	')'  shift 157
+	.  error
+
+
+state 99
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -1635,165 +1667,132 @@ state 98
 	expr:  expr.COLLATE IDENTIFIER 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	expr_list:  expr.    (145)
+	expr_list:  expr.    (143)
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 145 (src line 785)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 143 (src line 779)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 99
+state 100
 	expr:  CAST '('.expr AS convert_type ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 157
+	expr  goto 158
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 100
-	function_call_generic:  IDENTIFIER '('.distinct_function_opt expr_list_opt ')' filter_opt 
-	function_call_generic:  IDENTIFIER '('.'*' ')' filter_opt 
-	distinct_function_opt: .    (143)
-
-	DISTINCT  shift 160
-	'*'  shift 159
-	.  reduce 143 (src line 775)
-
-	distinct_function_opt  goto 158
+	numeric_literal  goto 32
 
 state 101
-	exists_subquery:  EXISTS subquery.    (136)
+	function_call_generic:  IDENTIFIER '('.distinct_function_opt expr_list_opt ')' filter_opt 
+	function_call_generic:  IDENTIFIER '('.'*' ')' filter_opt 
+	distinct_function_opt: .    (141)
 
-	.  reduce 136 (src line 730)
+	DISTINCT  shift 161
+	'*'  shift 160
+	.  reduce 141 (src line 769)
 
+	distinct_function_opt  goto 159
 
 state 102
+	exists_subquery:  EXISTS subquery.    (134)
+
+	.  reduce 134 (src line 724)
+
+
+state 103
 	subquery:  '('.select_stmt ')' 
 
 	SELECT  shift 5
 	.  error
 
-	select_stmt  goto 97
-
-state 103
-	exists_subquery:  NOT EXISTS.subquery 
-
-	'('  shift 102
-	.  error
-
-	subquery  goto 161
+	select_stmt  goto 98
 
 state 104
+	exists_subquery:  NOT EXISTS.subquery 
+
+	'('  shift 103
+	.  error
+
+	subquery  goto 162
+
+state 105
 	function_call_keyword:  GLOB '('.expr ',' expr ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 162
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 105
-	function_call_keyword:  LIKE '('.expr ',' expr ')' 
-	function_call_keyword:  LIKE '('.expr ',' expr ',' expr ')' 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -1805,120 +1804,157 @@ state 105
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 106
-	create_table_stmt:  CREATE TABLE table_name '('.column_def_list ')' 
-
-	IDENTIFIER  shift 149
-	.  error
-
-	column_name  goto 166
-	column_def_list  goto 164
-	column_def  goto 165
-
-state 107
-	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt.group_by_opt having_opt order_by_opt limit_opt 
-	group_by_opt: .    (40)
-
-	GROUP  shift 168
-	.  reduce 40 (src line 310)
-
-	group_by_opt  goto 167
-
-state 108
-	where_opt:  WHERE.expr 
+	function_call_keyword:  LIKE '('.expr ',' expr ')' 
+	function_call_keyword:  LIKE '('.expr ',' expr ',' expr ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 169
+	expr  goto 164
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
+
+state 107
+	create_table_stmt:  CREATE TABLE table_name '('.column_def_list ')' 
+
+	IDENTIFIER  shift 150
+	.  error
+
+	column_name  goto 167
+	column_def_list  goto 165
+	column_def  goto 166
+
+state 108
+	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt.group_by_opt having_opt order_by_opt limit_opt 
+	group_by_opt: .    (40)
+
+	GROUP  shift 169
+	.  reduce 40 (src line 312)
+
+	group_by_opt  goto 168
 
 state 109
-	select_column_list:  select_column_list ',' select_column.    (11)
+	where_opt:  WHERE.expr 
 
-	.  reduce 11 (src line 153)
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
 
+	expr  goto 170
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
 
 state 110
-	from_clause:  FROM table_expr_list.    (20)
-	table_expr_list:  table_expr_list.',' table_expr 
+	select_column_list:  select_column_list ',' select_column.    (11)
 
-	','  shift 170
-	.  reduce 20 (src line 196)
+	.  reduce 11 (src line 155)
 
 
 state 111
-	from_clause:  FROM join_clause.    (21)
-	join_clause:  join_clause.JOIN table_expr join_constraint 
+	from_clause:  FROM table_expr_list.    (20)
+	table_expr_list:  table_expr_list.',' table_expr 
 
-	JOIN  shift 171
-	.  reduce 21 (src line 201)
+	','  shift 171
+	.  reduce 20 (src line 198)
 
 
 state 112
-	table_expr_list:  table_expr.    (22)
-	join_clause:  table_expr.JOIN table_expr join_constraint 
+	from_clause:  FROM join_clause.    (21)
+	join_clause:  join_clause.JOIN table_expr join_constraint 
 
 	JOIN  shift 172
-	.  reduce 22 (src line 207)
+	.  reduce 21 (src line 203)
 
 
 state 113
+	table_expr_list:  table_expr.    (22)
+	join_clause:  table_expr.JOIN table_expr join_constraint 
+
+	JOIN  shift 173
+	.  reduce 22 (src line 209)
+
+
+state 114
 	table_expr:  table_name.as_table_opt 
 	as_table_opt: .    (28)
 
-	IDENTIFIER  shift 176
-	STRING  shift 177
-	AS  shift 175
-	.  reduce 28 (src line 237)
+	IDENTIFIER  shift 177
+	STRING  shift 178
+	AS  shift 176
+	.  reduce 28 (src line 239)
 
-	as_table_opt  goto 173
-	table_alias  goto 174
+	as_table_opt  goto 174
+	table_alias  goto 175
 
-state 114
+state 115
 	table_expr:  '('.select_stmt ')' as_table_opt 
 	table_expr:  '('.table_expr_list ')' 
 	table_expr:  '('.join_clause ')' 
 
-	IDENTIFIER  shift 45
-	'('  shift 114
+	IDENTIFIER  shift 46
+	'('  shift 115
 	SELECT  shift 5
 	.  error
 
-	select_stmt  goto 178
-	table_name  goto 113
-	table_expr_list  goto 179
-	table_expr  goto 112
-	join_clause  goto 180
+	select_stmt  goto 179
+	table_name  goto 114
+	table_expr_list  goto 180
+	table_expr  goto 113
+	join_clause  goto 181
 
-state 115
+state 116
 	expr:  expr.'+' expr 
 	expr:  expr '+' expr.    (63)
 	expr:  expr.'-' expr 
@@ -1948,21 +1984,21 @@ state 115
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 63 (src line 419)
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 63 (src line 421)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 116
+state 117
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr '-' expr.    (64)
@@ -1992,21 +2028,21 @@ state 116
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 64 (src line 423)
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 64 (src line 425)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 117
+state 118
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2036,18 +2072,18 @@ state 117
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 65 (src line 427)
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 65 (src line 429)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 118
+state 119
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2077,18 +2113,18 @@ state 118
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 66 (src line 431)
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 66 (src line 433)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 119
+state 120
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2118,18 +2154,18 @@ state 119
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 67 (src line 435)
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 67 (src line 437)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 120
+state 121
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2159,23 +2195,23 @@ state 120
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 68 (src line 439)
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 68 (src line 441)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 121
+state 122
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2205,23 +2241,23 @@ state 121
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 69 (src line 443)
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 69 (src line 445)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 122
+state 123
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2251,23 +2287,23 @@ state 122
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 70 (src line 447)
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 70 (src line 449)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 123
+state 124
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2297,23 +2333,23 @@ state 123
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 71 (src line 451)
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 71 (src line 453)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 124
+state 125
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2343,15 +2379,15 @@ state 124
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	COLLATE  shift 72
-	.  reduce 72 (src line 455)
+	COLLATE  shift 73
+	.  reduce 72 (src line 457)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 125
+state 126
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2381,15 +2417,15 @@ state 125
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	COLLATE  shift 72
-	.  reduce 73 (src line 459)
+	COLLATE  shift 73
+	.  reduce 73 (src line 461)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 126
+state 127
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2419,15 +2455,15 @@ state 126
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	COLLATE  shift 72
-	.  reduce 74 (src line 463)
+	COLLATE  shift 73
+	.  reduce 74 (src line 465)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 127
+state 128
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2457,31 +2493,31 @@ state 127
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 75 (src line 467)
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 75 (src line 469)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 128
+state 129
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2511,27 +2547,27 @@ state 128
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 76 (src line 471)
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 76 (src line 473)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 129
+state 130
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2562,32 +2598,32 @@ state 129
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	ESCAPE  shift 181
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 77 (src line 475)
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	ESCAPE  shift 182
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 77 (src line 477)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 130
+state 131
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2617,43 +2653,43 @@ state 130
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 82 (src line 499)
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 82 (src line 501)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 131
+state 132
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2683,44 +2719,44 @@ state 131
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 83 (src line 503)
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 83 (src line 505)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 132
+state 133
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2750,109 +2786,110 @@ state 132
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 84 (src line 507)
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 84 (src line 509)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 133
+state 134
 	expr:  expr IS ISNOT.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 182
+	expr  goto 183
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 134
-	expr:  expr NOT NULL.    (88)
-
-	.  reduce 88 (src line 523)
-
+	numeric_literal  goto 32
 
 state 135
-	expr:  expr NOT IN.col_tuple 
+	expr:  expr NOT NULL.    (88)
 
-	'('  shift 144
-	.  error
+	.  reduce 88 (src line 525)
 
-	subquery  goto 145
-	col_tuple  goto 183
 
 state 136
-	cmp_op:  NOT REGEXP.    (114)
+	expr:  expr NOT IN.col_tuple 
 
-	.  reduce 114 (src line 637)
+	'('  shift 145
+	.  error
 
+	subquery  goto 146
+	col_tuple  goto 184
 
 state 137
-	cmp_op:  NOT GLOB.    (116)
+	cmp_op:  NOT REGEXP.    (112)
 
-	.  reduce 116 (src line 645)
+	.  reduce 112 (src line 631)
 
 
 state 138
-	cmp_op:  NOT MATCH.    (118)
+	cmp_op:  NOT GLOB.    (114)
 
-	.  reduce 118 (src line 653)
+	.  reduce 114 (src line 639)
 
 
 state 139
-	like_op:  NOT LIKE.    (124)
+	cmp_op:  NOT MATCH.    (116)
 
-	.  reduce 124 (src line 683)
+	.  reduce 116 (src line 647)
 
 
 state 140
-	between_op:  NOT BETWEEN.    (126)
+	like_op:  NOT LIKE.    (122)
 
-	.  reduce 126 (src line 694)
+	.  reduce 122 (src line 677)
 
 
 state 141
+	between_op:  NOT BETWEEN.    (124)
+
+	.  reduce 124 (src line 688)
+
+
+state 142
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -2882,210 +2919,172 @@ state 141
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	AND  shift 184
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	AND  shift 185
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 142
-	expr:  expr COLLATE IDENTIFIER.    (91)
-
-	.  reduce 91 (src line 535)
-
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 143
-	expr:  expr IN col_tuple.    (93)
+	expr:  expr COLLATE IDENTIFIER.    (91)
 
-	.  reduce 93 (src line 543)
+	.  reduce 91 (src line 537)
 
 
 state 144
+	expr:  expr IN col_tuple.    (93)
+
+	.  reduce 93 (src line 545)
+
+
+state 145
 	col_tuple:  '('.')' 
 	col_tuple:  '('.expr_list ')' 
 	subquery:  '('.select_stmt ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
-	')'  shift 185
+	')'  shift 186
 	CAST  shift 28
 	CASE  shift 24
 	SELECT  shift 5
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	select_stmt  goto 97
-	expr  goto 98
+	select_stmt  goto 98
+	expr  goto 99
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
-	expr_list  goto 186
+	expr_list  goto 187
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 145
-	col_tuple:  subquery.    (133)
-
-	.  reduce 133 (src line 713)
-
+	numeric_literal  goto 32
 
 state 146
-	as_column_opt:  AS col_alias.    (17)
+	col_tuple:  subquery.    (131)
 
-	.  reduce 17 (src line 180)
+	.  reduce 131 (src line 707)
 
 
 state 147
-	select_column:  table_name '.' '*'.    (14)
+	as_column_opt:  AS col_alias.    (17)
 
-	.  reduce 14 (src line 167)
+	.  reduce 17 (src line 182)
 
 
 state 148
-	expr:  table_name '.' column_name.    (62)
+	select_column:  table_name '.' '*'.    (14)
 
-	.  reduce 62 (src line 414)
+	.  reduce 14 (src line 169)
 
 
 state 149
-	column_name:  IDENTIFIER.    (108)
+	expr:  table_name '.' column_name.    (62)
 
-	.  reduce 108 (src line 602)
+	.  reduce 62 (src line 416)
 
 
 state 150
-	expr:  table_name '.'.column_name 
+	column_name:  IDENTIFIER.    (106)
 
-	IDENTIFIER  shift 149
-	.  error
+	.  reduce 106 (src line 596)
 
-	column_name  goto 148
 
 state 151
-	expr:  CASE expr_opt when_expr_list.else_expr_opt END 
-	when_expr_list:  when_expr_list.when 
-	else_expr_opt: .    (156)
+	expr:  table_name '.'.column_name 
 
-	WHEN  shift 153
-	ELSE  shift 189
-	.  reduce 156 (src line 843)
+	IDENTIFIER  shift 150
+	.  error
 
-	else_expr_opt  goto 187
-	when  goto 188
+	column_name  goto 149
 
 state 152
-	when_expr_list:  when.    (154)
+	expr:  CASE expr_opt when_expr_list.else_expr_opt END 
+	when_expr_list:  when_expr_list.when 
+	else_expr_opt: .    (154)
 
-	.  reduce 154 (src line 833)
+	WHEN  shift 154
+	ELSE  shift 190
+	.  reduce 154 (src line 837)
 
+	else_expr_opt  goto 188
+	when  goto 189
 
 state 153
+	when_expr_list:  when.    (152)
+
+	.  reduce 152 (src line 827)
+
+
+state 154
 	when:  WHEN.expr THEN expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 190
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 154
-	expr:  '(' expr_list ')'.    (92)
-
-	.  reduce 92 (src line 539)
-
-
-state 155
-	expr_list:  expr_list ','.expr 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -3097,16 +3096,57 @@ state 155
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
+
+state 155
+	expr:  '(' expr_list ')'.    (92)
+
+	.  reduce 92 (src line 541)
+
 
 state 156
-	subquery:  '(' select_stmt ')'.    (135)
+	expr_list:  expr_list ','.expr 
 
-	.  reduce 135 (src line 723)
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
 
+	expr  goto 192
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
 
 state 157
+	subquery:  '(' select_stmt ')'.    (133)
+
+	.  reduce 133 (src line 717)
+
+
+state 158
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -3136,101 +3176,102 @@ state 157
 	expr:  expr.NOT IN col_tuple 
 	expr:  CAST '(' expr.AS convert_type ')' 
 
-	AS  shift 192
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	AS  shift 193
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 158
+state 159
 	function_call_generic:  IDENTIFIER '(' distinct_function_opt.expr_list_opt ')' filter_opt 
-	expr_list_opt: .    (147)
+	expr_list_opt: .    (145)
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
-	.  reduce 147 (src line 796)
+	.  reduce 145 (src line 790)
 
-	expr  goto 98
+	expr  goto 99
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
-	expr_list  goto 194
-	expr_list_opt  goto 193
+	expr_list  goto 195
+	expr_list_opt  goto 194
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 159
+state 160
 	function_call_generic:  IDENTIFIER '(' '*'.')' filter_opt 
 
-	')'  shift 195
+	')'  shift 196
 	.  error
 
 
-state 160
-	distinct_function_opt:  DISTINCT.    (144)
-
-	.  reduce 144 (src line 779)
-
-
 state 161
-	exists_subquery:  NOT EXISTS subquery.    (137)
+	distinct_function_opt:  DISTINCT.    (142)
 
-	.  reduce 137 (src line 735)
+	.  reduce 142 (src line 773)
 
 
 state 162
+	exists_subquery:  NOT EXISTS subquery.    (135)
+
+	.  reduce 135 (src line 729)
+
+
+state 163
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -3260,46 +3301,46 @@ state 162
 	expr:  expr.NOT IN col_tuple 
 	function_call_keyword:  GLOB '(' expr.',' expr ')' 
 
-	','  shift 196
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	','  shift 197
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 163
+state 164
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -3330,90 +3371,90 @@ state 163
 	function_call_keyword:  LIKE '(' expr.',' expr ')' 
 	function_call_keyword:  LIKE '(' expr.',' expr ',' expr ')' 
 
-	','  shift 197
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	','  shift 198
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 164
+state 165
 	create_table_stmt:  CREATE TABLE table_name '(' column_def_list.')' 
 	column_def_list:  column_def_list.',' column_def 
 
-	','  shift 199
-	')'  shift 198
+	','  shift 200
+	')'  shift 199
 	.  error
-
-
-state 165
-	column_def_list:  column_def.    (159)
-
-	.  reduce 159 (src line 860)
 
 
 state 166
-	column_def:  column_name.type_name column_constraints_opt 
+	column_def_list:  column_def.    (157)
 
-	INTEGER  shift 202
-	REAL  shift 203
-	TEXT  shift 204
-	INT  shift 201
-	BLOB  shift 205
-	ANY  shift 206
-	.  error
+	.  reduce 157 (src line 854)
 
-	type_name  goto 200
 
 state 167
+	column_def:  column_name.type_name column_constraints_opt 
+
+	INTEGER  shift 203
+	REAL  shift 204
+	TEXT  shift 205
+	INT  shift 202
+	BLOB  shift 206
+	ANY  shift 207
+	.  error
+
+	type_name  goto 201
+
+state 168
 	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt.having_opt order_by_opt limit_opt 
 	having_opt: .    (42)
 
-	HAVING  shift 208
-	.  reduce 42 (src line 320)
+	HAVING  shift 209
+	.  reduce 42 (src line 322)
 
-	having_opt  goto 207
+	having_opt  goto 208
 
-state 168
+state 169
 	group_by_opt:  GROUP.BY expr_list 
 
-	BY  shift 209
+	BY  shift 210
 	.  error
 
 
-state 169
+state 170
 	where_opt:  WHERE expr.    (39)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -3443,166 +3484,167 @@ state 169
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 39 (src line 304)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 39 (src line 306)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 170
-	table_expr_list:  table_expr_list ','.table_expr 
-
-	IDENTIFIER  shift 45
-	'('  shift 114
-	.  error
-
-	table_name  goto 113
-	table_expr  goto 210
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 171
-	join_clause:  join_clause JOIN.table_expr join_constraint 
+	table_expr_list:  table_expr_list ','.table_expr 
 
-	IDENTIFIER  shift 45
-	'('  shift 114
+	IDENTIFIER  shift 46
+	'('  shift 115
 	.  error
 
-	table_name  goto 113
+	table_name  goto 114
 	table_expr  goto 211
 
 state 172
-	join_clause:  table_expr JOIN.table_expr join_constraint 
+	join_clause:  join_clause JOIN.table_expr join_constraint 
 
-	IDENTIFIER  shift 45
-	'('  shift 114
+	IDENTIFIER  shift 46
+	'('  shift 115
 	.  error
 
-	table_name  goto 113
+	table_name  goto 114
 	table_expr  goto 212
 
 state 173
-	table_expr:  table_name as_table_opt.    (24)
+	join_clause:  table_expr JOIN.table_expr join_constraint 
 
-	.  reduce 24 (src line 218)
+	IDENTIFIER  shift 46
+	'('  shift 115
+	.  error
 
+	table_name  goto 114
+	table_expr  goto 213
 
 state 174
-	as_table_opt:  table_alias.    (29)
+	table_expr:  table_name as_table_opt.    (24)
 
-	.  reduce 29 (src line 241)
+	.  reduce 24 (src line 220)
 
 
 state 175
-	as_table_opt:  AS.table_alias 
+	as_table_opt:  table_alias.    (29)
 
-	IDENTIFIER  shift 176
-	STRING  shift 177
-	.  error
+	.  reduce 29 (src line 243)
 
-	table_alias  goto 213
 
 state 176
-	table_alias:  IDENTIFIER.    (31)
+	as_table_opt:  AS.table_alias 
 
-	.  reduce 31 (src line 250)
+	IDENTIFIER  shift 177
+	STRING  shift 178
+	.  error
 
+	table_alias  goto 214
 
 state 177
-	table_alias:  STRING.    (32)
+	table_alias:  IDENTIFIER.    (31)
 
-	.  reduce 32 (src line 255)
+	.  reduce 31 (src line 252)
 
 
 state 178
-	table_expr:  '(' select_stmt.')' as_table_opt 
+	table_alias:  STRING.    (32)
 
-	')'  shift 214
-	.  error
+	.  reduce 32 (src line 257)
 
 
 state 179
-	table_expr_list:  table_expr_list.',' table_expr 
-	table_expr:  '(' table_expr_list.')' 
+	table_expr:  '(' select_stmt.')' as_table_opt 
 
-	','  shift 170
 	')'  shift 215
 	.  error
 
 
 state 180
-	table_expr:  '(' join_clause.')' 
-	join_clause:  join_clause.JOIN table_expr join_constraint 
+	table_expr_list:  table_expr_list.',' table_expr 
+	table_expr:  '(' table_expr_list.')' 
 
+	','  shift 171
 	')'  shift 216
-	JOIN  shift 171
 	.  error
 
 
 state 181
+	table_expr:  '(' join_clause.')' 
+	join_clause:  join_clause.JOIN table_expr join_constraint 
+
+	')'  shift 217
+	JOIN  shift 172
+	.  error
+
+
+state 182
 	expr:  expr like_op expr ESCAPE.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 217
+	expr  goto 218
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 182
+state 183
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -3632,198 +3674,131 @@ state 182
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 85 (src line 511)
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 85 (src line 513)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 183
-	expr:  expr NOT IN col_tuple.    (94)
-
-	.  reduce 94 (src line 547)
-
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 184
+	expr:  expr NOT IN col_tuple.    (94)
+
+	.  reduce 94 (src line 549)
+
+
+state 185
 	expr:  expr between_op expr AND.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 218
+	expr  goto 219
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 185
-	col_tuple:  '(' ')'.    (132)
-
-	.  reduce 132 (src line 708)
-
+	numeric_literal  goto 32
 
 state 186
-	col_tuple:  '(' expr_list.')' 
-	expr_list:  expr_list.',' expr 
+	col_tuple:  '(' ')'.    (130)
 
-	','  shift 155
-	')'  shift 219
-	.  error
+	.  reduce 130 (src line 702)
 
 
 state 187
-	expr:  CASE expr_opt when_expr_list else_expr_opt.END 
+	col_tuple:  '(' expr_list.')' 
+	expr_list:  expr_list.',' expr 
 
-	END  shift 220
+	','  shift 156
+	')'  shift 220
 	.  error
 
 
 state 188
-	when_expr_list:  when_expr_list when.    (155)
+	expr:  CASE expr_opt when_expr_list else_expr_opt.END 
 
-	.  reduce 155 (src line 838)
+	END  shift 221
+	.  error
 
 
 state 189
+	when_expr_list:  when_expr_list when.    (153)
+
+	.  reduce 153 (src line 832)
+
+
+state 190
 	else_expr_opt:  ELSE.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 221
+	expr  goto 222
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 190
-	expr:  expr.'+' expr 
-	expr:  expr.'-' expr 
-	expr:  expr.'*' expr 
-	expr:  expr.'/' expr 
-	expr:  expr.'%' expr 
-	expr:  expr.'&' expr 
-	expr:  expr.'|' expr 
-	expr:  expr.LSHIFT expr 
-	expr:  expr.RSHIFT expr 
-	expr:  expr.CONCAT expr 
-	expr:  expr.JSON_EXTRACT_OP expr 
-	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
-	expr:  expr.cmp_op expr 
-	expr:  expr.cmp_inequality_op expr 
-	expr:  expr.like_op expr 
-	expr:  expr.like_op expr ESCAPE expr 
-	expr:  expr.ANDOP expr 
-	expr:  expr.OR expr 
-	expr:  expr.IS expr 
-	expr:  expr.IS ISNOT expr 
-	expr:  expr.ISNULL 
-	expr:  expr.NOTNULL 
-	expr:  expr.NOT NULL 
-	expr:  expr.between_op expr AND expr 
-	expr:  expr.COLLATE IDENTIFIER 
-	expr:  expr.IN col_tuple 
-	expr:  expr.NOT IN col_tuple 
-	when:  WHEN expr.THEN expr 
-
-	THEN  shift 222
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  error
-
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	numeric_literal  goto 32
 
 state 191
 	expr:  expr.'+' expr 
@@ -3853,135 +3828,170 @@ state 191
 	expr:  expr.COLLATE IDENTIFIER 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	expr_list:  expr_list ',' expr.    (146)
+	when:  WHEN expr.THEN expr 
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 146 (src line 790)
+	THEN  shift 223
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 192
-	expr:  CAST '(' expr AS.convert_type ')' 
+	expr:  expr.'+' expr 
+	expr:  expr.'-' expr 
+	expr:  expr.'*' expr 
+	expr:  expr.'/' expr 
+	expr:  expr.'%' expr 
+	expr:  expr.'&' expr 
+	expr:  expr.'|' expr 
+	expr:  expr.LSHIFT expr 
+	expr:  expr.RSHIFT expr 
+	expr:  expr.CONCAT expr 
+	expr:  expr.JSON_EXTRACT_OP expr 
+	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
+	expr:  expr.cmp_op expr 
+	expr:  expr.cmp_inequality_op expr 
+	expr:  expr.like_op expr 
+	expr:  expr.like_op expr ESCAPE expr 
+	expr:  expr.ANDOP expr 
+	expr:  expr.OR expr 
+	expr:  expr.IS expr 
+	expr:  expr.IS ISNOT expr 
+	expr:  expr.ISNULL 
+	expr:  expr.NOTNULL 
+	expr:  expr.NOT NULL 
+	expr:  expr.between_op expr AND expr 
+	expr:  expr.COLLATE IDENTIFIER 
+	expr:  expr.IN col_tuple 
+	expr:  expr.NOT IN col_tuple 
+	expr_list:  expr_list ',' expr.    (144)
 
-	NONE  shift 224
-	INTEGER  shift 227
-	NUMERIC  shift 228
-	REAL  shift 226
-	TEXT  shift 225
-	.  error
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 144 (src line 784)
 
-	convert_type  goto 223
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 193
-	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt.')' filter_opt 
+	expr:  CAST '(' expr AS.convert_type ')' 
 
-	')'  shift 229
+	NONE  shift 225
+	INTEGER  shift 228
+	NUMERIC  shift 229
+	REAL  shift 227
+	TEXT  shift 226
 	.  error
 
+	convert_type  goto 224
 
 state 194
-	expr_list:  expr_list.',' expr 
-	expr_list_opt:  expr_list.    (148)
+	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt.')' filter_opt 
 
-	','  shift 155
-	.  reduce 148 (src line 800)
+	')'  shift 230
+	.  error
 
 
 state 195
-	function_call_generic:  IDENTIFIER '(' '*' ')'.filter_opt 
-	filter_opt: .    (149)
+	expr_list:  expr_list.',' expr 
+	expr_list_opt:  expr_list.    (146)
 
-	FILTER  shift 231
-	.  reduce 149 (src line 806)
+	','  shift 156
+	.  reduce 146 (src line 794)
 
-	filter_opt  goto 230
 
 state 196
+	function_call_generic:  IDENTIFIER '(' '*' ')'.filter_opt 
+	filter_opt: .    (147)
+
+	FILTER  shift 232
+	.  reduce 147 (src line 800)
+
+	filter_opt  goto 231
+
+state 197
 	function_call_keyword:  GLOB '(' expr ','.expr ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 232
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 197
-	function_call_keyword:  LIKE '(' expr ','.expr ')' 
-	function_call_keyword:  LIKE '(' expr ','.expr ',' expr ')' 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
@@ -3993,207 +4003,246 @@ state 197
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
 state 198
-	create_table_stmt:  CREATE TABLE table_name '(' column_def_list ')'.    (158)
+	function_call_keyword:  LIKE '(' expr ','.expr ')' 
+	function_call_keyword:  LIKE '(' expr ','.expr ',' expr ')' 
 
-	.  reduce 158 (src line 853)
-
-
-state 199
-	column_def_list:  column_def_list ','.column_def 
-
-	IDENTIFIER  shift 149
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
 	.  error
 
-	column_name  goto 166
-	column_def  goto 234
+	expr  goto 234
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
+
+state 199
+	create_table_stmt:  CREATE TABLE table_name '(' column_def_list ')'.    (156)
+
+	.  reduce 156 (src line 847)
+
 
 state 200
-	column_def:  column_name type_name.column_constraints_opt 
-	column_constraints_opt: .    (168)
+	column_def_list:  column_def_list ','.column_def 
 
-	PRIMARY  shift 238
-	UNIQUE  shift 240
-	CHECK  shift 241
-	NOT  shift 239
-	.  reduce 168 (src line 887)
+	IDENTIFIER  shift 150
+	.  error
 
-	column_constraint  goto 237
-	column_constraints  goto 236
-	column_constraints_opt  goto 235
+	column_name  goto 167
+	column_def  goto 235
 
 state 201
-	type_name:  INT.    (162)
+	column_def:  column_name type_name.column_constraints_opt 
+	column_constraints_opt: .    (166)
 
-	.  reduce 162 (src line 878)
+	PRIMARY  shift 239
+	UNIQUE  shift 241
+	CHECK  shift 242
+	DEFAULT  shift 243
+	NOT  shift 240
+	.  reduce 166 (src line 881)
 
+	column_constraint  goto 238
+	column_constraints  goto 237
+	column_constraints_opt  goto 236
 
 state 202
-	type_name:  INTEGER.    (163)
+	type_name:  INT.    (160)
 
-	.  reduce 163 (src line 880)
+	.  reduce 160 (src line 872)
 
 
 state 203
-	type_name:  REAL.    (164)
+	type_name:  INTEGER.    (161)
 
-	.  reduce 164 (src line 881)
+	.  reduce 161 (src line 874)
 
 
 state 204
-	type_name:  TEXT.    (165)
+	type_name:  REAL.    (162)
 
-	.  reduce 165 (src line 882)
+	.  reduce 162 (src line 875)
 
 
 state 205
-	type_name:  BLOB.    (166)
+	type_name:  TEXT.    (163)
 
-	.  reduce 166 (src line 883)
+	.  reduce 163 (src line 876)
 
 
 state 206
-	type_name:  ANY.    (167)
+	type_name:  BLOB.    (164)
 
-	.  reduce 167 (src line 884)
+	.  reduce 164 (src line 877)
 
 
 state 207
+	type_name:  ANY.    (165)
+
+	.  reduce 165 (src line 878)
+
+
+state 208
 	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt.order_by_opt limit_opt 
 	order_by_opt: .    (44)
 
-	ORDER  shift 243
-	.  reduce 44 (src line 330)
+	ORDER  shift 245
+	.  reduce 44 (src line 332)
 
-	order_by_opt  goto 242
+	order_by_opt  goto 244
 
-state 208
+state 209
 	having_opt:  HAVING.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 244
+	expr  goto 246
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 209
+state 210
 	group_by_opt:  GROUP BY.expr_list 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 98
+	expr  goto 99
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
-	expr_list  goto 245
+	expr_list  goto 247
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 210
-	table_expr_list:  table_expr_list ',' table_expr.    (23)
-
-	.  reduce 23 (src line 212)
-
+	numeric_literal  goto 32
 
 state 211
+	table_expr_list:  table_expr_list ',' table_expr.    (23)
+
+	.  reduce 23 (src line 214)
+
+
+state 212
 	join_clause:  join_clause JOIN table_expr.join_constraint 
 	join_constraint: .    (35)
 
-	ON  shift 247
-	USING  shift 248
-	.  reduce 35 (src line 286)
+	ON  shift 249
+	USING  shift 250
+	.  reduce 35 (src line 288)
 
-	join_constraint  goto 246
+	join_constraint  goto 248
 
-state 212
+state 213
 	join_clause:  table_expr JOIN table_expr.join_constraint 
 	join_constraint: .    (35)
 
-	ON  shift 247
-	USING  shift 248
-	.  reduce 35 (src line 286)
+	ON  shift 249
+	USING  shift 250
+	.  reduce 35 (src line 288)
 
-	join_constraint  goto 249
-
-state 213
-	as_table_opt:  AS table_alias.    (30)
-
-	.  reduce 30 (src line 245)
-
+	join_constraint  goto 251
 
 state 214
+	as_table_opt:  AS table_alias.    (30)
+
+	.  reduce 30 (src line 247)
+
+
+state 215
 	table_expr:  '(' select_stmt ')'.as_table_opt 
 	as_table_opt: .    (28)
 
-	IDENTIFIER  shift 176
-	STRING  shift 177
-	AS  shift 175
-	.  reduce 28 (src line 237)
+	IDENTIFIER  shift 177
+	STRING  shift 178
+	AS  shift 176
+	.  reduce 28 (src line 239)
 
-	as_table_opt  goto 250
-	table_alias  goto 174
-
-state 215
-	table_expr:  '(' table_expr_list ')'.    (26)
-
-	.  reduce 26 (src line 227)
-
+	as_table_opt  goto 252
+	table_alias  goto 175
 
 state 216
-	table_expr:  '(' join_clause ')'.    (27)
+	table_expr:  '(' table_expr_list ')'.    (26)
 
-	.  reduce 27 (src line 231)
+	.  reduce 26 (src line 229)
 
 
 state 217
+	table_expr:  '(' join_clause ')'.    (27)
+
+	.  reduce 27 (src line 233)
+
+
+state 218
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4223,31 +4272,31 @@ state 217
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 78 (src line 479)
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 78 (src line 481)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 218
+state 219
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4277,43 +4326,43 @@ state 218
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 89 (src line 527)
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 89 (src line 529)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 219
-	col_tuple:  '(' expr_list ')'.    (134)
-
-	.  reduce 134 (src line 717)
-
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 220
-	expr:  CASE expr_opt when_expr_list else_expr_opt END.    (90)
+	col_tuple:  '(' expr_list ')'.    (132)
 
-	.  reduce 90 (src line 531)
+	.  reduce 132 (src line 711)
 
 
 state 221
+	expr:  CASE expr_opt when_expr_list else_expr_opt END.    (90)
+
+	.  reduce 90 (src line 533)
+
+
+state 222
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4341,139 +4390,140 @@ state 221
 	expr:  expr.COLLATE IDENTIFIER 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	else_expr_opt:  ELSE expr.    (157)
+	else_expr_opt:  ELSE expr.    (155)
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 157 (src line 847)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 155 (src line 841)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 222
+state 223
 	when:  WHEN expr THEN.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 251
+	expr  goto 253
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
-
-state 223
-	expr:  CAST '(' expr AS convert_type.')' 
-
-	')'  shift 252
-	.  error
-
+	numeric_literal  goto 32
 
 state 224
-	convert_type:  NONE.    (127)
+	expr:  CAST '(' expr AS convert_type.')' 
 
-	.  reduce 127 (src line 700)
+	')'  shift 254
+	.  error
 
 
 state 225
-	convert_type:  TEXT.    (128)
+	convert_type:  NONE.    (125)
 
-	.  reduce 128 (src line 702)
+	.  reduce 125 (src line 694)
 
 
 state 226
-	convert_type:  REAL.    (129)
+	convert_type:  TEXT.    (126)
 
-	.  reduce 129 (src line 703)
+	.  reduce 126 (src line 696)
 
 
 state 227
-	convert_type:  INTEGER.    (130)
+	convert_type:  REAL.    (127)
 
-	.  reduce 130 (src line 704)
+	.  reduce 127 (src line 697)
 
 
 state 228
-	convert_type:  NUMERIC.    (131)
+	convert_type:  INTEGER.    (128)
 
-	.  reduce 131 (src line 705)
+	.  reduce 128 (src line 698)
 
 
 state 229
-	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt ')'.filter_opt 
-	filter_opt: .    (149)
+	convert_type:  NUMERIC.    (129)
 
-	FILTER  shift 231
-	.  reduce 149 (src line 806)
+	.  reduce 129 (src line 699)
 
-	filter_opt  goto 253
 
 state 230
-	function_call_generic:  IDENTIFIER '(' '*' ')' filter_opt.    (142)
+	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt ')'.filter_opt 
+	filter_opt: .    (147)
 
-	.  reduce 142 (src line 765)
+	FILTER  shift 232
+	.  reduce 147 (src line 800)
 
+	filter_opt  goto 255
 
 state 231
-	filter_opt:  FILTER.'(' WHERE expr ')' 
+	function_call_generic:  IDENTIFIER '(' '*' ')' filter_opt.    (140)
 
-	'('  shift 254
-	.  error
+	.  reduce 140 (src line 759)
 
 
 state 232
+	filter_opt:  FILTER.'(' WHERE expr ')' 
+
+	'('  shift 256
+	.  error
+
+
+state 233
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4503,46 +4553,46 @@ state 232
 	expr:  expr.NOT IN col_tuple 
 	function_call_keyword:  GLOB '(' expr ',' expr.')' 
 
-	')'  shift 255
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	')'  shift 257
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 233
+state 234
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4573,120 +4623,143 @@ state 233
 	function_call_keyword:  LIKE '(' expr ',' expr.')' 
 	function_call_keyword:  LIKE '(' expr ',' expr.',' expr ')' 
 
-	','  shift 257
-	')'  shift 256
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	','  shift 259
+	')'  shift 258
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 234
-	column_def_list:  column_def_list ',' column_def.    (160)
-
-	.  reduce 160 (src line 865)
-
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 235
-	column_def:  column_name type_name column_constraints_opt.    (161)
+	column_def_list:  column_def_list ',' column_def.    (158)
 
-	.  reduce 161 (src line 871)
+	.  reduce 158 (src line 859)
 
 
 state 236
-	column_constraints_opt:  column_constraints.    (169)
-	column_constraints:  column_constraints.column_constraint 
+	column_def:  column_name type_name column_constraints_opt.    (159)
 
-	PRIMARY  shift 238
-	UNIQUE  shift 240
-	CHECK  shift 241
-	NOT  shift 239
-	.  reduce 169 (src line 891)
+	.  reduce 159 (src line 865)
 
-	column_constraint  goto 258
 
 state 237
-	column_constraints:  column_constraint.    (170)
+	column_constraints_opt:  column_constraints.    (167)
+	column_constraints:  column_constraints.column_constraint 
 
-	.  reduce 170 (src line 897)
+	PRIMARY  shift 239
+	UNIQUE  shift 241
+	CHECK  shift 242
+	DEFAULT  shift 243
+	NOT  shift 240
+	.  reduce 167 (src line 885)
 
+	column_constraint  goto 260
 
 state 238
-	column_constraint:  PRIMARY.KEY primary_key_order 
+	column_constraints:  column_constraint.    (168)
 
-	KEY  shift 259
-	.  error
+	.  reduce 168 (src line 891)
 
 
 state 239
-	column_constraint:  NOT.NULL 
+	column_constraint:  PRIMARY.KEY primary_key_order 
 
-	NULL  shift 260
+	KEY  shift 261
 	.  error
 
 
 state 240
-	column_constraint:  UNIQUE.    (174)
+	column_constraint:  NOT.NULL 
 
-	.  reduce 174 (src line 917)
+	NULL  shift 262
+	.  error
 
 
 state 241
-	column_constraint:  CHECK.'(' expr ')' 
+	column_constraint:  UNIQUE.    (172)
 
-	'('  shift 261
-	.  error
+	.  reduce 172 (src line 911)
 
 
 state 242
-	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt.limit_opt 
-	limit_opt: .    (55)
+	column_constraint:  CHECK.'(' expr ')' 
 
-	LIMIT  shift 263
-	.  reduce 55 (src line 386)
-
-	limit_opt  goto 262
-
-state 243
-	order_by_opt:  ORDER.BY order_list 
-
-	BY  shift 264
+	'('  shift 263
 	.  error
 
 
+state 243
+	column_constraint:  DEFAULT.'(' expr ')' 
+	column_constraint:  DEFAULT.literal_value 
+	column_constraint:  DEFAULT.signed_number 
+
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 264
+	'+'  shift 267
+	'-'  shift 268
+	.  error
+
+	literal_value  goto 265
+	signed_number  goto 266
+	numeric_literal  goto 32
+
 state 244
+	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt.limit_opt 
+	limit_opt: .    (55)
+
+	LIMIT  shift 270
+	.  reduce 55 (src line 388)
+
+	limit_opt  goto 269
+
+state 245
+	order_by_opt:  ORDER.BY order_list 
+
+	BY  shift 271
+	.  error
+
+
+state 246
 	having_opt:  HAVING expr.    (43)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -4716,111 +4789,112 @@ state 244
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 43 (src line 324)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 43 (src line 326)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 245
+state 247
 	group_by_opt:  GROUP BY expr_list.    (41)
 	expr_list:  expr_list.',' expr 
 
-	','  shift 155
-	.  reduce 41 (src line 314)
+	','  shift 156
+	.  reduce 41 (src line 316)
 
 
-state 246
+state 248
 	join_clause:  join_clause JOIN table_expr join_constraint.    (34)
 
-	.  reduce 34 (src line 273)
+	.  reduce 34 (src line 275)
 
 
-state 247
+state 249
 	join_constraint:  ON.expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 265
+	expr  goto 272
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 248
+state 250
 	join_constraint:  USING.'(' column_name_list ')' 
 
-	'('  shift 266
+	'('  shift 273
 	.  error
 
 
-state 249
+state 251
 	join_clause:  table_expr JOIN table_expr join_constraint.    (33)
 
-	.  reduce 33 (src line 261)
+	.  reduce 33 (src line 263)
 
 
-state 250
+state 252
 	table_expr:  '(' select_stmt ')' as_table_opt.    (25)
 
-	.  reduce 25 (src line 223)
+	.  reduce 25 (src line 225)
 
 
-state 251
+state 253
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4848,242 +4922,312 @@ state 251
 	expr:  expr.COLLATE IDENTIFIER 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	when:  WHEN expr THEN expr.    (153)
+	when:  WHEN expr THEN expr.    (151)
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 153 (src line 826)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 151 (src line 820)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 252
-	expr:  CAST '(' expr AS convert_type ')'.    (97)
-
-	.  reduce 97 (src line 559)
-
-
-state 253
-	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt ')' filter_opt.    (141)
-
-	.  reduce 141 (src line 756)
-
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 254
-	filter_opt:  FILTER '('.WHERE expr ')' 
+	expr:  CAST '(' expr AS convert_type ')'.    (97)
 
-	WHERE  shift 267
-	.  error
+	.  reduce 97 (src line 561)
 
 
 state 255
-	function_call_keyword:  GLOB '(' expr ',' expr ')'.    (138)
+	function_call_generic:  IDENTIFIER '(' distinct_function_opt expr_list_opt ')' filter_opt.    (139)
 
-	.  reduce 138 (src line 741)
+	.  reduce 139 (src line 750)
 
 
 state 256
-	function_call_keyword:  LIKE '(' expr ',' expr ')'.    (139)
+	filter_opt:  FILTER '('.WHERE expr ')' 
 
-	.  reduce 139 (src line 746)
+	WHERE  shift 274
+	.  error
 
 
 state 257
-	function_call_keyword:  LIKE '(' expr ',' expr ','.expr ')' 
+	function_call_keyword:  GLOB '(' expr ',' expr ')'.    (136)
 
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
+	.  reduce 136 (src line 735)
 
-	expr  goto 268
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
 
 state 258
-	column_constraints:  column_constraints column_constraint.    (171)
+	function_call_keyword:  LIKE '(' expr ',' expr ')'.    (137)
 
-	.  reduce 171 (src line 902)
+	.  reduce 137 (src line 740)
 
 
 state 259
-	column_constraint:  PRIMARY KEY.primary_key_order 
-	primary_key_order: .    (176)
-
-	ASC  shift 270
-	DESC  shift 271
-	.  reduce 176 (src line 927)
-
-	primary_key_order  goto 269
-
-state 260
-	column_constraint:  NOT NULL.    (173)
-
-	.  reduce 173 (src line 913)
-
-
-state 261
-	column_constraint:  CHECK '('.expr ')' 
+	function_call_keyword:  LIKE '(' expr ',' expr ','.expr ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 272
+	expr  goto 275
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
+
+state 260
+	column_constraints:  column_constraints column_constraint.    (169)
+
+	.  reduce 169 (src line 896)
+
+
+state 261
+	column_constraint:  PRIMARY KEY.primary_key_order 
+	primary_key_order: .    (177)
+
+	ASC  shift 277
+	DESC  shift 278
+	.  reduce 177 (src line 933)
+
+	primary_key_order  goto 276
 
 state 262
-	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt limit_opt.    (6)
+	column_constraint:  NOT NULL.    (171)
 
-	.  reduce 6 (src line 119)
+	.  reduce 171 (src line 907)
 
 
 state 263
+	column_constraint:  CHECK '('.expr ')' 
+
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
+
+	expr  goto 279
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
+
+state 264
+	column_constraint:  DEFAULT '('.expr ')' 
+
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
+
+	expr  goto 280
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
+
+state 265
+	column_constraint:  DEFAULT literal_value.    (175)
+
+	.  reduce 175 (src line 923)
+
+
+state 266
+	column_constraint:  DEFAULT signed_number.    (176)
+
+	.  reduce 176 (src line 927)
+
+
+state 267
+	signed_number:  '+'.numeric_literal 
+
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	.  error
+
+	numeric_literal  goto 281
+
+state 268
+	signed_number:  '-'.numeric_literal 
+
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	.  error
+
+	numeric_literal  goto 282
+
+state 269
+	select_stmt:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt limit_opt.    (6)
+
+	.  reduce 6 (src line 121)
+
+
+state 270
 	limit_opt:  LIMIT.expr 
 	limit_opt:  LIMIT.expr ',' expr 
 	limit_opt:  LIMIT.expr OFFSET expr 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 273
+	expr  goto 283
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 264
+state 271
 	order_by_opt:  ORDER BY.order_list 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 276
+	expr  goto 286
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
-	order_list  goto 274
-	ordering_term  goto 275
+	table_name  goto 92
+	order_list  goto 284
+	ordering_term  goto 285
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 265
+state 272
 	join_constraint:  ON expr.    (36)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -5113,87 +5257,88 @@ state 265
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 36 (src line 290)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 36 (src line 292)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 266
+state 273
 	join_constraint:  USING '('.column_name_list ')' 
 
-	IDENTIFIER  shift 149
+	IDENTIFIER  shift 150
 	.  error
 
-	column_name  goto 278
-	column_name_list  goto 277
+	column_name  goto 288
+	column_name_list  goto 287
 
-state 267
+state 274
 	filter_opt:  FILTER '(' WHERE.expr ')' 
 
 	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
 	'('  shift 25
 	CAST  shift 28
 	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
 	'+'  shift 22
 	'-'  shift 21
 	'~'  shift 23
 	.  error
 
-	expr  goto 279
+	expr  goto 289
 	literal_value  goto 19
 	function_call_keyword  goto 29
 	function_call_generic  goto 30
 	exists_subquery  goto 27
 	column_name  goto 20
-	table_name  goto 91
+	table_name  goto 92
 	subquery  goto 26
+	numeric_literal  goto 32
 
-state 268
+state 275
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5223,64 +5368,64 @@ state 268
 	expr:  expr.NOT IN col_tuple 
 	function_call_keyword:  LIKE '(' expr ',' expr ',' expr.')' 
 
-	')'  shift 280
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	')'  shift 290
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 269
-	column_constraint:  PRIMARY KEY primary_key_order.    (172)
+state 276
+	column_constraint:  PRIMARY KEY primary_key_order.    (170)
 
-	.  reduce 172 (src line 908)
-
-
-state 270
-	primary_key_order:  ASC.    (177)
-
-	.  reduce 177 (src line 931)
+	.  reduce 170 (src line 902)
 
 
-state 271
-	primary_key_order:  DESC.    (178)
+state 277
+	primary_key_order:  ASC.    (178)
 
-	.  reduce 178 (src line 935)
+	.  reduce 178 (src line 937)
 
 
-state 272
+state 278
+	primary_key_order:  DESC.    (179)
+
+	.  reduce 179 (src line 941)
+
+
+state 279
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5310,46 +5455,127 @@ state 272
 	expr:  expr.NOT IN col_tuple 
 	column_constraint:  CHECK '(' expr.')' 
 
-	')'  shift 281
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	')'  shift 291
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 273
+state 280
+	expr:  expr.'+' expr 
+	expr:  expr.'-' expr 
+	expr:  expr.'*' expr 
+	expr:  expr.'/' expr 
+	expr:  expr.'%' expr 
+	expr:  expr.'&' expr 
+	expr:  expr.'|' expr 
+	expr:  expr.LSHIFT expr 
+	expr:  expr.RSHIFT expr 
+	expr:  expr.CONCAT expr 
+	expr:  expr.JSON_EXTRACT_OP expr 
+	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
+	expr:  expr.cmp_op expr 
+	expr:  expr.cmp_inequality_op expr 
+	expr:  expr.like_op expr 
+	expr:  expr.like_op expr ESCAPE expr 
+	expr:  expr.ANDOP expr 
+	expr:  expr.OR expr 
+	expr:  expr.IS expr 
+	expr:  expr.IS ISNOT expr 
+	expr:  expr.ISNULL 
+	expr:  expr.NOTNULL 
+	expr:  expr.NOT NULL 
+	expr:  expr.between_op expr AND expr 
+	expr:  expr.COLLATE IDENTIFIER 
+	expr:  expr.IN col_tuple 
+	expr:  expr.NOT IN col_tuple 
+	column_constraint:  DEFAULT '(' expr.')' 
+
+	')'  shift 292
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  error
+
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
+
+state 281
+	signed_number:  '+' numeric_literal.    (180)
+
+	.  reduce 180 (src line 947)
+
+
+state 282
+	signed_number:  '-' numeric_literal.    (181)
+
+	.  reduce 181 (src line 952)
+
+
+state 283
 	limit_opt:  LIMIT expr.    (56)
 	limit_opt:  LIMIT expr.',' expr 
 	limit_opt:  LIMIT expr.OFFSET expr 
@@ -5381,61 +5607,61 @@ state 273
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	','  shift 282
-	OFFSET  shift 283
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 56 (src line 390)
+	','  shift 293
+	OFFSET  shift 294
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 56 (src line 392)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 274
+state 284
 	order_by_opt:  ORDER BY order_list.    (45)
 	order_list:  order_list.',' ordering_term 
 
-	','  shift 284
-	.  reduce 45 (src line 334)
+	','  shift 295
+	.  reduce 45 (src line 336)
 
 
-state 275
+state 285
 	order_list:  ordering_term.    (46)
 
-	.  reduce 46 (src line 340)
+	.  reduce 46 (src line 342)
 
 
-state 276
+state 286
 	ordering_term:  expr.asc_desc_opt nulls 
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -5466,63 +5692,63 @@ state 276
 	expr:  expr.NOT IN col_tuple 
 	asc_desc_opt: .    (49)
 
-	ASC  shift 286
-	DESC  shift 287
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 49 (src line 358)
+	ASC  shift 297
+	DESC  shift 298
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 49 (src line 360)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-	asc_desc_opt  goto 285
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
+	asc_desc_opt  goto 296
 
-state 277
+state 287
 	join_constraint:  USING '(' column_name_list.')' 
 	column_name_list:  column_name_list.',' column_name 
 
-	','  shift 289
-	')'  shift 288
+	','  shift 300
+	')'  shift 299
 	.  error
 
 
-state 278
-	column_name_list:  column_name.    (109)
+state 288
+	column_name_list:  column_name.    (107)
 
-	.  reduce 109 (src line 613)
+	.  reduce 107 (src line 607)
 
 
-state 279
+state 289
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5552,199 +5778,208 @@ state 279
 	expr:  expr.NOT IN col_tuple 
 	filter_opt:  FILTER '(' WHERE expr.')' 
 
-	')'  shift 290
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
+	')'  shift 301
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
 	.  error
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
-
-state 280
-	function_call_keyword:  LIKE '(' expr ',' expr ',' expr ')'.    (140)
-
-	.  reduce 140 (src line 750)
-
-
-state 281
-	column_constraint:  CHECK '(' expr ')'.    (175)
-
-	.  reduce 175 (src line 921)
-
-
-state 282
-	limit_opt:  LIMIT expr ','.expr 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 291
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 283
-	limit_opt:  LIMIT expr OFFSET.expr 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 292
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	subquery  goto 26
-
-state 284
-	order_list:  order_list ','.ordering_term 
-
-	IDENTIFIER  shift 31
-	STRING  shift 32
-	INTEGRAL  shift 33
-	HEXNUM  shift 36
-	FLOAT  shift 34
-	BLOBVAL  shift 35
-	TRUE  shift 37
-	FALSE  shift 38
-	NULL  shift 39
-	'('  shift 25
-	CAST  shift 28
-	CASE  shift 24
-	EXISTS  shift 40
-	NOT  shift 41
-	GLOB  shift 42
-	LIKE  shift 43
-	'+'  shift 22
-	'-'  shift 21
-	'~'  shift 23
-	.  error
-
-	expr  goto 276
-	literal_value  goto 19
-	function_call_keyword  goto 29
-	function_call_generic  goto 30
-	exists_subquery  goto 27
-	column_name  goto 20
-	table_name  goto 91
-	ordering_term  goto 293
-	subquery  goto 26
-
-state 285
-	ordering_term:  expr asc_desc_opt.nulls 
-	nulls: .    (52)
-
-	NULLS  shift 295
-	.  reduce 52 (src line 372)
-
-	nulls  goto 294
-
-state 286
-	asc_desc_opt:  ASC.    (50)
-
-	.  reduce 50 (src line 362)
-
-
-state 287
-	asc_desc_opt:  DESC.    (51)
-
-	.  reduce 51 (src line 366)
-
-
-state 288
-	join_constraint:  USING '(' column_name_list ')'.    (37)
-
-	.  reduce 37 (src line 294)
-
-
-state 289
-	column_name_list:  column_name_list ','.column_name 
-
-	IDENTIFIER  shift 149
-	.  error
-
-	column_name  goto 296
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
 state 290
-	filter_opt:  FILTER '(' WHERE expr ')'.    (150)
+	function_call_keyword:  LIKE '(' expr ',' expr ',' expr ')'.    (138)
 
-	.  reduce 150 (src line 810)
+	.  reduce 138 (src line 744)
 
 
 state 291
+	column_constraint:  CHECK '(' expr ')'.    (173)
+
+	.  reduce 173 (src line 915)
+
+
+state 292
+	column_constraint:  DEFAULT '(' expr ')'.    (174)
+
+	.  reduce 174 (src line 919)
+
+
+state 293
+	limit_opt:  LIMIT expr ','.expr 
+
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
+
+	expr  goto 302
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
+
+state 294
+	limit_opt:  LIMIT expr OFFSET.expr 
+
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
+
+	expr  goto 303
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	subquery  goto 26
+	numeric_literal  goto 32
+
+state 295
+	order_list:  order_list ','.ordering_term 
+
+	IDENTIFIER  shift 31
+	STRING  shift 33
+	INTEGRAL  shift 42
+	HEXNUM  shift 44
+	FLOAT  shift 43
+	BLOBVAL  shift 34
+	TRUE  shift 35
+	FALSE  shift 36
+	NULL  shift 37
+	'('  shift 25
+	CAST  shift 28
+	CASE  shift 24
+	EXISTS  shift 38
+	NOT  shift 39
+	GLOB  shift 40
+	LIKE  shift 41
+	'+'  shift 22
+	'-'  shift 21
+	'~'  shift 23
+	.  error
+
+	expr  goto 286
+	literal_value  goto 19
+	function_call_keyword  goto 29
+	function_call_generic  goto 30
+	exists_subquery  goto 27
+	column_name  goto 20
+	table_name  goto 92
+	ordering_term  goto 304
+	subquery  goto 26
+	numeric_literal  goto 32
+
+state 296
+	ordering_term:  expr asc_desc_opt.nulls 
+	nulls: .    (52)
+
+	NULLS  shift 306
+	.  reduce 52 (src line 374)
+
+	nulls  goto 305
+
+state 297
+	asc_desc_opt:  ASC.    (50)
+
+	.  reduce 50 (src line 364)
+
+
+state 298
+	asc_desc_opt:  DESC.    (51)
+
+	.  reduce 51 (src line 368)
+
+
+state 299
+	join_constraint:  USING '(' column_name_list ')'.    (37)
+
+	.  reduce 37 (src line 296)
+
+
+state 300
+	column_name_list:  column_name_list ','.column_name 
+
+	IDENTIFIER  shift 150
+	.  error
+
+	column_name  goto 307
+
+state 301
+	filter_opt:  FILTER '(' WHERE expr ')'.    (148)
+
+	.  reduce 148 (src line 804)
+
+
+state 302
 	limit_opt:  LIMIT expr ',' expr.    (57)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -5774,45 +6009,45 @@ state 291
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 57 (src line 394)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 57 (src line 396)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 292
+state 303
 	limit_opt:  LIMIT expr OFFSET expr.    (58)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -5842,92 +6077,92 @@ state 292
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	OR  shift 66
-	ANDOP  shift 65
-	NOT  shift 70
-	IS  shift 67
-	MATCH  shift 80
-	GLOB  shift 79
-	REGEXP  shift 78
-	LIKE  shift 85
-	BETWEEN  shift 86
-	IN  shift 73
-	ISNULL  shift 68
-	NOTNULL  shift 69
-	NE  shift 77
-	'='  shift 76
-	'<'  shift 81
-	'>'  shift 82
-	LE  shift 83
-	GE  shift 84
-	'&'  shift 55
-	'|'  shift 56
-	LSHIFT  shift 57
-	RSHIFT  shift 58
-	'+'  shift 50
-	'-'  shift 51
-	'*'  shift 52
-	'/'  shift 53
-	'%'  shift 54
-	CONCAT  shift 59
-	JSON_EXTRACT_OP  shift 60
-	JSON_UNQUOTE_EXTRACT_OP  shift 61
-	COLLATE  shift 72
-	.  reduce 58 (src line 398)
+	OR  shift 67
+	ANDOP  shift 66
+	NOT  shift 71
+	IS  shift 68
+	MATCH  shift 81
+	GLOB  shift 80
+	REGEXP  shift 79
+	LIKE  shift 86
+	BETWEEN  shift 87
+	IN  shift 74
+	ISNULL  shift 69
+	NOTNULL  shift 70
+	NE  shift 78
+	'='  shift 77
+	'<'  shift 82
+	'>'  shift 83
+	LE  shift 84
+	GE  shift 85
+	'&'  shift 56
+	'|'  shift 57
+	LSHIFT  shift 58
+	RSHIFT  shift 59
+	'+'  shift 51
+	'-'  shift 52
+	'*'  shift 53
+	'/'  shift 54
+	'%'  shift 55
+	CONCAT  shift 60
+	JSON_EXTRACT_OP  shift 61
+	JSON_UNQUOTE_EXTRACT_OP  shift 62
+	COLLATE  shift 73
+	.  reduce 58 (src line 400)
 
-	cmp_op  goto 62
-	cmp_inequality_op  goto 63
-	like_op  goto 64
-	between_op  goto 71
+	cmp_op  goto 63
+	cmp_inequality_op  goto 64
+	like_op  goto 65
+	between_op  goto 72
 
-state 293
+state 304
 	order_list:  order_list ',' ordering_term.    (47)
 
-	.  reduce 47 (src line 345)
+	.  reduce 47 (src line 347)
 
 
-state 294
+state 305
 	ordering_term:  expr asc_desc_opt nulls.    (48)
 
-	.  reduce 48 (src line 351)
+	.  reduce 48 (src line 353)
 
 
-state 295
+state 306
 	nulls:  NULLS.FIRST 
 	nulls:  NULLS.LAST 
 
-	FIRST  shift 297
-	LAST  shift 298
+	FIRST  shift 308
+	LAST  shift 309
 	.  error
 
 
-state 296
-	column_name_list:  column_name_list ',' column_name.    (110)
+state 307
+	column_name_list:  column_name_list ',' column_name.    (108)
 
-	.  reduce 110 (src line 618)
+	.  reduce 108 (src line 612)
 
 
-state 297
+state 308
 	nulls:  NULLS FIRST.    (53)
 
-	.  reduce 53 (src line 376)
+	.  reduce 53 (src line 378)
 
 
-state 298
+state 309
 	nulls:  NULLS LAST.    (54)
 
-	.  reduce 54 (src line 380)
+	.  reduce 54 (src line 382)
 
 
-97 terminals, 57 nonterminals
-179 grammar rules, 299/16000 states
+98 terminals, 59 nonterminals
+185 grammar rules, 310/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
-106 working sets used
-memory: parser 780/240000
-209 extra closures
-2096 shift entries, 2 exceptions
-144 goto entries
-546 entries saved by goto default
-Optimizer space used: output 1139/240000
-1139 table entries, 208 zero
-maximum spread: 96, maximum offset: 289
+108 working sets used
+memory: parser 879/240000
+210 extra closures
+2166 shift entries, 2 exceptions
+150 goto entries
+610 entries saved by goto default
+Optimizer space used: output 1180/240000
+1180 table entries, 196 zero
+maximum spread: 97, maximum offset: 300

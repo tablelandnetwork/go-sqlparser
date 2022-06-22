@@ -868,8 +868,8 @@ func (*ColumnConstraintPrimaryKey) iColumnConstraint() {}
 func (*ColumnConstraintNotNull) iColumnConstraint()    {}
 func (*ColumnConstraintUnique) iColumnConstraint()     {}
 func (*ColumnConstraintCheck) iColumnConstraint()      {}
+func (*ColumnConstraintDefault) iColumnConstraint()    {}
 
-// func (*ColumnConstraintDefaultValue) iColumnConstraint() {}
 // func (*ColumnConstraintGenerated) iColumnConstraint() {}
 
 type ColumnConstraintPrimaryKey struct {
@@ -916,6 +916,19 @@ type ColumnConstraintCheck struct {
 // String returns the string representation of the node.
 func (node *ColumnConstraintCheck) String() string {
 	return fmt.Sprintf("CHECK(%s)", node.Expr.String())
+}
+
+type ColumnConstraintDefault struct {
+	Expr        Expr
+	Parenthesis bool
+}
+
+// String returns the string representation of the node.
+func (node *ColumnConstraintDefault) String() string {
+	if node.Parenthesis {
+		return fmt.Sprintf("DEFAULT (%s)", node.Expr.String())
+	}
+	return fmt.Sprintf("DEFAULT %s", node.Expr.String())
 }
 
 // TableConstraint is constraint for table definition.

@@ -36,6 +36,7 @@ const MaxColumnNameLength = 64
   columnDef *ColumnDef
   columnConstraint ColumnConstraint
   columnConstraints []ColumnConstraint
+  value *Value
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -45,7 +46,7 @@ const MaxColumnNameLength = 64
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
-%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK
+%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -66,7 +67,7 @@ const MaxColumnNameLength = 64
 %type <statement> stmt
 %type <selectStmt> select_stmt
 %type <createTableStmt> create_table_stmt
-%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery
+%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order
 %type <column> column_name 
@@ -93,6 +94,7 @@ const MaxColumnNameLength = 64
 %type <columnDef> column_def
 %type <columnConstraint> column_constraint
 %type <columnConstraints> column_constraints column_constraints_opt
+%type <value> numeric_literal
 
 %%
 start: 
@@ -565,25 +567,17 @@ expr:
 ;
 
 literal_value:
-  STRING
+  numeric_literal
+  {
+    $$ = $1
+  }
+| STRING
   {
     $$ = &Value{Type: StrValue, Value: $1[1:len($1)-1]}
-  }
-| INTEGRAL
-  {
-    $$ = &Value{Type: IntValue, Value: $1}
-  }
-| FLOAT
-  {
-    $$ = &Value{Type: FloatValue, Value: $1}
   }
 | BLOBVAL
   {
     $$ = &Value{Type: BlobValue, Value: $1}
-  }
-| HEXNUM
-  {
-    $$ = &Value{Type: HexNumValue, Value: $1}
   }
 | TRUE
   {
@@ -922,6 +916,18 @@ column_constraint:
   {
     $$ = &ColumnConstraintCheck{Expr: $3}
   }
+| DEFAULT '(' expr ')'
+  {
+    $$ = &ColumnConstraintDefault{Expr: $3, Parenthesis: true}
+  }
+| DEFAULT literal_value
+  {
+    $$ = &ColumnConstraintDefault{Expr: $2}
+  }
+| DEFAULT signed_number
+  {
+    $$ = &ColumnConstraintDefault{Expr: $2}
+  }
 ;
 
 primary_key_order:
@@ -935,6 +941,33 @@ primary_key_order:
 | DESC
   {
     $$ = ColumnConstraintPrimaryKeyOrderDesc
+  }
+;
+
+signed_number:
+  '+' numeric_literal 
+  {
+    $$ = $2
+  }
+| '-' numeric_literal %prec UNARY
+  {
+    $2.Value = append([]byte("-"), $2.Value...)
+    $$ = $2
+  }
+;
+
+numeric_literal:
+  INTEGRAL
+  {
+    $$ = &Value{Type: IntValue, Value: $1}
+  }
+| FLOAT
+  {
+    $$ = &Value{Type: FloatValue, Value: $1}
+  }
+| HEXNUM
+  {
+    $$ = &Value{Type: HexNumValue, Value: $1}
   }
 ;
 %%

@@ -65,6 +65,7 @@ var keywords = map[string]int{
 	"KEY":      KEY,
 	"UNIQUE":   UNIQUE,
 	"CHECK":    CHECK,
+	"DEFAULT":  DEFAULT,
 }
 
 const EOF = 0
