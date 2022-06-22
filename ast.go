@@ -869,9 +869,9 @@ func (*ColumnConstraintNotNull) iColumnConstraint()    {}
 func (*ColumnConstraintUnique) iColumnConstraint()     {}
 func (*ColumnConstraintCheck) iColumnConstraint()      {}
 func (*ColumnConstraintDefault) iColumnConstraint()    {}
+func (*ColumnConstraintGenerated) iColumnConstraint()  {}
 
-// func (*ColumnConstraintGenerated) iColumnConstraint() {}
-
+// ColumnConstraintPrimaryKey represents a PRIMARY KEY column constraint for CREATE TABLE.
 type ColumnConstraintPrimaryKey struct {
 	Order string
 	//ConflictClause *ConflictClause
@@ -891,6 +891,7 @@ const (
 	ColumnConstraintPrimaryKeyOrderDesc  = "DESC"
 )
 
+// ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
 type ColumnConstraintNotNull struct {
 	//ConflictClause *ConflictClause
 }
@@ -900,6 +901,7 @@ func (node *ColumnConstraintNotNull) String() string {
 	return "NOT NULL"
 }
 
+// ColumnConstraintUnique represents a UNIQUE column constraint for CREATE TABLE.
 type ColumnConstraintUnique struct {
 	//ConflictClause *ConflictClause
 }
@@ -909,6 +911,7 @@ func (node *ColumnConstraintUnique) String() string {
 	return "UNIQUE"
 }
 
+// ColumnConstraintCheck represents a CHECK column constraint for CREATE TABLE.
 type ColumnConstraintCheck struct {
 	Expr Expr
 }
@@ -918,6 +921,7 @@ func (node *ColumnConstraintCheck) String() string {
 	return fmt.Sprintf("CHECK(%s)", node.Expr.String())
 }
 
+// ColumnConstraintDefault represents a DEFAULT column constraint for CREATE TABLE.
 type ColumnConstraintDefault struct {
 	Expr        Expr
 	Parenthesis bool
@@ -929,6 +933,33 @@ func (node *ColumnConstraintDefault) String() string {
 		return fmt.Sprintf("DEFAULT (%s)", node.Expr.String())
 	}
 	return fmt.Sprintf("DEFAULT %s", node.Expr.String())
+}
+
+// ColumnConstraintGenerated represents a GENERATED ALWAYS column constraint for CREATE TABLE.
+type ColumnConstraintGenerated struct {
+	Expr Expr
+
+	// the GENERATED ALWAYS keywords are optional in the grammar.
+	GeneratedAlways bool
+
+	// this is a flag for VIRTUAL or STORED keywords.
+	IsStored bool
+}
+
+// String returns the string representation of the node.
+func (node *ColumnConstraintGenerated) String() string {
+	var b strings.Builder
+	if node.GeneratedAlways {
+		b.WriteString(fmt.Sprintf("GENERATED ALWAYS AS (%s)", node.Expr.String()))
+	} else {
+		b.WriteString(fmt.Sprintf("AS (%s)", node.Expr.String()))
+	}
+
+	if node.IsStored {
+		b.WriteString(" STORED")
+	}
+
+	return b.String()
 }
 
 // TableConstraint is constraint for table definition.

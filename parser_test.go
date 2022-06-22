@@ -3027,6 +3027,98 @@ func TestCreateTable(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "create table check",
+			stmt:     "CREATE TABLE t1(a INTEGER PRIMARY KEY, b INT, c TEXT, d INT GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
+			deparsed: "CREATE TABLE t1 (a INTEGER PRIMARY KEY, b INT, c TEXT, d INT GENERATED ALWAYS AS (a * abs(b)), e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)))",
+			expectedAST: &AST{
+				Root: &CreateTable{
+					Name: &Table{Name: "t1"},
+					Columns: []*ColumnDef{
+						{
+							Name: &Column{Name: "a"},
+							Type: TypeIntegerStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintPrimaryKey{},
+							},
+						},
+						{
+							Name:        &Column{Name: "b"},
+							Type:        TypeIntStr,
+							Constraints: []ColumnConstraint{},
+						},
+						{
+							Name:        &Column{Name: "c"},
+							Type:        TypeTextStr,
+							Constraints: []ColumnConstraint{},
+						},
+						{
+							Name: &Column{Name: "d"},
+							Type: TypeIntStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintGenerated{
+									GeneratedAlways: true,
+									Expr: &BinaryExpr{
+										Operator: MultStr,
+										Left:     &Column{Name: "a"},
+										Right: &FuncExpr{
+											Name: "abs",
+											Args: Exprs{
+												&Column{Name: "b"},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Name: &Column{Name: "e"},
+							Type: TypeTextStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintGenerated{
+									GeneratedAlways: true,
+									IsStored:        true,
+									Expr: &FuncExpr{
+										Name: "substr",
+										Args: Exprs{
+											&Column{Name: "c"},
+											&Column{Name: "b"},
+											&BinaryExpr{
+												Operator: PlusStr,
+												Left:     &Column{Name: "b"},
+												Right:    &Value{Type: IntValue, Value: []byte("1")},
+											},
+										},
+									},
+								},
+							},
+						},
+						{
+							Name: &Column{Name: "f"},
+							Type: TypeTextStr,
+							Constraints: []ColumnConstraint{
+								&ColumnConstraintGenerated{
+									GeneratedAlways: false,
+									IsStored:        false,
+									Expr: &FuncExpr{
+										Name: "substr",
+										Args: Exprs{
+											&Column{Name: "c"},
+											&Column{Name: "b"},
+											&BinaryExpr{
+												Operator: PlusStr,
+												Left:     &Column{Name: "b"},
+												Right:    &Value{Type: IntValue, Value: []byte("1")},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {

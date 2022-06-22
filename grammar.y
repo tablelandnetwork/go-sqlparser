@@ -46,7 +46,7 @@ const MaxColumnNameLength = 64
 %token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
-%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT
+%token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -89,7 +89,7 @@ const MaxColumnNameLength = 64
 %type <columnList> column_name_list
 %type <subquery> subquery
 %type <colTuple> col_tuple
-%type <bool> distinct_function_opt
+%type <bool> distinct_function_opt is_stored
 %type <columnDefList> column_def_list
 %type <columnDef> column_def
 %type <columnConstraint> column_constraint
@@ -928,6 +928,14 @@ column_constraint:
   {
     $$ = &ColumnConstraintDefault{Expr: $2}
   }
+| GENERATED ALWAYS AS '(' expr ')' is_stored
+  {
+    $$ = &ColumnConstraintGenerated{Expr: $5, GeneratedAlways: true, IsStored: $7}
+  }
+| AS '(' expr ')' is_stored
+  {
+    $$ = &ColumnConstraintGenerated{Expr: $3, GeneratedAlways: false, IsStored: $5}
+  }
 ;
 
 primary_key_order:
@@ -968,6 +976,20 @@ numeric_literal:
 | HEXNUM
   {
     $$ = &Value{Type: HexNumValue, Value: $1}
+  }
+;
+
+is_stored:
+  {
+    $$ = false
+  }
+| STORED
+  {
+    $$ = true
+  }
+| VIRTUAL
+  {
+    $$ = false
   }
 ;
 %%
