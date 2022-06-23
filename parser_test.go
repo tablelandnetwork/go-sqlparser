@@ -3400,5 +3400,83 @@ func TestUpdate(t *testing.T) {
 			}
 		}(tc))
 	}
+}
 
+func TestGrant(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name           string
+		stmt           string
+		deparsed       string
+		expectedAST    *AST
+		expectedErrMsg string
+	}
+
+	tests := []testCase{
+		{
+			name:     "grant",
+			stmt:     "GRANT INSERT, UPDATE, DELETE on t TO 'a', 'b'",
+			deparsed: "grant delete, insert, update on t to 'a', 'b'",
+			expectedAST: &AST{
+				Root: &Grant{
+					Table: &Table{Name: "t"},
+					Privileges: Privileges{
+						"insert": struct{}{},
+						"update": struct{}{},
+						"delete": struct{}{},
+					},
+					Roles: []string{"a", "b"},
+				},
+			},
+		},
+		{
+			name:           "grant number of privileges",
+			stmt:           "GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b'",
+			deparsed:       "",
+			expectedAST:    nil,
+			expectedErrMsg: "number of privileges exceeded",
+		},
+		{
+			name:           "grant repeated",
+			stmt:           "GRANT INSERT, DELETE, DELETE on t TO 'a', 'b'",
+			deparsed:       "",
+			expectedAST:    nil,
+			expectedErrMsg: "repeated privilege: delete",
+		},
+		{
+			name:     "revoke",
+			stmt:     "REVOKE INSERT, UPDATE, DELETE ON t FROM 'a', 'b'",
+			deparsed: "revoke delete, insert, update on t from 'a', 'b'",
+			expectedAST: &AST{
+				Root: &Revoke{
+					Table: &Table{Name: "t"},
+					Privileges: Privileges{
+						"insert": struct{}{},
+						"update": struct{}{},
+						"delete": struct{}{},
+					},
+					Roles: []string{"a", "b"},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+
+				if tc.expectedErrMsg == "" {
+					require.NoError(t, err)
+					require.Equal(t, tc.expectedAST, ast)
+					require.Equal(t, tc.deparsed, ast.String())
+				} else {
+					require.Contains(t, err.Error(), tc.expectedErrMsg)
+				}
+
+			}
+		}(tc))
+	}
 }

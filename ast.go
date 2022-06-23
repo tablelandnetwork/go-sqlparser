@@ -2,6 +2,7 @@ package sqlparser
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
@@ -40,6 +41,8 @@ func (*CreateTable) iStatement() {}
 func (*Insert) iStatement()      {}
 func (*Delete) iStatement()      {}
 func (*Update) iStatement()      {}
+func (*Grant) iStatement()       {}
+func (*Revoke) iStatement()      {}
 
 // SelectStatement any SELECT statement.
 type SelectStatement interface {
@@ -1101,8 +1104,47 @@ func (node *Update) String() string {
 	return fmt.Sprintf("update %s set %s%s", node.Table.String(), strings.Join(exprs, ", "), node.Where.String())
 }
 
-// UpdateExpr represents an update expression.
+// UpdateExpr represents an UPDATE SET expression (Column = Expr).
 type UpdateExpr struct {
 	Column *Column
 	Expr   Expr
+}
+
+// Grant represents a GRANT statement.
+type Grant struct {
+	Privileges Privileges
+	Table      *Table
+	Roles      []string
+}
+
+// String returns the string representation of the node.
+func (node *Grant) String() string {
+	return fmt.Sprintf("grant %s on %s to %s", node.Privileges.String(), node.Table.String(), "'"+strings.Join(node.Roles, "', '")+"'")
+}
+
+// Privileges represents the GRANT privilges (INSERT, UPDATE, DELETE).
+type Privileges map[string]struct{}
+
+// String returns the string representation of the node.
+func (node Privileges) String() string {
+	var privileges []string
+	for priv, _ := range node {
+		privileges = append(privileges, priv)
+	}
+
+	// we cannot guarantee map order, so we sort it so the string is deterministic
+	sort.Strings(privileges)
+	return strings.Join(privileges, ", ")
+}
+
+// Revoke represents a REVOKE statement.
+type Revoke struct {
+	Privileges Privileges
+	Table      *Table
+	Roles      []string
+}
+
+// String returns the string representation of the node.
+func (node *Revoke) String() string {
+	return fmt.Sprintf("revoke %s on %s from %s", node.Privileges.String(), node.Table.String(), "'"+strings.Join(node.Roles, "', '")+"'")
 }

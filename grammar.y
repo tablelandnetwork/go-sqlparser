@@ -45,6 +45,10 @@ const MaxColumnNameLength = 64
   updateStmt *Update
   updateExpression *UpdateExpr
   updateList []*UpdateExpr
+  grant *Grant
+  revoke *Revoke
+  strings []string
+  privileges Privileges
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -56,6 +60,7 @@ const MaxColumnNameLength = 64
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 %token <empty> INSERT INTO VALUES DELETE UPDATE SET
+%token <empty> GRANT TO REVOKE
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -78,7 +83,7 @@ const MaxColumnNameLength = 64
 %type <createTableStmt> create_table_stmt
 %type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number
 %type <exprs> expr_list expr_list_opt group_by_opt
-%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order
+%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege
 %type <column> column_name 
 %type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name
 %type <SelectColumn> select_column
@@ -112,6 +117,10 @@ const MaxColumnNameLength = 64
 %type <updateStmt> update_stmt
 %type <updateExpression> update_expression
 %type <updateList> update_list common_update_list paren_update_list
+%type <grant> grant_stmt
+%type <revoke> revoke_stmt
+%type <strings> roles
+%type <privileges> privileges
 
 %%
 start: 
@@ -136,6 +145,14 @@ stmt:
     $$ = $1
   }
 | update_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+| grant_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+| revoke_stmt semicolon_opt
   {
     $$ = $1
   }
@@ -1144,5 +1161,69 @@ update_expression:
   }
 ;
 
+grant_stmt:
+  GRANT privileges ON table_name TO roles
+  {
+    $$ = &Grant{Table: $4, Privileges: $2, Roles: $6}
+  }
+;
+
+revoke_stmt:
+  REVOKE privileges ON table_name FROM roles
+  {
+    $$ = &Revoke{Table: $4, Privileges: $2, Roles: $6}
+  }
+;
+
+
+roles:
+  STRING
+  {
+    $$ = []string{string($1[1:len($1)-1])}
+  }
+| roles ',' STRING
+  {
+    $$ = append($1, string($3[1:len($3)-1]))
+  }
+;
+
+privileges:
+  privilege
+  {
+    privileges := make(map[string]struct{})
+    privileges[$1] = struct{}{}
+    $$ = Privileges(privileges)
+  }
+| privileges ',' privilege
+  {
+    if len($1) == 3 {
+      yylex.Error("number of privileges exceeded")
+      return 1
+    }
+    
+    if _, ok := $1[$3]; ok {
+      yylex.Error(__yyfmt__.Sprintf("repeated privilege: %s", $3))
+      return 1   
+    } 
+    
+    $1[$3] = struct{}{}
+    $$ = $1
+  }
+;
+
+privilege:
+  INSERT
+  {
+    $$ = "insert"
+  }
+| UPDATE
+  {
+    $$ = "update"
+  }
+| DELETE
+  {
+    $$ = "delete"
+  }
+;
 %%
 
