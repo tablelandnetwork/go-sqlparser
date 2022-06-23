@@ -71,6 +71,9 @@ var keywords = map[string]int{
 	"STORED":     STORED,
 	"VIRTUAL":    VIRTUAL,
 	"CONSTRAINT": CONSTRAINT,
+	"INSERT":     INSERT,
+	"VALUES":     VALUES,
+	"INTO":       INTO,
 }
 
 const EOF = 0

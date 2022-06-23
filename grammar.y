@@ -39,6 +39,8 @@ const MaxColumnNameLength = 64
   value *Value
   tableConstraint TableConstraint
   tableConstraints []TableConstraint
+  insertStmt *Insert
+  insertRows []Exprs
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -49,6 +51,7 @@ const MaxColumnNameLength = 64
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
+%token <empty> INSERT INTO VALUES
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -99,6 +102,8 @@ const MaxColumnNameLength = 64
 %type <value> numeric_literal
 %type <tableConstraint> table_constraint
 %type <tableConstraints> table_constraint_list table_constraint_list_opt
+%type <insertStmt> insert_stmt
+%type <insertRows> insert_rows
 
 %%
 start: 
@@ -111,6 +116,10 @@ stmt:
     $$ = $1
   }
 | create_table_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+| insert_stmt semicolon_opt
   {
     $$ = $1
   }
@@ -1036,6 +1045,28 @@ table_constraint:
 | constraint_name CHECK '(' expr ')'
   {
     $$ = &TableConstraintCheck{Name: $1, Expr: $4}
+  }
+;
+
+insert_stmt:
+  INSERT INTO table_name '(' column_name_list ')' VALUES insert_rows
+  {
+    $$ = &Insert{Table: $3, Columns: $5, Rows: $8}
+  }
+| INSERT INTO table_name DEFAULT VALUES
+  {
+    $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{}, DefaultValues: true}
+  }
+;
+
+insert_rows:
+  '(' expr_list ')'
+  {
+    $$ = []Exprs{$2}
+  }
+| insert_rows ',' '(' expr_list ')'
+  {
+    $$ = append($1, $4)
   }
 ;
 

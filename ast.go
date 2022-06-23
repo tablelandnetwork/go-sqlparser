@@ -37,6 +37,7 @@ type Statement interface {
 
 func (*Select) iStatement()      {}
 func (*CreateTable) iStatement() {}
+func (*Insert) iStatement()      {}
 
 // SelectStatement any SELECT statement.
 type SelectStatement interface {
@@ -1048,4 +1049,25 @@ func (node *TableConstraintCheck) String() string {
 	}
 
 	return fmt.Sprintf("%sCHECK(%s)", constraintName, node.Expr.String())
+}
+
+// Insert represents an INSERT statement.
+type Insert struct {
+	Table         *Table
+	Columns       ColumnList
+	Rows          []Exprs
+	DefaultValues bool
+}
+
+// String returns the string representation of the node.
+func (node *Insert) String() string {
+	if node.DefaultValues {
+		return fmt.Sprintf("insert into %s default values", node.Table.Name.String())
+	}
+
+	var rows []string
+	for _, row := range node.Rows {
+		rows = append(rows, row.String())
+	}
+	return fmt.Sprintf("insert into %s %s values %s", node.Table.Name.String(), node.Columns.String(), strings.Join(rows, ", "))
 }

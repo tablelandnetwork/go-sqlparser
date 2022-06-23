@@ -3191,3 +3191,82 @@ func TestCreateTableStrict(t *testing.T) {
 
 	require.Equal(t, "CREATE TABLE t (a INT) STRICT", ast.String())
 }
+
+func TestInsert(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+	}
+
+	tests := []testCase{
+		{
+			name:     "insert simple",
+			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
+			deparsed: "insert into t (a, b) values (1, 2), (3, 4)",
+			expectedAST: &AST{
+				Root: &Insert{
+					Table: &Table{Name: "t"},
+					Columns: ColumnList{
+						&Column{Name: "a"},
+						&Column{Name: "b"},
+					},
+					Rows: []Exprs{
+						{
+							&Value{Type: IntValue, Value: []byte("1")},
+							&Value{Type: IntValue, Value: []byte("2")},
+						},
+						{
+							&Value{Type: IntValue, Value: []byte("3")},
+							&Value{Type: IntValue, Value: []byte("4")},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "insert default values",
+			stmt:     "INSERT INTO t DEFAULT VALUES;",
+			deparsed: "insert into t default values",
+			expectedAST: &AST{
+				Root: &Insert{
+					Table:         &Table{Name: "t"},
+					Columns:       ColumnList{},
+					Rows:          []Exprs{},
+					DefaultValues: true,
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedAST, ast)
+				require.Equal(t, tc.deparsed, ast.String())
+
+				// test all CREATE statements against SQLite3
+				// db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+				// require.NoError(t, err)
+
+				// _, err = db.Exec(tc.stmt)
+				// require.NoError(t, err)
+
+				// _, err = db.Exec(fmt.Sprintf("DROP TABLE %s", ast.Root.(*CreateTable).Table.Name))
+				// require.NoError(t, err)
+
+				// // test AST SQL generation against SQLite3
+				// _, err = db.Exec(ast.String())
+				// require.NoError(t, err)
+			}
+		}(tc))
+	}
+
+}
