@@ -51,16 +51,44 @@ func (*Update) iStatement()      {}
 func (*Grant) iStatement()       {}
 func (*Revoke) iStatement()      {}
 
-// SelectStatement any SELECT statement.
-type SelectStatement interface {
-	iSelectStatement()
+// ReadStatement is any SELECT statement.
+type ReadStatement interface {
+	iReadStatement()
 	iStatement()
-	// AddOrder(*Order)
-	// SetLimit(*Limit)
 	Node
 }
 
-func (*Select) iSelectStatement() {}
+func (*Select) iReadStatement() {}
+
+// CreateTableStatement is any CREATE TABLE statement.
+type CreateTableStatement interface {
+	iCreateTableStatement()
+	iStatement()
+	Node
+}
+
+func (*CreateTable) iCreateTableStatement() {}
+
+// WriteStatement is any INSERT, UPDATE or DELETE statement.
+type WriteStatement interface {
+	iWriteStatement()
+	iStatement()
+	Node
+}
+
+func (*Insert) iWriteStatement() {}
+func (*Update) iWriteStatement() {}
+func (*Delete) iWriteStatement() {}
+
+// GrantOrRevokeStatement is any GRANT/REVOKE statement.
+type GrantOrRevokeStatement interface {
+	iGrantOrRevokeStatement()
+	iStatement()
+	Node
+}
+
+func (*Grant) iGrantOrRevokeStatement()  {}
+func (*Revoke) iGrantOrRevokeStatement() {}
 
 // Select represents a SELECT statement.
 type Select struct {
@@ -199,7 +227,7 @@ func (*Subquery) iSimpleTableExpr() {}
 
 // Subquery represents a subquery.
 type Subquery struct {
-	Select SelectStatement
+	Select *Select
 }
 
 // String returns the string representation of the node.
