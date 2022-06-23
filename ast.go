@@ -73,6 +73,7 @@ func (*CreateTable) iCreateTableStatement() {}
 type WriteStatement interface {
 	iWriteStatement()
 	iStatement()
+	GetTable() *Table
 	Node
 }
 
@@ -84,6 +85,9 @@ func (*Delete) iWriteStatement() {}
 type GrantOrRevokeStatement interface {
 	iGrantOrRevokeStatement()
 	iStatement()
+	GetRoles() []string
+	GetPrivileges() Privileges
+	GetTable() *Table
 	Node
 }
 
@@ -272,7 +276,7 @@ func (node *JoinTableExpr) String() string {
 	}
 
 	if node.Using != nil {
-		return fmt.Sprintf("%s %s %s using %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.Using.String())
+		return fmt.Sprintf("%s %s %s using%s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.Using.String())
 	}
 
 	return fmt.Sprintf("%s %s %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String())
@@ -751,12 +755,16 @@ type ColumnList []*Column
 
 // String returns the string representation of the node.
 func (node ColumnList) String() string {
+	if len(node) == 0 {
+		return ""
+	}
+
 	var strs []string
 	for _, col := range node {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
+	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
 }
 
 // Exprs represents a list of expressions.
@@ -1069,7 +1077,7 @@ func (node *TableConstraintPrimaryKey) String() string {
 		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sPRIMARY KEY %s", constraintName, node.Columns.String())
+	return fmt.Sprintf("%sPRIMARY KEY%s", constraintName, node.Columns.String())
 }
 
 // TableConstraintUnique is a UNIQUE constraint for table definition.
@@ -1085,7 +1093,7 @@ func (node *TableConstraintUnique) String() string {
 		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sUNIQUE %s", constraintName, node.Columns.String())
+	return fmt.Sprintf("%sUNIQUE%s", constraintName, node.Columns.String())
 }
 
 // TableConstraintCheck is a CHECK constraint for table definition.
@@ -1110,19 +1118,31 @@ type Insert struct {
 	Columns       ColumnList
 	Rows          []Exprs
 	DefaultValues bool
+
+	// RETURNING clause is not accepted in the parser.
+	ReturningClause Exprs
+}
+
+// GetTable returns the table.
+func (node *Insert) GetTable() *Table {
+	return node.Table
 }
 
 // String returns the string representation of the node.
 func (node *Insert) String() string {
+	var returning string
+	if node.ReturningClause != nil {
+		returning = fmt.Sprintf(" returning %s", node.ReturningClause.String())
+	}
 	if node.DefaultValues {
-		return fmt.Sprintf("insert into %s default values", node.Table.Name.String())
+		return fmt.Sprintf("insert into %s default values%s", node.Table.Name.String(), returning)
 	}
 
 	var rows []string
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return fmt.Sprintf("insert into %s %s values %s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "))
+	return fmt.Sprintf("insert into %s%s values %s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), returning)
 }
 
 // Delete represents an DELETE statement.
@@ -1136,20 +1156,69 @@ func (node *Delete) String() string {
 	return fmt.Sprintf("delete from %s%s", node.Table.String(), node.Where.String())
 }
 
+// GetTable returns the table.
+func (node *Delete) GetTable() *Table {
+	return node.Table
+}
+
+// AddWhereClause add a WHERE clause to DELETE.
+func (node *Delete) AddWhereClause(where *Where) {
+	if node.Where == nil {
+		node.Where = where
+		return
+	}
+
+	node.Where = &Where{
+		Type: WhereStr,
+		Expr: &AndExpr{
+			Left:  node.Where.Expr,
+			Right: where.Expr,
+		},
+	}
+}
+
 // Update represents an UPDATE statement.
 type Update struct {
 	Table *Table
 	Exprs []*UpdateExpr
 	Where *Where
+
+	// RETURNING clause is not accepted in the parser.
+	ReturningClause Exprs
 }
 
 // String returns the string representation of the node.
 func (node *Update) String() string {
+	var returning string
+	if node.ReturningClause != nil {
+		returning = fmt.Sprintf(" returning %s", node.ReturningClause.String())
+	}
 	var exprs []string
 	for _, expr := range node.Exprs {
 		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
 	}
-	return fmt.Sprintf("update %s set %s%s", node.Table.String(), strings.Join(exprs, ", "), node.Where.String())
+	return fmt.Sprintf("update %s set %s%s%s", node.Table.String(), strings.Join(exprs, ", "), node.Where.String(), returning)
+}
+
+// GetTable returns the table.
+func (node *Update) GetTable() *Table {
+	return node.Table
+}
+
+// AddWhereClause add a WHERE clause to UPDATE.
+func (node *Update) AddWhereClause(where *Where) {
+	if node.Where == nil {
+		node.Where = where
+		return
+	}
+
+	node.Where = &Where{
+		Type: WhereStr,
+		Expr: &AndExpr{
+			Left:  node.Where.Expr,
+			Right: where.Expr,
+		},
+	}
 }
 
 // UpdateExpr represents an UPDATE SET expression (Column = Expr).
@@ -1168,6 +1237,21 @@ type Grant struct {
 // String returns the string representation of the node.
 func (node *Grant) String() string {
 	return fmt.Sprintf("grant %s on %s to %s", node.Privileges.String(), node.Table.String(), "'"+strings.Join(node.Roles, "', '")+"'")
+}
+
+// GetRoles returns the roles.
+func (node *Grant) GetRoles() []string {
+	return node.Roles
+}
+
+// GetTable returns the table.
+func (node *Grant) GetTable() *Table {
+	return node.Table
+}
+
+// GetPrivileges returns the privileges.
+func (node *Grant) GetPrivileges() Privileges {
+	return node.Privileges
 }
 
 // Privileges represents the GRANT privilges (INSERT, UPDATE, DELETE).
@@ -1195,4 +1279,19 @@ type Revoke struct {
 // String returns the string representation of the node.
 func (node *Revoke) String() string {
 	return fmt.Sprintf("revoke %s on %s from %s", node.Privileges.String(), node.Table.String(), "'"+strings.Join(node.Roles, "', '")+"'")
+}
+
+// GetRoles returns the roles.
+func (node *Revoke) GetRoles() []string {
+	return node.Roles
+}
+
+// GetTable returns the table.
+func (node *Revoke) GetTable() *Table {
+	return node.Table
+}
+
+// GetPrivileges returns the privileges.
+func (node *Revoke) GetPrivileges() Privileges {
+	return node.Privileges
 }

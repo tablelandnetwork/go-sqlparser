@@ -101,7 +101,7 @@ const MaxColumnNameLength = 64
 %type <tableExprList> table_expr_list from_clause
 %type <tableExpr> table_expr
 %type <joinTableExpr> join_clause join_constraint
-%type <columnList> column_name_list
+%type <columnList> column_name_list column_name_list_opt
 %type <subquery> subquery
 %type <colTuple> col_tuple
 %type <bool> distinct_function_opt is_stored
@@ -1109,15 +1109,26 @@ table_constraint:
 ;
 
 insert_stmt:
-  INSERT INTO table_name '(' column_name_list ')' VALUES insert_rows
+  INSERT INTO table_name column_name_list_opt VALUES insert_rows
   {
-    $$ = &Insert{Table: $3, Columns: $5, Rows: $8}
+    $$ = &Insert{Table: $3, Columns: $4, Rows: $6}
   }
 | INSERT INTO table_name DEFAULT VALUES
   {
     $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{}, DefaultValues: true}
   }
 ;
+
+column_name_list_opt:
+  {
+    $$ = ColumnList{}
+  }
+| '(' column_name_list ')'
+  {
+    $$ = $2
+  }
+;
+
 
 insert_rows:
   '(' expr_list ')'

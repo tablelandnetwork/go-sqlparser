@@ -3437,6 +3437,29 @@ func TestInsert(t *testing.T) {
 			},
 		},
 		{
+			name:     "insert skip columns",
+			stmt:     "INSERT INTO t VALUES (1, 2), (3, 4);",
+			deparsed: "insert into t values (1, 2), (3, 4)",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table:   &Table{Name: "t"},
+						Columns: ColumnList{},
+						Rows: []Exprs{
+							{
+								&Value{Type: IntValue, Value: []byte("1")},
+								&Value{Type: IntValue, Value: []byte("2")},
+							},
+							{
+								&Value{Type: IntValue, Value: []byte("3")},
+								&Value{Type: IntValue, Value: []byte("4")},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:     "insert default values",
 			stmt:     "INSERT INTO t DEFAULT VALUES;",
 			deparsed: "insert into t default values",
@@ -3813,8 +3836,56 @@ func TestMultipleStatements(t *testing.T) {
 				} else {
 					require.Contains(t, err.Error(), tc.expectedErrMsg)
 				}
-
 			}
 		}(tc))
+	}
+}
+
+func TestAddWhere(t *testing.T) {
+	t.Parallel()
+
+	where := &Where{
+		Type: WhereStr,
+		Expr: &CmpExpr{
+			Operator: EqualStr,
+			Left:     &Column{Name: "b"},
+			Right:    &Value{Type: IntValue, Value: []byte("2")},
+		},
+	}
+
+	{
+		ast, err := Parse("update t SET a = 1")
+		require.NoError(t, err)
+
+		updateStmt := ast.Statements[0].(*Update)
+		updateStmt.AddWhereClause(where)
+		require.Equal(t, "update t set a = 1 where b = 2", updateStmt.String())
+	}
+
+	{
+		ast, err := Parse("update t SET a = 1 WHERE a = 2")
+		require.NoError(t, err)
+
+		updateStmt := ast.Statements[0].(*Update)
+		updateStmt.AddWhereClause(where)
+		require.Equal(t, "update t set a = 1 where a = 2 and b = 2", updateStmt.String())
+	}
+	{
+		ast, err := Parse("delete from t")
+		require.NoError(t, err)
+
+		deleteStmt := ast.Statements[0].(*Delete)
+		deleteStmt.AddWhereClause(where)
+
+		require.Equal(t, "delete from t where b = 2", deleteStmt.String())
+	}
+
+	{
+		ast, err := Parse("delete from t WHERE a = 2")
+		require.NoError(t, err)
+
+		deleteStmt := ast.Statements[0].(*Delete)
+		deleteStmt.AddWhereClause(where)
+		require.Equal(t, "delete from t where a = 2 and b = 2", deleteStmt.String())
 	}
 }
