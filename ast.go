@@ -1,6 +1,8 @@
 package sqlparser
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"sort"
 	"strings"
@@ -837,6 +839,19 @@ func (node *CreateTable) String() string {
 	} else {
 		return fmt.Sprintf("CREATE TABLE %s (%s)", node.Table.String(), column)
 	}
+}
+
+// StructureHash returns the hash of the structure of the statement.
+func (node *CreateTable) StructureHash() string {
+	cols := make([]string, len(node.Columns))
+	for i := range node.Columns {
+		cols[i] = fmt.Sprintf("%s:%s", node.Columns[i].Name.String(), node.Columns[i].Type)
+	}
+	stringifiedColDef := strings.Join(cols, ",")
+	sh := sha256.New()
+	sh.Write([]byte(stringifiedColDef))
+	hash := sh.Sum(nil)
+	return hex.EncodeToString(hash)
 }
 
 // ColumnDef represents the column definition of a CREATE TABLE statement.

@@ -2917,17 +2917,19 @@ func TestCreateTable(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name        string
-		stmt        string
-		deparsed    string
-		expectedAST *AST
+		name         string
+		stmt         string
+		deparsed     string
+		expectedAST  *AST
+		expectedHash string
 	}
 
 	tests := []testCase{
 		{
-			name:     "create table simple",
-			stmt:     "CREATE TABLE t (a INT);",
-			deparsed: "CREATE TABLE t (a INT)",
+			name:         "create table simple",
+			stmt:         "CREATE TABLE t (a INT);",
+			deparsed:     "CREATE TABLE t (a INT)",
+			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -2941,9 +2943,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table types",
-			stmt:     "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
-			deparsed: "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY)",
+			name:         "create table types",
+			stmt:         "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
+			deparsed:     "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY)",
+			expectedHash: "0670bf7a857084333a128354b6f6c6cc1772c9c22bbfeba256c77012fa50fdba",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -2962,9 +2965,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table primary key",
-			stmt:     "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
-			deparsed: "CREATE TABLE t (id INT PRIMARY KEY, a INT)",
+			name:         "create table primary key",
+			stmt:         "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
+			deparsed:     "CREATE TABLE t (id INT PRIMARY KEY, a INT)",
+			expectedHash: "a360ddb202c0871558c0a3140a67e8a7a7a76e794a297214f7443e8739546408",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -2985,9 +2989,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table primary key asc",
-			stmt:     "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
-			deparsed: "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT)",
+			name:         "create table primary key asc",
+			stmt:         "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
+			deparsed:     "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT)",
+			expectedHash: "a360ddb202c0871558c0a3140a67e8a7a7a76e794a297214f7443e8739546408",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3008,9 +3013,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table primary key desc",
-			stmt:     "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT);",
-			deparsed: "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT)",
+			name:         "create table primary key desc",
+			stmt:         "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT);",
+			deparsed:     "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT)",
+			expectedHash: "a360ddb202c0871558c0a3140a67e8a7a7a76e794a297214f7443e8739546408",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3031,9 +3037,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table primary key not null",
-			stmt:     "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
-			deparsed: "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL)",
+			name:         "create table primary key not null",
+			stmt:         "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
+			deparsed:     "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL)",
+			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3063,9 +3070,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table unique",
-			stmt:     "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
-			deparsed: "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE)",
+			name:         "create table unique",
+			stmt:         "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
+			deparsed:     "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE)",
+			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3094,9 +3102,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table check",
-			stmt:     "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
-			deparsed: "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2))",
+			name:         "create table check",
+			stmt:         "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
+			deparsed:     "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2))",
+			expectedHash: "0e93c25832cc90984a0157bdb71f7fa33172700a41c55cd9d896ff4c3d07d598",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3136,9 +3145,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table default",
-			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
-			deparsed: "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
+			name:         "create table default",
+			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
+			deparsed:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
+			expectedHash: "26c558fd4e4dfb28a9bd399d7872bd24576214a0676eb4a7d3f97362734a03d9",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3198,9 +3208,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table generated",
-			stmt:     "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed: "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)), e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)))",
+			name:         "create table generated",
+			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
+			deparsed:     "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)), e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)))",
+			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3296,9 +3307,10 @@ func TestCreateTable(t *testing.T) {
 			},
 		},
 		{
-			name:     "create table table constraints",
-			stmt:     "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
-			deparsed: "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0))",
+			name:         "create table table constraints",
+			stmt:         "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
+			deparsed:     "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0))",
+			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3355,6 +3367,7 @@ func TestCreateTable(t *testing.T) {
 				ast, err := Parse(tc.stmt)
 
 				require.NoError(t, err)
+				require.Equal(t, tc.expectedHash, ast.Statements[0].(*CreateTable).StructureHash())
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
 
