@@ -74,6 +74,7 @@ var keywords = map[string]int{
 	"INSERT":     INSERT,
 	"VALUES":     VALUES,
 	"INTO":       INTO,
+	"DELETE":     DELETE,
 }
 
 const EOF = 0

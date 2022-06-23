@@ -41,6 +41,7 @@ const MaxColumnNameLength = 64
   tableConstraints []TableConstraint
   insertStmt *Insert
   insertRows []Exprs
+  deleteStmt *Delete
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -51,7 +52,7 @@ const MaxColumnNameLength = 64
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
-%token <empty> INSERT INTO VALUES
+%token <empty> INSERT INTO VALUES DELETE
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -104,6 +105,7 @@ const MaxColumnNameLength = 64
 %type <tableConstraints> table_constraint_list table_constraint_list_opt
 %type <insertStmt> insert_stmt
 %type <insertRows> insert_rows
+%type <deleteStmt> delete_stmt
 
 %%
 start: 
@@ -120,6 +122,10 @@ stmt:
     $$ = $1
   }
 | insert_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+| delete_stmt semicolon_opt
   {
     $$ = $1
   }
@@ -1067,6 +1073,13 @@ insert_rows:
 | insert_rows ',' '(' expr_list ')'
   {
     $$ = append($1, $4)
+  }
+;
+
+delete_stmt:
+  DELETE FROM table_name where_opt
+  {
+    $$ = &Delete{Table: $3, Where: $4}
   }
 ;
 

@@ -38,6 +38,7 @@ type Statement interface {
 func (*Select) iStatement()      {}
 func (*CreateTable) iStatement() {}
 func (*Insert) iStatement()      {}
+func (*Delete) iStatement()      {}
 
 // SelectStatement any SELECT statement.
 type SelectStatement interface {
@@ -1069,5 +1070,16 @@ func (node *Insert) String() string {
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return fmt.Sprintf("insert into %s %s values %s", node.Table.Name.String(), node.Columns.String(), strings.Join(rows, ", "))
+	return fmt.Sprintf("insert into %s %s values %s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "))
+}
+
+// Delete represents an DELETE statement.
+type Delete struct {
+	Table *Table
+	Where *Where
+}
+
+// String returns the string representation of the node.
+func (node *Delete) String() string {
+	return fmt.Sprintf("delete from %s%s", node.Table.String(), node.Where.String())
 }

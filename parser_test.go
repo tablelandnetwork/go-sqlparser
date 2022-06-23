@@ -3251,20 +3251,62 @@ func TestInsert(t *testing.T) {
 				require.NoError(t, err)
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
+			}
+		}(tc))
+	}
 
-				// test all CREATE statements against SQLite3
-				// db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
-				// require.NoError(t, err)
+}
 
-				// _, err = db.Exec(tc.stmt)
-				// require.NoError(t, err)
+func TestDelete(t *testing.T) {
+	t.Parallel()
 
-				// _, err = db.Exec(fmt.Sprintf("DROP TABLE %s", ast.Root.(*CreateTable).Table.Name))
-				// require.NoError(t, err)
+	type testCase struct {
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+	}
 
-				// // test AST SQL generation against SQLite3
-				// _, err = db.Exec(ast.String())
-				// require.NoError(t, err)
+	tests := []testCase{
+		{
+			name:     "delete simple",
+			stmt:     "DELETE FROM t;",
+			deparsed: "delete from t",
+			expectedAST: &AST{
+				Root: &Delete{
+					Table: &Table{Name: "t"},
+				},
+			},
+		},
+		{
+			name:     "delete with where",
+			stmt:     "DELETE FROM t WHERE a = 1;",
+			deparsed: "delete from t where a = 1",
+			expectedAST: &AST{
+				Root: &Delete{
+					Table: &Table{Name: "t"},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: EqualStr,
+							Left:     &Column{Name: "a"},
+							Right:    &Value{Type: IntValue, Value: []byte("1")},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedAST, ast)
+				require.Equal(t, tc.deparsed, ast.String())
 			}
 		}(tc))
 	}
