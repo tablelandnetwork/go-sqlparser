@@ -49,6 +49,7 @@ const MaxColumnNameLength = 64
   revoke *Revoke
   strings []string
   privileges Privileges
+  stmts []Statement
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -78,7 +79,7 @@ const MaxColumnNameLength = 64
 %left <empty> COLLATE
 %right <empty> '~' UNARY
 
-%type <statement> stmt
+%type <statement> multi_stmt single_stmt
 %type <selectStmt> select_stmt
 %type <createTableStmt> create_table_stmt
 %type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number
@@ -121,38 +122,64 @@ const MaxColumnNameLength = 64
 %type <revoke> revoke_stmt
 %type <strings> roles
 %type <privileges> privileges
+%type <stmts> stmts multi_stmts
 
 %%
 start: 
-  stmt { yylex.(*Lexer).ast = &AST{$1} }
+  stmts { yylex.(*Lexer).ast = &AST{$1} }
 ;
 
-stmt:
-  select_stmt semicolon_opt
+stmts: 
+  single_stmt semicolon_opt
+  {
+    $$ = []Statement{$1}
+  }
+| multi_stmts semicolon_opt
   {
     $$ = $1
   }
-| create_table_stmt semicolon_opt
+;
+
+single_stmt:
+  select_stmt
   {
     $$ = $1
   }
-| insert_stmt semicolon_opt
+| create_table_stmt
   {
     $$ = $1
   }
-| delete_stmt semicolon_opt
+;
+
+multi_stmts:
+  multi_stmt 
+  {
+    $$ = []Statement{$1}
+  }
+| multi_stmts ';' multi_stmt
+  {
+    $$ = append($1, $3)
+  }
+;
+
+multi_stmt:
+  insert_stmt
   {
     $$ = $1
   }
-| update_stmt semicolon_opt
+| delete_stmt
   {
     $$ = $1
   }
-| grant_stmt semicolon_opt
+| update_stmt
   {
     $$ = $1
   }
-| revoke_stmt semicolon_opt
+| grant_stmt
+  {
+    $$ = $1
+  }
+| revoke_stmt
   {
     $$ = $1
   }

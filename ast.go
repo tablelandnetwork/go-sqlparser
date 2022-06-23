@@ -15,14 +15,19 @@ type Node interface {
 
 // AST represents the root Node of the AST.
 type AST struct {
-	Root Statement
+	Statements []Statement
 }
 
 func (node *AST) String() string {
-	if node.Root == nil {
+	if len(node.Statements) == 0 {
 		return ""
 	}
-	return node.Root.String()
+
+	var stmts []string
+	for _, stmt := range node.Statements {
+		stmts = append(stmts, stmt.String())
+	}
+	return strings.Join(stmts, "; ")
 }
 
 func (ast *AST) PrettyPrint() {
