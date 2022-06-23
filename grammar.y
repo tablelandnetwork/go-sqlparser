@@ -1,7 +1,20 @@
 %{
 package sqlparser
 
-const MaxColumnNameLength = 64
+import "bytes"
+
+const (
+  MaxColumnNameLength = 64
+  MaxTextLength = 1024
+  MaxBlobLength = 1024
+)
+
+var keywordsNotAllowed = map[string]struct{}{
+	"CURRENT_TIME":      {},
+	"CURRENT_DATE":      {},
+	"CURRENT_TIMESTAMP": {},
+}
+
 %}
 
 %union{
@@ -86,7 +99,7 @@ const MaxColumnNameLength = 64
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege
 %type <column> column_name 
-%type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name
+%type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name identifier
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
 %type <table> table_name
@@ -258,9 +271,9 @@ as_column_opt:
   }
 
 col_alias:
-  IDENTIFIER
+  identifier
   {
-    $$ = Identifier(string($1))
+    $$ = $1
   }
 | STRING
   {
@@ -323,9 +336,9 @@ as_table_opt:
   }
 
 table_alias:
-  IDENTIFIER
+  identifier
   {
-    $$ = Identifier(string($1))
+    $$ = $1
   }
 | STRING
   {
@@ -477,9 +490,9 @@ limit_opt:
 ;
 
 table_name:
-  IDENTIFIER
+  identifier
   { 
-    $$ = &Table{Name : Identifier(string($1))} 
+    $$ = &Table{Name : $1} 
   }
 ;
 
@@ -607,9 +620,9 @@ expr:
   {
     $$ = &CaseExpr{Expr: $2, Whens: $3, Else: $4}
   }
-| expr COLLATE IDENTIFIER
+| expr COLLATE identifier
   {  
-    $$ = &CollateExpr{Expr : $1, CollationName: string($3)}
+    $$ = &CollateExpr{Expr : $1, CollationName: $3}
   }
 | expr IN col_tuple
   {
@@ -642,10 +655,19 @@ literal_value:
   }
 | STRING
   {
-    $$ = &Value{Type: StrValue, Value: $1[1:len($1)-1]}
+    str := $1[1:len($1)-1]
+    if len(str) > MaxTextLength {
+      yylex.(*Lexer).err = &ErrTextTooLong{Length: len(str), MaxAllowed: MaxTextLength}
+      return 1
+    }
+    $$ = &Value{Type: StrValue, Value: str}
   }
 | BLOBVAL
   {
+    if len($1) > MaxBlobLength {
+      yylex.(*Lexer).err = &ErrBlobTooBig{Length: len($1), MaxAllowed: MaxBlobLength}
+      return 1
+    }
     $$ = &Value{Type: BlobValue, Value: $1}
   }
 | TRUE
@@ -663,7 +685,7 @@ literal_value:
 ;
 
 column_name:
-  IDENTIFIER
+  identifier
   { 
     if len($1) > MaxColumnNameLength {
       yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
@@ -817,7 +839,7 @@ function_call_keyword:
 ;
 
 function_call_generic:
-  IDENTIFIER '(' distinct_function_opt expr_list_opt ')' filter_opt
+  identifier '(' distinct_function_opt expr_list_opt ')' filter_opt
   {
     if _, ok := AllowedFunctions[string($1)]; !ok {
       yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string($1)))
@@ -825,7 +847,7 @@ function_call_generic:
     }
     $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: $3, Args: $4, Filter: $6}
   }
-| IDENTIFIER '(' '*' ')' filter_opt
+| identifier '(' '*' ')' filter_opt
   {
     if _, ok := AllowedFunctions[string($1)]; !ok {
       yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string($1)))
@@ -1011,9 +1033,9 @@ constraint_name:
   {
     $$ = Identifier("")
   }
-| CONSTRAINT IDENTIFIER 
+| CONSTRAINT identifier 
   {
-    $$ = Identifier(string($2))
+    $$ = $2
   }
 ;
 
@@ -1263,5 +1285,17 @@ privilege:
     $$ = "delete"
   }
 ;
+
+identifier:
+  IDENTIFIER
+  {
+    literalUpper := bytes.ToUpper($1)
+    if _, ok := keywordsNotAllowed[string(literalUpper)]; ok {
+      yylex.(*Lexer).err = &ErrKeywordIsNotAllowed{Keyword : string($1)}
+      return 1
+    } 
+
+    $$ = Identifier($1)
+  }
 %%
 

@@ -3889,3 +3889,39 @@ func TestAddWhere(t *testing.T) {
 		require.Equal(t, "delete from t where a = 2 and b = 2", deleteStmt.String())
 	}
 }
+
+func TestKeywordsNotAllowed(t *testing.T) {
+	t.Parallel()
+
+	for keyword := range keywordsNotAllowed {
+		_, err := Parse(fmt.Sprintf("select %s from t", keyword))
+		require.Equal(t, &ErrKeywordIsNotAllowed{Keyword: keyword}, err)
+	}
+}
+
+func TestLimits(t *testing.T) {
+	t.Parallel()
+
+	t.Run("max text length", func(t *testing.T) {
+		t.Parallel()
+		text := ""
+		for i := 0; i <= MaxTextLength; i++ {
+			text = text + "a"
+		}
+
+		_, err := Parse(fmt.Sprintf("insert into t (a) values ('%s')", text))
+		require.Equal(t, &ErrTextTooLong{Length: len(text), MaxAllowed: MaxTextLength}, err)
+	})
+
+	t.Run("max blob length", func(t *testing.T) {
+		t.Parallel()
+		blob := ""
+		for i := 0; i <= MaxBlobLength; i++ {
+			blob = blob + "f"
+		}
+
+		_, err := Parse(fmt.Sprintf("insert into t (a) values (x'%s')", blob))
+		require.Equal(t, &ErrBlobTooBig{Length: len(blob), MaxAllowed: MaxBlobLength}, err)
+	})
+
+}

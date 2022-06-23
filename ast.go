@@ -641,12 +641,12 @@ func (node *NotNullExpr) String() string {
 // CollateExpr the COLLATE operator
 type CollateExpr struct {
 	Expr          Expr
-	CollationName string
+	CollationName Identifier
 }
 
 // String returns the string representation of the node.
 func (node *CollateExpr) String() string {
-	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName)
+	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName.String())
 }
 
 // ConvertExpr represents a CAST expression.
@@ -1260,7 +1260,7 @@ type Privileges map[string]struct{}
 // String returns the string representation of the node.
 func (node Privileges) String() string {
 	var privileges []string
-	for priv, _ := range node {
+	for priv := range node {
 		privileges = append(privileges, priv)
 	}
 

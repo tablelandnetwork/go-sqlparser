@@ -1,6 +1,6 @@
 package sqlparser
 
-var AllowedFunctions, NotAllowedFunctions map[string]struct{}
+var AllowedFunctions map[string]struct{}
 
 func init() {
 	AllowedFunctions = map[string]struct{}{
@@ -115,5 +115,4 @@ func init() {
 		"sum":   {},
 		"total": {},
 	}
-
 }
