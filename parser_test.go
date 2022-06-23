@@ -3357,7 +3357,7 @@ func TestUpdate(t *testing.T) {
 			stmt:           "update t set (a, b) = (1);",
 			deparsed:       "",
 			expectedAST:    nil,
-			expectedErrMsg: "number of columns different from number of exprs",
+			expectedErrMsg: "2 columns assigned 1 values",
 		},
 		{
 			name:     "update simple",

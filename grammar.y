@@ -1126,7 +1126,7 @@ paren_update_list:
   '(' column_name_list ')' '=' '(' expr_list ')'
   {
     if len($2) != len($6) {
-      yylex.Error("number of columns different from number of exprs")
+      yylex.Error(__yyfmt__.Sprintf("%d columns assigned %d values", len($2), len($6)))
       return 1
     }
     exprs := make([]*UpdateExpr, len($2))

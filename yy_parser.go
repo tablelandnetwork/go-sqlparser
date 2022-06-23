@@ -2060,7 +2060,7 @@ yydefault:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
 			if len(yyDollar[2].columnList) != len(yyDollar[6].exprs) {
-				yylex.Error("number of columns different from number of exprs")
+				yylex.Error(__yyfmt__.Sprintf("%d columns assigned %d values", len(yyDollar[2].columnList), len(yyDollar[6].exprs)))
 				return 1
 			}
 			exprs := make([]*UpdateExpr, len(yyDollar[2].columnList))
