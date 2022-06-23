@@ -3310,5 +3310,95 @@ func TestDelete(t *testing.T) {
 			}
 		}(tc))
 	}
+}
+
+func TestUpdate(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name           string
+		stmt           string
+		deparsed       string
+		expectedAST    *AST
+		expectedErrMsg string
+	}
+
+	tests := []testCase{
+		{
+			name:     "update simple",
+			stmt:     "update t set a = 1, b = 2;",
+			deparsed: "update t set a = 1, b = 2",
+			expectedAST: &AST{
+				Root: &Update{
+					Table: &Table{Name: "t"},
+					Exprs: []*UpdateExpr{
+						{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
+						{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
+					},
+				},
+			},
+		},
+		{
+			name:     "update parenthesis",
+			stmt:     "update t set (a, b) = (1, 2);",
+			deparsed: "update t set a = 1, b = 2",
+			expectedAST: &AST{
+				Root: &Update{
+					Table: &Table{Name: "t"},
+					Exprs: []*UpdateExpr{
+						{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
+						{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
+					},
+				},
+			},
+		},
+		{
+			name:           "update wrong number of exprs",
+			stmt:           "update t set (a, b) = (1);",
+			deparsed:       "",
+			expectedAST:    nil,
+			expectedErrMsg: "number of columns different from number of exprs",
+		},
+		{
+			name:     "update simple",
+			stmt:     "update t set a = 1, b = 2 where a = 3;",
+			deparsed: "update t set a = 1, b = 2 where a = 3",
+			expectedAST: &AST{
+				Root: &Update{
+					Table: &Table{Name: "t"},
+					Exprs: []*UpdateExpr{
+						{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
+						{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
+					},
+					Where: &Where{
+						Type: WhereStr,
+						Expr: &CmpExpr{
+							Operator: EqualStr,
+							Left:     &Column{Name: "a"},
+							Right:    &Value{Type: IntValue, Value: []byte("3")},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+
+				if tc.expectedErrMsg == "" {
+					require.NoError(t, err)
+					require.Equal(t, tc.expectedAST, ast)
+					require.Equal(t, tc.deparsed, ast.String())
+				} else {
+					require.Contains(t, err.Error(), tc.expectedErrMsg)
+				}
+
+			}
+		}(tc))
+	}
 
 }

@@ -39,6 +39,7 @@ func (*Select) iStatement()      {}
 func (*CreateTable) iStatement() {}
 func (*Insert) iStatement()      {}
 func (*Delete) iStatement()      {}
+func (*Update) iStatement()      {}
 
 // SelectStatement any SELECT statement.
 type SelectStatement interface {
@@ -1082,4 +1083,26 @@ type Delete struct {
 // String returns the string representation of the node.
 func (node *Delete) String() string {
 	return fmt.Sprintf("delete from %s%s", node.Table.String(), node.Where.String())
+}
+
+// Update represents an UPDATE statement.
+type Update struct {
+	Table *Table
+	Exprs []*UpdateExpr
+	Where *Where
+}
+
+// String returns the string representation of the node.
+func (node *Update) String() string {
+	var exprs []string
+	for _, expr := range node.Exprs {
+		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
+	}
+	return fmt.Sprintf("update %s set %s%s", node.Table.String(), strings.Join(exprs, ", "), node.Where.String())
+}
+
+// UpdateExpr represents an update expression.
+type UpdateExpr struct {
+	Column *Column
+	Expr   Expr
 }

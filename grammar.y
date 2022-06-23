@@ -42,6 +42,9 @@ const MaxColumnNameLength = 64
   insertStmt *Insert
   insertRows []Exprs
   deleteStmt *Delete
+  updateStmt *Update
+  updateExpression *UpdateExpr
+  updateList []*UpdateExpr
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -52,7 +55,7 @@ const MaxColumnNameLength = 64
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
-%token <empty> INSERT INTO VALUES DELETE
+%token <empty> INSERT INTO VALUES DELETE UPDATE SET
 
 %left <empty> JOIN
 %left <empty> ON USING
@@ -106,6 +109,9 @@ const MaxColumnNameLength = 64
 %type <insertStmt> insert_stmt
 %type <insertRows> insert_rows
 %type <deleteStmt> delete_stmt
+%type <updateStmt> update_stmt
+%type <updateExpression> update_expression
+%type <updateList> update_list common_update_list paren_update_list
 
 %%
 start: 
@@ -126,6 +132,10 @@ stmt:
     $$ = $1
   }
 | delete_stmt semicolon_opt
+  {
+    $$ = $1
+  }
+| update_stmt semicolon_opt
   {
     $$ = $1
   }
@@ -1080,6 +1090,57 @@ delete_stmt:
   DELETE FROM table_name where_opt
   {
     $$ = &Delete{Table: $3, Where: $4}
+  }
+;
+
+update_stmt:
+  UPDATE table_name SET update_list where_opt
+  {
+    $$ = &Update{Table: $2, Exprs: $4, Where: $5}
+  }
+;
+
+update_list:
+  common_update_list
+  {
+    $$ = $1
+  }
+| paren_update_list
+  {
+    $$ = $1
+  }
+;
+
+common_update_list:
+  update_expression
+  {
+    $$ = []*UpdateExpr{$1}
+  }
+| common_update_list ',' update_expression
+  {
+    $$ = append($1, $3)
+  }
+;
+
+paren_update_list:
+  '(' column_name_list ')' '=' '(' expr_list ')'
+  {
+    if len($2) != len($6) {
+      yylex.Error("number of columns different from number of exprs")
+      return 1
+    }
+    exprs := make([]*UpdateExpr, len($2))
+    for i := 0; i < len($2); i++ {
+      exprs[i] = &UpdateExpr{Column: $2[i], Expr: $6[i]}
+    }
+    $$ = exprs
+  }
+;
+
+update_expression:
+  column_name '=' expr
+  {
+    $$ = &UpdateExpr{Column: $1, Expr: $3}
   }
 ;
 
