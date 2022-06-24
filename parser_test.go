@@ -3,6 +3,7 @@ package sqlparser
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -464,13 +465,6 @@ func TestSelectStatement(t *testing.T) {
 					},
 				},
 			},
-		},
-		{
-			name:           "column-max-size",
-			stmt:           "SELECT aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-			deparsed:       "",
-			expectedAST:    nil,
-			expectedErrMsg: "column length greater than",
 		},
 		{
 			name:     "minus-float",
@@ -3924,4 +3918,23 @@ func TestLimits(t *testing.T) {
 		require.Equal(t, &ErrBlobTooBig{Length: len(blob), MaxAllowed: MaxBlobLength}, err)
 	})
 
+	t.Run("max columns allowed", func(t *testing.T) {
+		t.Parallel()
+
+		// generate a list (a, ..., z, aa, ab, ...) of MaxAllowedColumns + 1 columns
+		columnsDef := []string{}
+		for i := 1; i <= MaxAllowedColumns; i++ {
+			column, j := []byte{}, i
+			for j > 0 {
+				column = append(column, byte('a'+j%('z'-'a'+1)))
+				j = j / ('z' - 'a' + 1)
+			}
+			columnsDef = append(columnsDef, string(column)+" INT")
+		}
+
+		columnsDef = append([]string{"a INT"}, columnsDef...)
+
+		_, err := Parse(fmt.Sprintf("create table t (%s);", strings.Join(columnsDef, ", ")))
+		require.Equal(t, &ErrTooManyColumns{ColumnCount: len(columnsDef), MaxAllowed: MaxAllowedColumns}, err)
+	})
 }

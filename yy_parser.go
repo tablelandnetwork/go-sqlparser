@@ -5,12 +5,6 @@ import __yyfmt__ "fmt"
 
 import "bytes"
 
-const (
-	MaxColumnNameLength = 64
-	MaxTextLength       = 1024
-	MaxBlobLength       = 1024
-)
-
 var keywordsNotAllowed = map[string]struct{}{
 	"CURRENT_TIME":      {},
 	"CURRENT_DATE":      {},
@@ -1614,10 +1608,6 @@ yydefault:
 	case 114:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			if len(yyDollar[1].identifier) > MaxColumnNameLength {
-				yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
-				return 1
-			}
 			yyVAL.column = &Column{Name: Identifier(string(yyDollar[1].identifier))}
 		}
 	case 115:
@@ -1876,6 +1866,10 @@ yydefault:
 	case 164:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
+			if len(yyDollar[5].columnDefList) > MaxAllowedColumns {
+				yylex.(*Lexer).err = &ErrTooManyColumns{ColumnCount: len(yyDollar[5].columnDefList), MaxAllowed: MaxAllowedColumns}
+				return 1
+			}
 			yyVAL.createTableStmt = &CreateTable{Table: yyDollar[3].table, Columns: yyDollar[5].columnDefList, Constraints: yyDollar[6].tableConstraints}
 		}
 	case 165:

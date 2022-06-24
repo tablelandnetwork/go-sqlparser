@@ -3,12 +3,6 @@ package sqlparser
 
 import "bytes"
 
-const (
-  MaxColumnNameLength = 64
-  MaxTextLength = 1024
-  MaxBlobLength = 1024
-)
-
 var keywordsNotAllowed = map[string]struct{}{
 	"CURRENT_TIME":      {},
 	"CURRENT_DATE":      {},
@@ -687,10 +681,6 @@ literal_value:
 column_name:
   identifier
   { 
-    if len($1) > MaxColumnNameLength {
-      yylex.Error(__yyfmt__.Sprintf("column length greater than %d", MaxColumnNameLength))
-      return 1
-    }
     $$ = &Column{Name : Identifier(string($1))} 
   }
 ;
@@ -938,6 +928,10 @@ else_expr_opt:
 create_table_stmt:
   CREATE TABLE table_name '(' column_def_list table_constraint_list_opt ')'
   {
+    if len($5) > MaxAllowedColumns {
+      yylex.(*Lexer).err = &ErrTooManyColumns{ColumnCount: len($5), MaxAllowed: MaxAllowedColumns}
+      return 1
+    }
     $$ = &CreateTable{Table: $3, Columns: $5, Constraints: $6}
   }
 ;
