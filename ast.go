@@ -18,6 +18,7 @@ type Node interface {
 // AST represents the root Node of the AST.
 type AST struct {
 	Statements []Statement
+	Errors     map[int][]error
 }
 
 func (node *AST) String() string {
@@ -1400,6 +1401,10 @@ func (node Privileges) String() string {
 	// we cannot guarantee map order, so we sort it so the string is deterministic
 	sort.Strings(privileges)
 	return strings.Join(privileges, ", ")
+}
+
+func (node Privileges) Len() int {
+	return len(node)
 }
 
 // Revoke represents a REVOKE statement.

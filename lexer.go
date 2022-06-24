@@ -91,7 +91,10 @@ type Lexer struct {
 	ch           byte
 
 	literal []byte
-	err     error
+
+	statementIdx int
+	errors       map[int][]error
+	syntaxError  error
 
 	// This is used to solve the ambigous grammar rules:
 	// - expr AND expr
@@ -107,8 +110,14 @@ type Lexer struct {
 	ast *AST
 }
 
+// AddError keeps track of errors per statement for syntatically valid statements.
+func (l *Lexer) AddError(err error) {
+	l.errors[l.statementIdx] = append(l.errors[l.statementIdx], err)
+}
+
+// Error is used for syntatically not valid statements.
 func (l *Lexer) Error(e string) {
-	l.err = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
+	l.syntaxError = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
 }
 
 func (l *Lexer) Lex(lval *yySymType) (token int) {

@@ -133,7 +133,7 @@ var keywordsNotAllowed = map[string]struct{}{
 
 %%
 start: 
-  stmts { yylex.(*Lexer).ast = &AST{$1} }
+  stmts { yylex.(*Lexer).ast = &AST{Statements: $1} }
 ;
 
 stmts: 
@@ -142,7 +142,7 @@ stmts:
     $$ = []Statement{$1}
   }
 | multi_stmts semicolon_opt
-  {
+  { 
     $$ = $1
   }
 ;
@@ -172,22 +172,27 @@ multi_stmts:
 multi_stmt:
   insert_stmt
   {
+    yylex.(*Lexer).statementIdx++ 
     $$ = $1
   }
 | delete_stmt
   {
-    $$ = $1
+    yylex.(*Lexer).statementIdx++ 
+    $$ = $1 
   }
 | update_stmt
   {
-    $$ = $1
+    yylex.(*Lexer).statementIdx++ 
+    $$ = $1 
   }
 | grant_stmt
   {
+    yylex.(*Lexer).statementIdx++ 
     $$ = $1
   }
 | revoke_stmt
   {
+    yylex.(*Lexer).statementIdx++ 
     $$ = $1
   }
 ;
@@ -651,16 +656,14 @@ literal_value:
   {
     str := $1[1:len($1)-1]
     if len(str) > MaxTextLength {
-      yylex.(*Lexer).err = &ErrTextTooLong{Length: len(str), MaxAllowed: MaxTextLength}
-      return 1
+      yylex.(*Lexer).AddError(&ErrTextTooLong{Length: len(str), MaxAllowed: MaxTextLength})
     }
     $$ = &Value{Type: StrValue, Value: str}
   }
 | BLOBVAL
   {
     if len($1) > MaxBlobLength {
-      yylex.(*Lexer).err = &ErrBlobTooBig{Length: len($1), MaxAllowed: MaxBlobLength}
-      return 1
+      yylex.(*Lexer).AddError(&ErrBlobTooBig{Length: len($1), MaxAllowed: MaxBlobLength})
     }
     $$ = &Value{Type: BlobValue, Value: $1}
   }
@@ -832,16 +835,14 @@ function_call_generic:
   identifier '(' distinct_function_opt expr_list_opt ')' filter_opt
   {
     if _, ok := AllowedFunctions[string($1)]; !ok {
-      yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string($1)))
-      return 1
+      yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string($1)})
     }
     $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: $3, Args: $4, Filter: $6}
   }
 | identifier '(' '*' ')' filter_opt
   {
     if _, ok := AllowedFunctions[string($1)]; !ok {
-      yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string($1)))
-      return 1
+      yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string($1)})
     }
     $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: false, Args: nil, Filter: $5}
   }
@@ -929,8 +930,7 @@ create_table_stmt:
   CREATE TABLE table_name '(' column_def_list table_constraint_list_opt ')'
   {
     if len($5) > MaxAllowedColumns {
-      yylex.(*Lexer).err = &ErrTooManyColumns{ColumnCount: len($5), MaxAllowed: MaxAllowedColumns}
-      return 1
+      yylex.(*Lexer).AddError(&ErrTooManyColumns{ColumnCount: len($5), MaxAllowed: MaxAllowedColumns})
     }
     $$ = &CreateTable{Table: $3, Columns: $5, Constraints: $6}
   }
@@ -1130,8 +1130,7 @@ insert_stmt:
     for _, row := range $6 {
       for _, expr := range row {
 				if expr.ContainsSubquery() {
-          yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "insert"}
-					return 1
+          yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "insert"})
 				}
 			}
     }
@@ -1169,8 +1168,7 @@ delete_stmt:
   DELETE FROM table_name where_opt
   {
     if $4 != nil && $4.Expr.ContainsSubquery() {
-      yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "delete"}
-      return 1
+      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
     }
     $$ = &Delete{Table: $3, Where: $4}
   }
@@ -1198,8 +1196,7 @@ common_update_list:
   update_expression
   {
     if $1.Expr.ContainsSubquery() {
-      yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "update"}
-      return 1
+      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
     }
     $$ = []*UpdateExpr{$1}
   }
@@ -1213,14 +1210,15 @@ paren_update_list:
   '(' column_name_list ')' '=' '(' expr_list ')'
   {
     if len($2) != len($6) {
-      yylex.Error(__yyfmt__.Sprintf("%d columns assigned %d values", len($2), len($6)))
-      return 1
+      yylex.(*Lexer).AddError(&ErrUpdateColumnsAndValuesDiffer{ColumnsCount: len($2), ValuesCount: len($6)})
+      $$ = []*UpdateExpr{}
+    } else {
+      exprs := make([]*UpdateExpr, len($2))
+      for i := 0; i < len($2); i++ {
+        exprs[i] = &UpdateExpr{Column: $2[i], Expr: $6[i]}
+      }
+      $$ = exprs
     }
-    exprs := make([]*UpdateExpr, len($2))
-    for i := 0; i < len($2); i++ {
-      exprs[i] = &UpdateExpr{Column: $2[i], Expr: $6[i]}
-    }
-    $$ = exprs
   }
 ;
 
@@ -1267,13 +1265,11 @@ privileges:
 | privileges ',' privilege
   {
     if len($1) == 3 {
-      yylex.Error("number of privileges exceeded")
-      return 1
+      yylex.(*Lexer).AddError(&ErrGrantPrivilegesCountExceeded{PrivilegesCount: len($1) + 1, MaxAllowed: 3})
     }
     
     if _, ok := $1[$3]; ok {
-      yylex.Error(__yyfmt__.Sprintf("repeated privilege: %s", $3))
-      return 1   
+      yylex.(*Lexer).AddError(&ErrGrantRepeatedPrivilege{Privilege: $3})
     } 
     
     $1[$3] = struct{}{}
@@ -1301,8 +1297,7 @@ identifier:
   {
     literalUpper := bytes.ToUpper($1)
     if _, ok := keywordsNotAllowed[string(literalUpper)]; ok {
-      yylex.(*Lexer).err = &ErrKeywordIsNotAllowed{Keyword: string($1)}
-      return 1
+      yylex.(*Lexer).AddError(&ErrKeywordIsNotAllowed{Keyword: string($1)})
     } 
 
     $$ = Identifier($1)

@@ -55,3 +55,41 @@ type ErrStatementContainsSubquery struct {
 func (e *ErrStatementContainsSubquery) Error() string {
 	return fmt.Sprintf("%s contains subquery", e.StatementKind)
 }
+
+// ErrNoSuchFunction indicates that the function called does not exist.
+type ErrNoSuchFunction struct {
+	FunctionName string
+}
+
+func (e *ErrNoSuchFunction) Error() string {
+	return fmt.Sprintf("no such: %s", e.FunctionName)
+}
+
+// ErrUpdateColumnsAndValuesDiffer indicates that there's a mismatch between the number of columns and number of values.
+type ErrUpdateColumnsAndValuesDiffer struct {
+	ColumnsCount int
+	ValuesCount  int
+}
+
+func (e *ErrUpdateColumnsAndValuesDiffer) Error() string {
+	return fmt.Sprintf("%d columns assigned %d values", e.ColumnsCount, e.ValuesCount)
+}
+
+// ErrGrantPrivilegesCountExceeded indicates too much privileges on a GRANT/REVOKE statement.
+type ErrGrantPrivilegesCountExceeded struct {
+	PrivilegesCount int
+	MaxAllowed      int
+}
+
+func (e *ErrGrantPrivilegesCountExceeded) Error() string {
+	return fmt.Sprintf("%d privileges, max allowed %d", e.PrivilegesCount, e.MaxAllowed)
+}
+
+// ErrGrantRepeatedPrivilege indicates a repeated privilege.
+type ErrGrantRepeatedPrivilege struct {
+	Privilege string
+}
+
+func (e *ErrGrantRepeatedPrivilege) Error() string {
+	return fmt.Sprintf("repeated privilege: %s", e.Privilege)
+}

@@ -1018,7 +1018,7 @@ yydefault:
 	case 1:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yylex.(*Lexer).ast = &AST{yyDollar[1].stmts}
+			yylex.(*Lexer).ast = &AST{Statements: yyDollar[1].stmts}
 		}
 	case 2:
 		yyDollar = yyS[yypt-2 : yypt+1]
@@ -1053,26 +1053,31 @@ yydefault:
 	case 8:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*Lexer).statementIdx++
 			yyVAL.statement = yyDollar[1].insertStmt
 		}
 	case 9:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*Lexer).statementIdx++
 			yyVAL.statement = yyDollar[1].deleteStmt
 		}
 	case 10:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*Lexer).statementIdx++
 			yyVAL.statement = yyDollar[1].updateStmt
 		}
 	case 11:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*Lexer).statementIdx++
 			yyVAL.statement = yyDollar[1].grant
 		}
 	case 12:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			yylex.(*Lexer).statementIdx++
 			yyVAL.statement = yyDollar[1].revoke
 		}
 	case 13:
@@ -1576,8 +1581,7 @@ yydefault:
 		{
 			str := yyDollar[1].bytes[1 : len(yyDollar[1].bytes)-1]
 			if len(str) > MaxTextLength {
-				yylex.(*Lexer).err = &ErrTextTooLong{Length: len(str), MaxAllowed: MaxTextLength}
-				return 1
+				yylex.(*Lexer).AddError(&ErrTextTooLong{Length: len(str), MaxAllowed: MaxTextLength})
 			}
 			yyVAL.expr = &Value{Type: StrValue, Value: str}
 		}
@@ -1585,8 +1589,7 @@ yydefault:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			if len(yyDollar[1].bytes) > MaxBlobLength {
-				yylex.(*Lexer).err = &ErrBlobTooBig{Length: len(yyDollar[1].bytes), MaxAllowed: MaxBlobLength}
-				return 1
+				yylex.(*Lexer).AddError(&ErrBlobTooBig{Length: len(yyDollar[1].bytes), MaxAllowed: MaxBlobLength})
 			}
 			yyVAL.expr = &Value{Type: BlobValue, Value: yyDollar[1].bytes}
 		}
@@ -1774,8 +1777,7 @@ yydefault:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
 			if _, ok := AllowedFunctions[string(yyDollar[1].identifier)]; !ok {
-				yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string(yyDollar[1].identifier)))
-				return 1
+				yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string(yyDollar[1].identifier)})
 			}
 			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].identifier)), Distinct: yyDollar[3].bool, Args: yyDollar[4].exprs, Filter: yyDollar[6].where}
 		}
@@ -1783,8 +1785,7 @@ yydefault:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
 			if _, ok := AllowedFunctions[string(yyDollar[1].identifier)]; !ok {
-				yylex.Error(__yyfmt__.Sprintf("no such function: %s,", string(yyDollar[1].identifier)))
-				return 1
+				yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string(yyDollar[1].identifier)})
 			}
 			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].identifier)), Distinct: false, Args: nil, Filter: yyDollar[5].where}
 		}
@@ -1867,8 +1868,7 @@ yydefault:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
 			if len(yyDollar[5].columnDefList) > MaxAllowedColumns {
-				yylex.(*Lexer).err = &ErrTooManyColumns{ColumnCount: len(yyDollar[5].columnDefList), MaxAllowed: MaxAllowedColumns}
-				return 1
+				yylex.(*Lexer).AddError(&ErrTooManyColumns{ColumnCount: len(yyDollar[5].columnDefList), MaxAllowed: MaxAllowedColumns})
 			}
 			yyVAL.createTableStmt = &CreateTable{Table: yyDollar[3].table, Columns: yyDollar[5].columnDefList, Constraints: yyDollar[6].tableConstraints}
 		}
@@ -2089,8 +2089,7 @@ yydefault:
 			for _, row := range yyDollar[6].insertRows {
 				for _, expr := range row {
 					if expr.ContainsSubquery() {
-						yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "insert"}
-						return 1
+						yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "insert"})
 					}
 				}
 			}
@@ -2125,8 +2124,7 @@ yydefault:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
 			if yyDollar[4].where != nil && yyDollar[4].where.Expr.ContainsSubquery() {
-				yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "delete"}
-				return 1
+				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
 			}
 			yyVAL.deleteStmt = &Delete{Table: yyDollar[3].table, Where: yyDollar[4].where}
 		}
@@ -2149,8 +2147,7 @@ yydefault:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
 			if yyDollar[1].updateExpression.Expr.ContainsSubquery() {
-				yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "update"}
-				return 1
+				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
 			}
 			yyVAL.updateList = []*UpdateExpr{yyDollar[1].updateExpression}
 		}
@@ -2163,14 +2160,15 @@ yydefault:
 		yyDollar = yyS[yypt-7 : yypt+1]
 		{
 			if len(yyDollar[2].columnList) != len(yyDollar[6].exprs) {
-				yylex.Error(__yyfmt__.Sprintf("%d columns assigned %d values", len(yyDollar[2].columnList), len(yyDollar[6].exprs)))
-				return 1
+				yylex.(*Lexer).AddError(&ErrUpdateColumnsAndValuesDiffer{ColumnsCount: len(yyDollar[2].columnList), ValuesCount: len(yyDollar[6].exprs)})
+				yyVAL.updateList = []*UpdateExpr{}
+			} else {
+				exprs := make([]*UpdateExpr, len(yyDollar[2].columnList))
+				for i := 0; i < len(yyDollar[2].columnList); i++ {
+					exprs[i] = &UpdateExpr{Column: yyDollar[2].columnList[i], Expr: yyDollar[6].exprs[i]}
+				}
+				yyVAL.updateList = exprs
 			}
-			exprs := make([]*UpdateExpr, len(yyDollar[2].columnList))
-			for i := 0; i < len(yyDollar[2].columnList); i++ {
-				exprs[i] = &UpdateExpr{Column: yyDollar[2].columnList[i], Expr: yyDollar[6].exprs[i]}
-			}
-			yyVAL.updateList = exprs
 		}
 	case 220:
 		yyDollar = yyS[yypt-3 : yypt+1]
@@ -2208,13 +2206,11 @@ yydefault:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
 			if len(yyDollar[1].privileges) == 3 {
-				yylex.Error("number of privileges exceeded")
-				return 1
+				yylex.(*Lexer).AddError(&ErrGrantPrivilegesCountExceeded{PrivilegesCount: len(yyDollar[1].privileges) + 1, MaxAllowed: 3})
 			}
 
 			if _, ok := yyDollar[1].privileges[yyDollar[3].string]; ok {
-				yylex.Error(__yyfmt__.Sprintf("repeated privilege: %s", yyDollar[3].string))
-				return 1
+				yylex.(*Lexer).AddError(&ErrGrantRepeatedPrivilege{Privilege: yyDollar[3].string})
 			}
 
 			yyDollar[1].privileges[yyDollar[3].string] = struct{}{}
@@ -2240,8 +2236,7 @@ yydefault:
 		{
 			literalUpper := bytes.ToUpper(yyDollar[1].bytes)
 			if _, ok := keywordsNotAllowed[string(literalUpper)]; ok {
-				yylex.(*Lexer).err = &ErrKeywordIsNotAllowed{Keyword: string(yyDollar[1].bytes)}
-				return 1
+				yylex.(*Lexer).AddError(&ErrKeywordIsNotAllowed{Keyword: string(yyDollar[1].bytes)})
 			}
 
 			yyVAL.identifier = Identifier(yyDollar[1].bytes)

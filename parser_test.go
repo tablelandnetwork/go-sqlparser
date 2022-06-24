@@ -15,11 +15,11 @@ func TestSelectStatement(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name           string
-		stmt           string
-		deparsed       string
-		expectedAST    *AST
-		expectedErrMsg string
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+		expectedErr error
 	}
 
 	tests := []testCase{
@@ -2734,11 +2734,11 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
-			name:           "function does not exist star",
-			stmt:           "SELECT foo(*) FROM t",
-			deparsed:       "select foo(*) from t",
-			expectedAST:    nil,
-			expectedErrMsg: "no such function: foo",
+			name:        "function does not exist star",
+			stmt:        "SELECT foo(*) FROM t",
+			deparsed:    "select foo(*) from t",
+			expectedAST: nil,
+			expectedErr: &ErrNoSuchFunction{FunctionName: "foo"},
 		},
 		{
 			name:     "function call distinct",
@@ -2768,11 +2768,11 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
-			name:           "function does not exist",
-			stmt:           "SELECT foo(ID) FILTER(WHERE ID > 2) FROM t",
-			deparsed:       "select foo(ID) filter(where ID > 2) from t",
-			expectedAST:    nil,
-			expectedErrMsg: "no such function: foo",
+			name:        "function does not exist",
+			stmt:        "SELECT foo(ID) FILTER(WHERE ID > 2) FROM t",
+			deparsed:    "select foo(ID) filter(where ID > 2) from t",
+			expectedAST: nil,
+			expectedErr: &ErrNoSuchFunction{FunctionName: "foo"},
 		},
 		{
 			name:     "function call like with escape",
@@ -2809,7 +2809,7 @@ func TestSelectStatement(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-				if tc.expectedErrMsg == "" {
+				if tc.expectedErr == nil {
 					require.NoError(t, err)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
@@ -2828,9 +2828,8 @@ func TestSelectStatement(t *testing.T) {
 
 					_, err = db.Exec(tc.stmt)
 					require.NoError(t, err)
-
 				} else {
-					require.Contains(t, err.Error(), tc.expectedErrMsg)
+					require.Equal(t, tc.expectedErr, ast.Errors[0][0])
 				}
 			}
 		}(tc))
@@ -3548,11 +3547,11 @@ func TestUpdate(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name           string
-		stmt           string
-		deparsed       string
-		expectedAST    *AST
-		expectedErrMsg string
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+		expectedErr error
 	}
 
 	tests := []testCase{
@@ -3589,11 +3588,11 @@ func TestUpdate(t *testing.T) {
 			},
 		},
 		{
-			name:           "update wrong number of exprs",
-			stmt:           "update t set (a, b) = (1);",
-			deparsed:       "",
-			expectedAST:    nil,
-			expectedErrMsg: "2 columns assigned 1 values",
+			name:        "update wrong number of exprs",
+			stmt:        "update t set (a, b) = (1);",
+			deparsed:    "",
+			expectedAST: nil,
+			expectedErr: &ErrUpdateColumnsAndValuesDiffer{ColumnsCount: 2, ValuesCount: 1},
 		},
 		{
 			name:     "update with where",
@@ -3627,14 +3626,13 @@ func TestUpdate(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
 
-				if tc.expectedErrMsg == "" {
+				if tc.expectedErr == nil {
 					require.NoError(t, err)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
-					require.Contains(t, err.Error(), tc.expectedErrMsg)
+					require.Equal(t, tc.expectedErr, ast.Errors[0][0])
 				}
-
 			}
 		}(tc))
 	}
@@ -3644,11 +3642,11 @@ func TestGrant(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name           string
-		stmt           string
-		deparsed       string
-		expectedAST    *AST
-		expectedErrMsg string
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+		expectedErr error
 	}
 
 	tests := []testCase{
@@ -3671,18 +3669,18 @@ func TestGrant(t *testing.T) {
 			},
 		},
 		{
-			name:           "grant number of privileges",
-			stmt:           "GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b'",
-			deparsed:       "",
-			expectedAST:    nil,
-			expectedErrMsg: "number of privileges exceeded",
+			name:        "grant number of privileges",
+			stmt:        "GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b'",
+			deparsed:    "",
+			expectedAST: nil,
+			expectedErr: &ErrGrantPrivilegesCountExceeded{PrivilegesCount: 4, MaxAllowed: 3},
 		},
 		{
-			name:           "grant repeated",
-			stmt:           "GRANT INSERT, DELETE, DELETE on t TO 'a', 'b'",
-			deparsed:       "",
-			expectedAST:    nil,
-			expectedErrMsg: "repeated privilege: delete",
+			name:        "grant repeated",
+			stmt:        "GRANT INSERT, DELETE, DELETE on t TO 'a', 'b'",
+			deparsed:    "",
+			expectedAST: nil,
+			expectedErr: &ErrGrantRepeatedPrivilege{Privilege: "delete"},
 		},
 		{
 			name:     "revoke",
@@ -3710,12 +3708,12 @@ func TestGrant(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
 
-				if tc.expectedErrMsg == "" {
+				if tc.expectedErr == nil {
 					require.NoError(t, err)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
-					require.Contains(t, err.Error(), tc.expectedErrMsg)
+					require.Equal(t, tc.expectedErr, ast.Errors[0][0])
 				}
 			}
 		}(tc))
@@ -3888,8 +3886,9 @@ func TestKeywordsNotAllowed(t *testing.T) {
 	t.Parallel()
 
 	for keyword := range keywordsNotAllowed {
-		_, err := Parse(fmt.Sprintf("select %s from t", keyword))
-		require.Equal(t, &ErrKeywordIsNotAllowed{Keyword: keyword}, err)
+		ast, err := Parse(fmt.Sprintf("select %s from t", keyword))
+		require.NoError(t, err)
+		require.Equal(t, &ErrKeywordIsNotAllowed{Keyword: keyword}, ast.Errors[0][0])
 	}
 }
 
@@ -3903,8 +3902,9 @@ func TestLimits(t *testing.T) {
 			text = text + "a"
 		}
 
-		_, err := Parse(fmt.Sprintf("insert into t (a) values ('%s')", text))
-		require.Equal(t, &ErrTextTooLong{Length: len(text), MaxAllowed: MaxTextLength}, err)
+		ast, err := Parse(fmt.Sprintf("insert into t (a) values ('%s')", text))
+		require.NoError(t, err)
+		require.Equal(t, &ErrTextTooLong{Length: len(text), MaxAllowed: MaxTextLength}, ast.Errors[0][0])
 	})
 
 	t.Run("max blob length", func(t *testing.T) {
@@ -3914,8 +3914,9 @@ func TestLimits(t *testing.T) {
 			blob = blob + "f"
 		}
 
-		_, err := Parse(fmt.Sprintf("insert into t (a) values (x'%s')", blob))
-		require.Equal(t, &ErrBlobTooBig{Length: len(blob), MaxAllowed: MaxBlobLength}, err)
+		ast, err := Parse(fmt.Sprintf("insert into t (a) values (x'%s')", blob))
+		require.NoError(t, err)
+		require.Equal(t, &ErrBlobTooBig{Length: len(blob), MaxAllowed: MaxBlobLength}, ast.Errors[0][0])
 	})
 
 	t.Run("max columns allowed", func(t *testing.T) {
@@ -3933,25 +3934,38 @@ func TestLimits(t *testing.T) {
 		}
 		columnsDef = append([]string{"a INT"}, columnsDef...)
 
-		_, err := Parse(fmt.Sprintf("create table t (%s);", strings.Join(columnsDef, ", ")))
-		require.Equal(t, &ErrTooManyColumns{ColumnCount: len(columnsDef), MaxAllowed: MaxAllowedColumns}, err)
+		ast, err := Parse(fmt.Sprintf("create table t (%s);", strings.Join(columnsDef, ", ")))
+		require.NoError(t, err)
+		require.Equal(t, &ErrTooManyColumns{ColumnCount: len(columnsDef), MaxAllowed: MaxAllowedColumns}, ast.Errors[0][0])
 	})
 }
 
 func TestDisallowSubqueriesOnStatements(t *testing.T) {
 	t.Parallel()
 	t.Run("insert", func(t *testing.T) {
-		_, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "insert"}, err)
+		ast, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
+		require.NoError(t, err)
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "insert"}, ast.Errors[0][0])
 	})
 
 	t.Run("update", func(t *testing.T) {
-		_, err := Parse("update t set a = (select 1 FROM t limit 1)")
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, err)
+		ast, err := Parse("update t set a = (select 1 FROM t limit 1)")
+		require.NoError(t, err)
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, ast.Errors[0][0])
 	})
 
 	t.Run("delete", func(t *testing.T) {
-		_, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "delete"}, err)
+		ast, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
+		require.NoError(t, err)
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "delete"}, ast.Errors[0][0])
 	})
+}
+
+func TestMultipleErrors(t *testing.T) {
+	t.Parallel()
+	ast, err := Parse("GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b';")
+
+	require.NoError(t, err)
+	require.Equal(t, &ErrGrantPrivilegesCountExceeded{PrivilegesCount: 4, MaxAllowed: 3}, ast.Errors[0][0])
+	require.Equal(t, &ErrGrantRepeatedPrivilege{Privilege: "delete"}, ast.Errors[0][1])
 }
