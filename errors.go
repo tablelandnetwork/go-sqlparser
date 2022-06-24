@@ -46,3 +46,12 @@ func (e *ErrTooManyColumns) Error() string {
 	return fmt.Sprintf("table has too many columns (has %d, max %d)",
 		e.ColumnCount, e.MaxAllowed)
 }
+
+// ErrStatementContainsSubquery indicates a statement contains a subquery.
+type ErrStatementContainsSubquery struct {
+	StatementKind string
+}
+
+func (e *ErrStatementContainsSubquery) Error() string {
+	return fmt.Sprintf("%s contains subquery", e.StatementKind)
+}

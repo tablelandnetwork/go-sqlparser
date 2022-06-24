@@ -1127,6 +1127,14 @@ table_constraint:
 insert_stmt:
   INSERT INTO table_name column_name_list_opt VALUES insert_rows
   {
+    for _, row := range $6 {
+      for _, expr := range row {
+				if expr.ContainsSubquery() {
+          yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "insert"}
+					return 1
+				}
+			}
+    }
     $$ = &Insert{Table: $3, Columns: $4, Rows: $6}
   }
 | INSERT INTO table_name DEFAULT VALUES
@@ -1160,6 +1168,10 @@ insert_rows:
 delete_stmt:
   DELETE FROM table_name where_opt
   {
+    if $4 != nil && $4.Expr.ContainsSubquery() {
+      yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "delete"}
+      return 1
+    }
     $$ = &Delete{Table: $3, Where: $4}
   }
 ;
@@ -1185,6 +1197,10 @@ update_list:
 common_update_list:
   update_expression
   {
+    if $1.Expr.ContainsSubquery() {
+      yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "update"}
+      return 1
+    }
     $$ = []*UpdateExpr{$1}
   }
 | common_update_list ',' update_expression
@@ -1285,7 +1301,7 @@ identifier:
   {
     literalUpper := bytes.ToUpper($1)
     if _, ok := keywordsNotAllowed[string(literalUpper)]; ok {
-      yylex.(*Lexer).err = &ErrKeywordIsNotAllowed{Keyword : string($1)}
+      yylex.(*Lexer).err = &ErrKeywordIsNotAllowed{Keyword: string($1)}
       return 1
     } 
 

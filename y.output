@@ -297,7 +297,7 @@ state 31
 state 32
 	identifier:  IDENTIFIER.    (230)
 
-	.  reduce 230 (src line 1283)
+	.  reduce 230 (src line 1299)
 
 
 state 33
@@ -312,25 +312,25 @@ state 33
 state 34
 	privileges:  privilege.    (225)
 
-	.  reduce 225 (src line 1244)
+	.  reduce 225 (src line 1260)
 
 
 state 35
 	privilege:  INSERT.    (227)
 
-	.  reduce 227 (src line 1268)
+	.  reduce 227 (src line 1284)
 
 
 state 36
 	privilege:  UPDATE.    (228)
 
-	.  reduce 228 (src line 1273)
+	.  reduce 228 (src line 1289)
 
 
 state 37
 	privilege:  DELETE.    (229)
 
-	.  reduce 229 (src line 1277)
+	.  reduce 229 (src line 1293)
 
 
 state 38
@@ -755,7 +755,7 @@ state 72
 
 	'('  shift 138
 	DEFAULT  shift 137
-	.  reduce 209 (src line 1138)
+	.  reduce 209 (src line 1146)
 
 	column_name_list_opt  goto 136
 
@@ -2068,7 +2068,7 @@ state 138
 state 139
 	delete_stmt:  DELETE FROM table_name where_opt.    (213)
 
-	.  reduce 213 (src line 1160)
+	.  reduce 213 (src line 1168)
 
 
 state 140
@@ -2120,19 +2120,19 @@ state 142
 	common_update_list:  common_update_list.',' update_expression 
 
 	','  shift 213
-	.  reduce 215 (src line 1174)
+	.  reduce 215 (src line 1186)
 
 
 state 143
 	update_list:  paren_update_list.    (216)
 
-	.  reduce 216 (src line 1179)
+	.  reduce 216 (src line 1191)
 
 
 state 144
 	common_update_list:  update_expression.    (217)
 
-	.  reduce 217 (src line 1185)
+	.  reduce 217 (src line 1197)
 
 
 state 145
@@ -2168,7 +2168,7 @@ state 148
 state 149
 	privileges:  privileges ',' privilege.    (226)
 
-	.  reduce 226 (src line 1251)
+	.  reduce 226 (src line 1267)
 
 
 state 150
@@ -3703,7 +3703,7 @@ state 207
 state 208
 	insert_stmt:  INSERT INTO table_name DEFAULT VALUES.    (208)
 
-	.  reduce 208 (src line 1132)
+	.  reduce 208 (src line 1140)
 
 
 state 209
@@ -3792,7 +3792,7 @@ state 211
 state 212
 	update_stmt:  UPDATE table_name SET update_list where_opt.    (214)
 
-	.  reduce 214 (src line 1167)
+	.  reduce 214 (src line 1179)
 
 
 state 213
@@ -4547,13 +4547,13 @@ state 260
 state 261
 	column_name_list_opt:  '(' column_name_list ')'.    (210)
 
-	.  reduce 210 (src line 1142)
+	.  reduce 210 (src line 1150)
 
 
 state 262
 	common_update_list:  common_update_list ',' update_expression.    (218)
 
-	.  reduce 218 (src line 1190)
+	.  reduce 218 (src line 1206)
 
 
 state 263
@@ -4624,7 +4624,7 @@ state 264
 	JSON_EXTRACT_OP  shift 92
 	JSON_UNQUOTE_EXTRACT_OP  shift 93
 	COLLATE  shift 104
-	.  reduce 220 (src line 1211)
+	.  reduce 220 (src line 1227)
 
 	cmp_op  goto 94
 	cmp_inequality_op  goto 95
@@ -4636,13 +4636,13 @@ state 265
 	roles:  roles.',' STRING 
 
 	','  shift 310
-	.  reduce 221 (src line 1218)
+	.  reduce 221 (src line 1234)
 
 
 state 266
 	roles:  STRING.    (223)
 
-	.  reduce 223 (src line 1233)
+	.  reduce 223 (src line 1249)
 
 
 state 267
@@ -4650,7 +4650,7 @@ state 267
 	roles:  roles.',' STRING 
 
 	','  shift 310
-	.  reduce 222 (src line 1225)
+	.  reduce 222 (src line 1241)
 
 
 state 268
@@ -5871,7 +5871,7 @@ state 341
 state 342
 	insert_rows:  '(' expr_list ')'.    (211)
 
-	.  reduce 211 (src line 1149)
+	.  reduce 211 (src line 1157)
 
 
 state 343
@@ -5913,7 +5913,7 @@ state 343
 state 344
 	roles:  roles ',' STRING.    (224)
 
-	.  reduce 224 (src line 1238)
+	.  reduce 224 (src line 1254)
 
 
 state 345
@@ -6985,13 +6985,13 @@ state 385
 state 386
 	insert_rows:  insert_rows ',' '(' expr_list ')'.    (212)
 
-	.  reduce 212 (src line 1154)
+	.  reduce 212 (src line 1162)
 
 
 state 387
 	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list ')'.    (219)
 
-	.  reduce 219 (src line 1196)
+	.  reduce 219 (src line 1212)
 
 
 state 388

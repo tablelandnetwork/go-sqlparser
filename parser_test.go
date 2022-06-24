@@ -3931,10 +3931,27 @@ func TestLimits(t *testing.T) {
 			}
 			columnsDef = append(columnsDef, string(column)+" INT")
 		}
-
 		columnsDef = append([]string{"a INT"}, columnsDef...)
 
 		_, err := Parse(fmt.Sprintf("create table t (%s);", strings.Join(columnsDef, ", ")))
 		require.Equal(t, &ErrTooManyColumns{ColumnCount: len(columnsDef), MaxAllowed: MaxAllowedColumns}, err)
+	})
+}
+
+func TestDisallowSubqueriesOnStatements(t *testing.T) {
+	t.Parallel()
+	t.Run("insert", func(t *testing.T) {
+		_, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "insert"}, err)
+	})
+
+	t.Run("update", func(t *testing.T) {
+		_, err := Parse("update t set a = (select 1 FROM t limit 1)")
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, err)
+	})
+
+	t.Run("delete", func(t *testing.T) {
+		_, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "delete"}, err)
 	})
 }

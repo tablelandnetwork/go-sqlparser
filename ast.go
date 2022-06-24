@@ -239,6 +239,11 @@ func (node *Subquery) String() string {
 	return fmt.Sprintf("(%s)", node.Select.String())
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *Subquery) ContainsSubquery() bool {
+	return true
+}
+
 // ParenTableExpr represents a parenthesized list of TableExpr.
 type ParenTableExpr struct {
 	TableExprList TableExprList
@@ -407,6 +412,9 @@ func (node *Limit) String() string {
 // Expr represents an expr node in the AST.
 type Expr interface {
 	iExpr()
+
+	// ContainsSubquery returns true is a Subquery is found recursively.
+	ContainsSubquery() bool
 	Node
 }
 
@@ -440,6 +448,11 @@ func (node *NullValue) String() string {
 	return "null"
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *NullValue) ContainsSubquery() bool {
+	return false
+}
+
 // BoolValue represents booleans.
 type BoolValue bool
 
@@ -450,6 +463,11 @@ func (node BoolValue) String() string {
 	}
 
 	return "false"
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node BoolValue) ContainsSubquery() bool {
+	return false
 }
 
 // Value represents a single value.
@@ -485,6 +503,11 @@ func (node *Value) String() string {
 	return value
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *Value) ContainsSubquery() bool {
+	return false
+}
+
 // UnaryExpr represents a unary value expression.
 type UnaryExpr struct {
 	Operator string
@@ -504,6 +527,11 @@ func (node *UnaryExpr) String() string {
 		return fmt.Sprintf("%s %s", node.Operator, expr.String())
 	}
 	return fmt.Sprintf("%s%s", node.Operator, node.Expr.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node UnaryExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
 }
 
 // BinaryExpr represents a binary value expression.
@@ -531,6 +559,11 @@ const (
 // String returns the string representation of the node.
 func (node *BinaryExpr) String() string {
 	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *BinaryExpr) ContainsSubquery() bool {
+	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
 }
 
 // CmpExpr represents the comparison of two expressions.
@@ -569,6 +602,11 @@ func (node *CmpExpr) String() string {
 	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *CmpExpr) ContainsSubquery() bool {
+	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+}
+
 // AndExpr represents an AND expression.
 type AndExpr struct {
 	Left, Right Expr
@@ -580,6 +618,11 @@ func (node *AndExpr) String() string {
 		return ""
 	}
 	return fmt.Sprintf("%s and %s", node.Left.String(), node.Right.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *AndExpr) ContainsSubquery() bool {
+	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
 }
 
 // OrExpr represents an OR expression.
@@ -595,6 +638,11 @@ func (node *OrExpr) String() string {
 	return fmt.Sprintf("%s or %s", node.Left.String(), node.Right.String())
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *OrExpr) ContainsSubquery() bool {
+	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+}
+
 // NotExpr represents an NOT expression.
 type NotExpr struct {
 	Expr Expr
@@ -608,6 +656,11 @@ func (node *NotExpr) String() string {
 	return fmt.Sprintf("not %s", node.Expr.String())
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *NotExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
+}
+
 // IsExpr represents a IS expression
 type IsExpr struct {
 	Left, Right Expr
@@ -616,6 +669,11 @@ type IsExpr struct {
 // String returns the string representation of the node.
 func (node *IsExpr) String() string {
 	return fmt.Sprintf("%s is %s", node.Left.String(), node.Right.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *IsExpr) ContainsSubquery() bool {
+	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
 }
 
 // IsNullExpr represents a IS expression
@@ -628,6 +686,11 @@ func (node *IsNullExpr) String() string {
 	return fmt.Sprintf("%s isnull", node.Expr.String())
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *IsNullExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
+}
+
 // NotNullExpr represents a IS expression
 type NotNullExpr struct {
 	Expr Expr
@@ -636,6 +699,11 @@ type NotNullExpr struct {
 // String returns the string representation of the node.
 func (node *NotNullExpr) String() string {
 	return fmt.Sprintf("%s notnull", node.Expr.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *NotNullExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
 }
 
 // CollateExpr the COLLATE operator
@@ -647,6 +715,11 @@ type CollateExpr struct {
 // String returns the string representation of the node.
 func (node *CollateExpr) String() string {
 	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *CollateExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
 }
 
 // ConvertExpr represents a CAST expression.
@@ -671,6 +744,11 @@ func (node *ConvertExpr) String() string {
 	return fmt.Sprintf("cast (%s as %s)", node.Expr.String(), string(node.Type))
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *ConvertExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
+}
+
 // BetweenExpr represents a BETWEEN or a NOT BETWEEN expression.
 type BetweenExpr struct {
 	Operator string
@@ -687,6 +765,11 @@ const (
 // String returns the string representation of the node.
 func (node *BetweenExpr) String() string {
 	return fmt.Sprintf("%s %s %s and %s", node.Left.String(), node.Operator, node.From.String(), node.To.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *BetweenExpr) ContainsSubquery() bool {
+	return node.Left.ContainsSubquery() || node.From.ContainsSubquery() || node.To.ContainsSubquery()
 }
 
 // When represents a WHEN sub-expression.
@@ -726,6 +809,23 @@ func (node *CaseExpr) String() string {
 	return b.String()
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *CaseExpr) ContainsSubquery() bool {
+	var containsSubquery bool
+	if node.Expr != nil {
+		containsSubquery = node.Expr.ContainsSubquery()
+	}
+
+	for _, when := range node.Whens {
+		containsSubquery = containsSubquery || when.Condition.ContainsSubquery() || when.Value.ContainsSubquery()
+	}
+
+	if node.Else != nil {
+		containsSubquery = containsSubquery || node.Else.ContainsSubquery()
+	}
+	return containsSubquery
+}
+
 // Table represents a table.
 type Table struct {
 	Name Identifier
@@ -748,6 +848,11 @@ func (node *Column) String() string {
 		return fmt.Sprintf("%s.%s", node.TableRef.String(), node.Name)
 	}
 	return node.Name.String()
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *Column) ContainsSubquery() bool {
+	return false
 }
 
 // ColumnList is a list of columns.
@@ -780,6 +885,15 @@ func (node Exprs) String() string {
 	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
 }
 
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node Exprs) ContainsSubquery() bool {
+	var contains bool
+	for _, expr := range node {
+		contains = contains || expr.ContainsSubquery()
+	}
+	return contains
+}
+
 // ExistsExpr represents a EXISTS expression.
 type ExistsExpr struct {
 	Subquery *Subquery
@@ -788,6 +902,11 @@ type ExistsExpr struct {
 // String returns the string representation of the node.
 func (node *ExistsExpr) String() string {
 	return fmt.Sprintf("exists %s", node.Subquery.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *ExistsExpr) ContainsSubquery() bool {
+	return true
 }
 
 // ColTuple represents a list of column values for IN operator.
@@ -828,6 +947,20 @@ func (node *FuncExpr) String() string {
 	}
 
 	return fmt.Sprintf("%s%s%s", node.Name.String(), argsStr[:1]+distinct+argsStr[1:], filter)
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *FuncExpr) ContainsSubquery() bool {
+	var contains bool
+	for _, arg := range node.Args {
+		contains = contains || arg.ContainsSubquery()
+	}
+
+	if node.Filter != nil {
+		contains = contains || node.Filter.Expr.ContainsSubquery()
+	}
+
+	return contains
 }
 
 // Identifier represents a Column, Table and Function name identifier.

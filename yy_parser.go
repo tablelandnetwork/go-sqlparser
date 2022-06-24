@@ -2086,6 +2086,14 @@ yydefault:
 	case 207:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
+			for _, row := range yyDollar[6].insertRows {
+				for _, expr := range row {
+					if expr.ContainsSubquery() {
+						yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "insert"}
+						return 1
+					}
+				}
+			}
 			yyVAL.insertStmt = &Insert{Table: yyDollar[3].table, Columns: yyDollar[4].columnList, Rows: yyDollar[6].insertRows}
 		}
 	case 208:
@@ -2116,6 +2124,10 @@ yydefault:
 	case 213:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
+			if yyDollar[4].where != nil && yyDollar[4].where.Expr.ContainsSubquery() {
+				yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "delete"}
+				return 1
+			}
 			yyVAL.deleteStmt = &Delete{Table: yyDollar[3].table, Where: yyDollar[4].where}
 		}
 	case 214:
@@ -2136,6 +2148,10 @@ yydefault:
 	case 217:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			if yyDollar[1].updateExpression.Expr.ContainsSubquery() {
+				yylex.(*Lexer).err = &ErrStatementContainsSubquery{StatementKind: "update"}
+				return 1
+			}
 			yyVAL.updateList = []*UpdateExpr{yyDollar[1].updateExpression}
 		}
 	case 218:
