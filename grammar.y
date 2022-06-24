@@ -623,6 +623,10 @@ expr:
   {  
     $$ = &CollateExpr{Expr : $1, CollationName: $3}
   }
+| '(' expr ')'
+  {
+    $$ = &ParenExpr{Expr: $2}
+  }
 | expr IN col_tuple
   {
     $$ = &CmpExpr{Left: $1, Operator: InStr, Right: $3}

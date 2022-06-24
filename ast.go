@@ -440,6 +440,7 @@ func (Exprs) iExpr()        {}
 func (*Subquery) iExpr()    {}
 func (*ExistsExpr) iExpr()  {}
 func (*FuncExpr) iExpr()    {}
+func (*ParenExpr) iExpr()   {}
 
 // NullValue represents null values.
 type NullValue struct{}
@@ -962,6 +963,21 @@ func (node *FuncExpr) ContainsSubquery() bool {
 	}
 
 	return contains
+}
+
+// ParenExpr represents a (expr) expression.
+type ParenExpr struct {
+	Expr Expr
+}
+
+// String returns the string representation of the node.
+func (node *ParenExpr) String() string {
+	return fmt.Sprintf("(%s)", node.Expr.String())
+}
+
+// ContainsSubquery returns true is a Subquery is found recursively.
+func (node *ParenExpr) ContainsSubquery() bool {
+	return node.Expr.ContainsSubquery()
 }
 
 // Identifier represents a Column, Table and Function name identifier.

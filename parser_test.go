@@ -1641,21 +1641,31 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
-			name:     "expression-list",
-			stmt:     "SELECT c1, c2, 1 FROM t",
-			deparsed: "select c1, c2, 1 from t",
+			name:     "parens-expr",
+			stmt:     "SELECT a and (a and a and (a or a)) FROM t",
+			deparsed: "select a and (a and a and (a or a)) from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
 						SelectColumnList: []SelectColumn{
 							&AliasedSelectColumn{
-								Expr: &Column{Name: "c1"},
-							},
-							&AliasedSelectColumn{
-								Expr: &Column{Name: "c2"},
-							},
-							&AliasedSelectColumn{
-								Expr: &Value{Type: IntValue, Value: []byte("1")},
+								Expr: &AndExpr{
+									Left: &Column{Name: "a"},
+									Right: &ParenExpr{
+										Expr: &AndExpr{
+											Left: &AndExpr{
+												Left:  &Column{Name: "a"},
+												Right: &Column{Name: "a"},
+											},
+											Right: &ParenExpr{
+												Expr: &OrExpr{
+													Left:  &Column{Name: "a"},
+													Right: &Column{Name: "a"},
+												},
+											},
+										},
+									},
+								},
 							},
 						},
 						From: TableExprList{
@@ -2811,6 +2821,7 @@ func TestSelectStatement(t *testing.T) {
 				ast, err := Parse(tc.stmt)
 				if tc.expectedErr == nil {
 					require.NoError(t, err)
+					require.Len(t, ast.Errors, 0)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 
@@ -2897,8 +2908,8 @@ func TestAllowedFunctions(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-
 				require.NoError(t, err)
+				require.Len(t, ast.Errors, 0)
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
 			}
@@ -3358,8 +3369,8 @@ func TestCreateTable(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-
 				require.NoError(t, err)
+				require.Len(t, ast.Errors, 0)
 				require.Equal(t, tc.expectedHash, ast.Statements[0].(*CreateTable).StructureHash())
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
@@ -3474,8 +3485,8 @@ func TestInsert(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-
 				require.NoError(t, err)
+				require.Len(t, ast.Errors, 0)
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
 			}
@@ -3534,8 +3545,8 @@ func TestDelete(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-
 				require.NoError(t, err)
+				require.Len(t, ast.Errors, 0)
 				require.Equal(t, tc.expectedAST, ast)
 				require.Equal(t, tc.deparsed, ast.String())
 			}
@@ -3625,9 +3636,9 @@ func TestUpdate(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-
 				if tc.expectedErr == nil {
 					require.NoError(t, err)
+					require.Len(t, ast.Errors, 0)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
@@ -3707,9 +3718,9 @@ func TestGrant(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-
 				if tc.expectedErr == nil {
 					require.NoError(t, err)
+					require.Len(t, ast.Errors, 0)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
@@ -3823,6 +3834,7 @@ func TestMultipleStatements(t *testing.T) {
 				ast, err := Parse(tc.stmt)
 				if tc.expectedErrMsg == "" {
 					require.NoError(t, err)
+					require.Len(t, ast.Errors, 0)
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
