@@ -1,7 +1,27 @@
 package sqlparser
 
+import "sync"
+
+// parserPool is a pool for parser objects.
+var parserPool = sync.Pool{
+	New: func() interface{} {
+		return &yyParserImpl{}
+	},
+}
+
+var zeroParser yyParserImpl
+
+func yyParsePooled(yylex yyLexer) int {
+	parser := parserPool.Get().(*yyParserImpl)
+	defer func() {
+		*parser = zeroParser
+		parserPool.Put(parser)
+	}()
+	return parser.Parse(yylex)
+}
+
 func Parse(statement string) (*AST, error) {
-	yyErrorVerbose = true
+	//yyErrorVerbose = true
 	//yyDebug = 4
 
 	if len(statement) == 0 {
@@ -13,7 +33,7 @@ func Parse(statement string) (*AST, error) {
 	lexer.input = []byte(statement)
 	lexer.readByte()
 
-	yyParse(lexer)
+	yyParsePooled(lexer)
 	if lexer.syntaxError != nil {
 		return nil, lexer.syntaxError
 	}

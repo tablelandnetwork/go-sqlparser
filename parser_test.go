@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"math/rand"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/google/uuid"
@@ -4049,4 +4051,304 @@ func TestMultipleErrors(t *testing.T) {
 	if errors.As(ast.Errors[0], &e2) {
 		require.Equal(t, "delete", e2.Privilege)
 	}
+}
+
+func TestParallel(t *testing.T) {
+	parallelism := 200
+	numIters := 500
+
+	type testCase struct {
+		stmt     string
+		deparsed string
+	}
+
+	tests := []testCase{
+		{
+			stmt:     "SELECT true FROM t",
+			deparsed: "select true from t",
+		},
+		{
+			stmt:     "SELECT FALSE FROM t",
+			deparsed: "select false from t",
+		},
+		{
+			stmt:     "SELECT 'anything betwen single quotes is a string' FROM t",
+			deparsed: "select 'anything betwen single quotes is a string' from t",
+		},
+		{
+			stmt:     "SELECT 'bruno''s car' FROM t",
+			deparsed: "select 'bruno''s car' from t",
+		},
+		{
+			stmt:     "SELECT 12 FROM t",
+			deparsed: "select 12 from t",
+		},
+		{
+			stmt:     "SELECT -12 FROM t",
+			deparsed: "select -12 from t",
+		},
+		{
+			stmt:     "SELECT 1.2 FROM t",
+			deparsed: "select 1.2 from t",
+		},
+		{
+			stmt:     "SELECT 0.2 FROM t",
+			deparsed: "select 0.2 from t",
+		},
+		{
+			stmt:     "SELECT .2 FROM t",
+			deparsed: "select .2 from t",
+		},
+		{
+			stmt:     "SELECT 1e2 FROM t",
+			deparsed: "select 1e2 from t",
+		},
+		{
+			stmt:     "SELECT 1E2 FROM t",
+			deparsed: "select 1E2 from t",
+		},
+		{
+			stmt:     "SELECT 0xAF12 FROM t",
+			deparsed: "select 0xAF12 from t",
+		},
+		{
+			stmt:     "SELECT x'AF12' FROM t",
+			deparsed: "select X'AF12' from t",
+		},
+		{
+			stmt:     "SELECT X'AF12' FROM t",
+			deparsed: "select X'AF12' from t",
+		},
+		{
+			stmt:     "SELECT null FROM t",
+			deparsed: "select null from t",
+		},
+		{
+			stmt:     "SELECT NULL FROM t",
+			deparsed: "select null from t",
+		},
+		{
+			stmt:     "SELECT thisisacolumn FROM t",
+			deparsed: "select thisisacolumn from t",
+		},
+		{
+			stmt:     "SELECT this_is_a_column3208ADKJHKDS_ FROM t",
+			deparsed: "select this_is_a_column3208ADKJHKDS_ from t",
+		},
+		{
+			stmt:     "SELECT _also_column FROM t",
+			deparsed: "select _also_column from t",
+		},
+		{
+			stmt:     "SELECT -2.3 FROM t",
+			deparsed: "select -2.3 from t",
+		},
+		{
+			stmt:     "SELECT -a FROM t",
+			deparsed: "select -a from t",
+		},
+		{
+			stmt:     "SELECT a = 2 FROM t",
+			deparsed: "select a = 2 from t",
+		},
+		{
+			stmt:     "SELECT a != 2 FROM t",
+			deparsed: "select a != 2 from t",
+		},
+		{
+			stmt:     "SELECT a < 2 FROM t",
+			deparsed: "select a < 2 from t",
+		},
+		{
+			stmt:     "SELECT a >= 2 FROM t",
+			deparsed: "select a >= 2 from t",
+		},
+		{
+			stmt:     "SELECT a <= 2 FROM t",
+			deparsed: "select a <= 2 from t",
+		},
+		{
+			stmt:     "SELECT a glob 'a' FROM t",
+			deparsed: "select a glob 'a' from t",
+		},
+		{
+			stmt:     "SELECT a match 'a' FROM t",
+			deparsed: "select a match 'a' from t",
+		},
+		{
+			stmt:     "SELECT a like 'a' FROM t",
+			deparsed: "select a like 'a' from t",
+		},
+		{
+			stmt:     "SELECT a not like '%a\\%%' escape '\\' FROM t",
+			deparsed: "select a not like '%a\\%%' escape '\\' from t",
+		},
+		{
+			stmt:     "SELECT a and b FROM t",
+			deparsed: "select a and b from t",
+		},
+		{
+			stmt:     "SELECT a or b FROM t",
+			deparsed: "select a or b from t",
+		},
+		{
+			stmt:     "SELECT a is b FROM t",
+			deparsed: "select a is b from t",
+		},
+		{
+			stmt:     "SELECT a is not b FROM t",
+			deparsed: "select a is not b from t",
+		},
+		{
+			stmt:     "SELECT a isnull FROM t",
+			deparsed: "select a isnull from t",
+		},
+		{
+			stmt:     "SELECT a not null FROM t",
+			deparsed: "select a notnull from t",
+		},
+		{
+			stmt:     "SELECT CAST (1 AS TEXT) FROM t",
+			deparsed: "select cast (1 as text) from t",
+		},
+		{
+			stmt:     "SELECT CAST (a AS REAL) FROM t",
+			deparsed: "select cast (a as real) from t",
+		},
+		{
+			stmt:     "SELECT CAST (a AS none) FROM t",
+			deparsed: "select cast (a as none) from t",
+		},
+		{
+			stmt:     "SELECT CAST (a AS numeric) FROM t",
+			deparsed: "select cast (a as numeric) from t",
+		},
+		{
+			stmt:     "SELECT CAST (a AS integer) FROM t",
+			deparsed: "select cast (a as integer) from t",
+		},
+		{
+			stmt:     "SELECT c1 = c2 COLLATE rtrim FROM t",
+			deparsed: "select c1 = c2 collate rtrim from t",
+		},
+		{
+			stmt:     "SELECT c1 + 10 FROM t",
+			deparsed: "select c1 + 10 from t",
+		},
+		{
+			stmt:     "SELECT c1 - 10 FROM t",
+			deparsed: "select c1 - 10 from t",
+		},
+		{
+			stmt:     "SELECT c1 * 10 FROM t",
+			deparsed: "select c1 * 10 from t",
+		},
+		{
+			stmt:     "SELECT c1 / 10 FROM t",
+			deparsed: "select c1 / 10 from t",
+		},
+		{
+			stmt:     "SELECT c1 % 10 FROM t",
+			deparsed: "select c1 % 10 from t",
+		},
+		{
+			stmt:     "SELECT c1 & 10 FROM t",
+			deparsed: "select c1 & 10 from t",
+		},
+		{
+			stmt:     "SELECT c1 | 10 FROM t",
+			deparsed: "select c1 | 10 from t",
+		},
+		{
+			stmt:     "GRANT INSERT, UPDATE, DELETE on t TO 'a', 'b'",
+			deparsed: "grant delete, insert, update on t to 'a', 'b'",
+		},
+		{
+			stmt:     "REVOKE INSERT, UPDATE, DELETE ON t FROM 'a', 'b'",
+			deparsed: "revoke delete, insert, update on t from 'a', 'b'",
+		},
+		{
+			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
+			deparsed: "insert into t (a, b) values (1, 2), (3, 4)",
+		},
+		{
+			stmt:     "INSERT INTO t VALUES (1, 2), (3, 4);",
+			deparsed: "insert into t values (1, 2), (3, 4)",
+		},
+		{
+			stmt:     "INSERT INTO t DEFAULT VALUES;",
+			deparsed: "insert into t default values",
+		},
+		{
+			stmt:     "DELETE FROM t;",
+			deparsed: "delete from t",
+		},
+		{
+			stmt:     "DELETE FROM t WHERE a = 1;",
+			deparsed: "delete from t where a = 1",
+		},
+		{
+			stmt:     "update t set a = 1, b = 2;",
+			deparsed: "update t set a = 1, b = 2",
+		},
+		{
+			stmt:     "update t set (a, b) = (1, 2);",
+			deparsed: "update t set a = 1, b = 2",
+		},
+		{
+			stmt:     "update t set a = 1, b = 2 where a = 3;",
+			deparsed: "update t set a = 1, b = 2 where a = 3",
+		},
+		{
+			stmt:     "CREATE TABLE t (a INT);",
+			deparsed: "CREATE TABLE t (a INT)",
+		},
+		{
+			stmt:     "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
+			deparsed: "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY, a INT)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
+			deparsed: "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
+			deparsed: "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE)",
+		},
+		{
+			stmt:     "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
+			deparsed: "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2))",
+		},
+		{
+			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
+			deparsed: "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
+		},
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(parallelism)
+	for i := 0; i < parallelism; i++ {
+		go func() {
+			defer wg.Done()
+			for j := 0; j < numIters; j++ {
+				tc := tests[rand.Intn(len(tests))]
+				tree, err := Parse(tc.stmt)
+				require.NoError(t, err)
+				require.Equal(t, tc.deparsed, tree.String())
+			}
+		}()
+	}
+	wg.Wait()
 }
