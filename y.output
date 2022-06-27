@@ -297,7 +297,7 @@ state 31
 state 32
 	identifier:  IDENTIFIER.    (231)
 
-	.  reduce 231 (src line 1299)
+	.  reduce 231 (src line 1302)
 
 
 state 33
@@ -312,25 +312,25 @@ state 33
 state 34
 	privileges:  privilege.    (226)
 
-	.  reduce 226 (src line 1262)
+	.  reduce 226 (src line 1265)
 
 
 state 35
 	privilege:  INSERT.    (228)
 
-	.  reduce 228 (src line 1284)
+	.  reduce 228 (src line 1287)
 
 
 state 36
 	privilege:  UPDATE.    (229)
 
-	.  reduce 229 (src line 1289)
+	.  reduce 229 (src line 1292)
 
 
 state 37
 	privilege:  DELETE.    (230)
 
-	.  reduce 230 (src line 1293)
+	.  reduce 230 (src line 1296)
 
 
 state 38
@@ -2227,19 +2227,19 @@ state 144
 	common_update_list:  common_update_list.',' update_expression 
 
 	','  shift 216
-	.  reduce 216 (src line 1188)
+	.  reduce 216 (src line 1191)
 
 
 state 145
 	update_list:  paren_update_list.    (217)
 
-	.  reduce 217 (src line 1193)
+	.  reduce 217 (src line 1196)
 
 
 state 146
 	common_update_list:  update_expression.    (218)
 
-	.  reduce 218 (src line 1199)
+	.  reduce 218 (src line 1202)
 
 
 state 147
@@ -2275,7 +2275,7 @@ state 150
 state 151
 	privileges:  privileges ',' privilege.    (227)
 
-	.  reduce 227 (src line 1269)
+	.  reduce 227 (src line 1272)
 
 
 state 152
@@ -4666,7 +4666,7 @@ state 264
 state 265
 	common_update_list:  common_update_list ',' update_expression.    (219)
 
-	.  reduce 219 (src line 1207)
+	.  reduce 219 (src line 1210)
 
 
 state 266
@@ -4737,7 +4737,7 @@ state 267
 	JSON_EXTRACT_OP  shift 92
 	JSON_UNQUOTE_EXTRACT_OP  shift 93
 	COLLATE  shift 104
-	.  reduce 221 (src line 1229)
+	.  reduce 221 (src line 1232)
 
 	cmp_op  goto 94
 	cmp_inequality_op  goto 95
@@ -4749,13 +4749,13 @@ state 268
 	roles:  roles.',' STRING 
 
 	','  shift 313
-	.  reduce 222 (src line 1236)
+	.  reduce 222 (src line 1239)
 
 
 state 269
 	roles:  STRING.    (224)
 
-	.  reduce 224 (src line 1251)
+	.  reduce 224 (src line 1254)
 
 
 state 270
@@ -4763,7 +4763,7 @@ state 270
 	roles:  roles.',' STRING 
 
 	','  shift 313
-	.  reduce 223 (src line 1243)
+	.  reduce 223 (src line 1246)
 
 
 state 271
@@ -6026,7 +6026,7 @@ state 346
 state 347
 	roles:  roles ',' STRING.    (225)
 
-	.  reduce 225 (src line 1256)
+	.  reduce 225 (src line 1259)
 
 
 state 348
@@ -7104,7 +7104,7 @@ state 389
 state 390
 	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list ')'.    (220)
 
-	.  reduce 220 (src line 1213)
+	.  reduce 220 (src line 1216)
 
 
 state 391

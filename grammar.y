@@ -1181,6 +1181,9 @@ delete_stmt:
 update_stmt:
   UPDATE table_name SET update_list where_opt
   {
+    if $5 != nil && $5.Expr.ContainsSubquery() {
+      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
+    }
     $$ = &Update{Table: $2, Exprs: $4, Where: $5}
   }
 ;

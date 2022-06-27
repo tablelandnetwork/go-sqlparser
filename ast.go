@@ -35,6 +35,7 @@ func (node *AST) String() string {
 
 func (ast *AST) PrettyPrint() {
 	spew.Config.DisablePointerAddresses = true
+	spew.Config.DisableMethods = true
 	spew.Dump("%#v", ast)
 }
 

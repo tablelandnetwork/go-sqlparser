@@ -2145,6 +2145,9 @@ yydefault:
 	case 215:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
+			if yyDollar[5].where != nil && yyDollar[5].where.Expr.ContainsSubquery() {
+				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
+			}
 			yyVAL.updateStmt = &Update{Table: yyDollar[2].table, Exprs: yyDollar[4].updateList, Where: yyDollar[5].where}
 		}
 	case 216:

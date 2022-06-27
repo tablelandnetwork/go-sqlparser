@@ -3957,18 +3957,29 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 	t.Run("insert", func(t *testing.T) {
 		ast, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
 		require.NoError(t, err)
+		require.Len(t, ast.Errors[0], 1)
 		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "insert"}, ast.Errors[0][0])
 	})
 
-	t.Run("update", func(t *testing.T) {
+	t.Run("update update expr", func(t *testing.T) {
 		ast, err := Parse("update t set a = (select 1 FROM t limit 1)")
 		require.NoError(t, err)
+		require.Len(t, ast.Errors[0], 1)
+		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, ast.Errors[0][0])
+	})
+
+	t.Run("update where", func(t *testing.T) {
+		ast, err := Parse("update foo set a=1 where a=(select a from bar limit 1) and b=1")
+
+		require.NoError(t, err)
+		require.Len(t, ast.Errors[0], 1)
 		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, ast.Errors[0][0])
 	})
 
 	t.Run("delete", func(t *testing.T) {
 		ast, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
 		require.NoError(t, err)
+		require.Len(t, ast.Errors[0], 1)
 		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "delete"}, ast.Errors[0][0])
 	})
 }
