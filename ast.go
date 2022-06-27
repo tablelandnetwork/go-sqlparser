@@ -18,7 +18,7 @@ type Node interface {
 // AST represents the root Node of the AST.
 type AST struct {
 	Statements []Statement
-	Errors     map[int][]error
+	Errors     map[int]error
 }
 
 func (node *AST) String() string {

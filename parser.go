@@ -9,7 +9,7 @@ func Parse(statement string) (*AST, error) {
 	}
 
 	lexer := &Lexer{}
-	lexer.errors = make(map[int][]error)
+	lexer.errors = make(map[int]error)
 	lexer.input = []byte(statement)
 	lexer.readByte()
 

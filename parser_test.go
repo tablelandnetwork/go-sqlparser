@@ -2,6 +2,7 @@ package sqlparser
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -2840,7 +2841,7 @@ func TestSelectStatement(t *testing.T) {
 					_, err = db.Exec(tc.stmt)
 					require.NoError(t, err)
 				} else {
-					require.Equal(t, tc.expectedErr, ast.Errors[0][0])
+					require.ErrorAs(t, ast.Errors[0], &tc.expectedErr)
 				}
 			}
 		}(tc))
@@ -3642,7 +3643,7 @@ func TestUpdate(t *testing.T) {
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
-					require.Equal(t, tc.expectedErr, ast.Errors[0][0])
+					require.ErrorAs(t, ast.Errors[0], &tc.expectedErr)
 				}
 			}
 		}(tc))
@@ -3724,7 +3725,7 @@ func TestGrant(t *testing.T) {
 					require.Equal(t, tc.expectedAST, ast)
 					require.Equal(t, tc.deparsed, ast.String())
 				} else {
-					require.Equal(t, tc.expectedErr, ast.Errors[0][0])
+					require.ErrorAs(t, ast.Errors[0], &tc.expectedErr)
 				}
 			}
 		}(tc))
@@ -3900,7 +3901,13 @@ func TestKeywordsNotAllowed(t *testing.T) {
 	for keyword := range keywordsNotAllowed {
 		ast, err := Parse(fmt.Sprintf("select %s from t", keyword))
 		require.NoError(t, err)
-		require.Equal(t, &ErrKeywordIsNotAllowed{Keyword: keyword}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrKeywordIsNotAllowed
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, keyword, e.Keyword)
+		}
 	}
 }
 
@@ -3916,7 +3923,14 @@ func TestLimits(t *testing.T) {
 
 		ast, err := Parse(fmt.Sprintf("insert into t (a) values ('%s')", text))
 		require.NoError(t, err)
-		require.Equal(t, &ErrTextTooLong{Length: len(text), MaxAllowed: MaxTextLength}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrTextTooLong
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, len(text), e.Length)
+			require.Equal(t, MaxBlobLength, e.MaxAllowed)
+		}
 	})
 
 	t.Run("max blob length", func(t *testing.T) {
@@ -3928,7 +3942,14 @@ func TestLimits(t *testing.T) {
 
 		ast, err := Parse(fmt.Sprintf("insert into t (a) values (x'%s')", blob))
 		require.NoError(t, err)
-		require.Equal(t, &ErrBlobTooBig{Length: len(blob), MaxAllowed: MaxBlobLength}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrBlobTooBig
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, len(blob), e.Length)
+			require.Equal(t, MaxBlobLength, e.MaxAllowed)
+		}
 	})
 
 	t.Run("max columns allowed", func(t *testing.T) {
@@ -3948,7 +3969,14 @@ func TestLimits(t *testing.T) {
 
 		ast, err := Parse(fmt.Sprintf("create table t (%s);", strings.Join(columnsDef, ", ")))
 		require.NoError(t, err)
-		require.Equal(t, &ErrTooManyColumns{ColumnCount: len(columnsDef), MaxAllowed: MaxAllowedColumns}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrTooManyColumns
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, len(columnsDef), e.ColumnCount)
+			require.Equal(t, MaxAllowedColumns, e.MaxAllowed)
+		}
 	})
 }
 
@@ -3957,30 +3985,49 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 	t.Run("insert", func(t *testing.T) {
 		ast, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
 		require.NoError(t, err)
-		require.Len(t, ast.Errors[0], 1)
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "insert"}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrStatementContainsSubquery
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, "insert", e.StatementKind)
+		}
 	})
 
 	t.Run("update update expr", func(t *testing.T) {
 		ast, err := Parse("update t set a = (select 1 FROM t limit 1)")
 		require.NoError(t, err)
-		require.Len(t, ast.Errors[0], 1)
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrStatementContainsSubquery
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, "update", e.StatementKind)
+		}
 	})
 
 	t.Run("update where", func(t *testing.T) {
 		ast, err := Parse("update foo set a=1 where a=(select a from bar limit 1) and b=1")
-
 		require.NoError(t, err)
-		require.Len(t, ast.Errors[0], 1)
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "update"}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrStatementContainsSubquery
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, "update", e.StatementKind)
+		}
 	})
 
 	t.Run("delete", func(t *testing.T) {
 		ast, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
 		require.NoError(t, err)
-		require.Len(t, ast.Errors[0], 1)
-		require.Equal(t, &ErrStatementContainsSubquery{StatementKind: "delete"}, ast.Errors[0][0])
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrStatementContainsSubquery
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, "delete", e.StatementKind)
+		}
 	})
 }
 
@@ -3989,6 +4036,17 @@ func TestMultipleErrors(t *testing.T) {
 	ast, err := Parse("GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b';")
 
 	require.NoError(t, err)
-	require.Equal(t, &ErrGrantPrivilegesCountExceeded{PrivilegesCount: 4, MaxAllowed: 3}, ast.Errors[0][0])
-	require.Equal(t, &ErrGrantRepeatedPrivilege{Privilege: "delete"}, ast.Errors[0][1])
+	require.Len(t, ast.Errors, 1)
+
+	var e1 *ErrGrantPrivilegesCountExceeded
+	var e2 *ErrGrantRepeatedPrivilege
+	require.ErrorAs(t, ast.Errors[0], &e1)
+	require.ErrorAs(t, ast.Errors[0], &e2)
+	if errors.As(ast.Errors[0], &e1) {
+		require.Equal(t, 4, e1.PrivilegesCount)
+		require.Equal(t, 3, e1.MaxAllowed)
+	}
+	if errors.As(ast.Errors[0], &e2) {
+		require.Equal(t, "delete", e2.Privilege)
+	}
 }

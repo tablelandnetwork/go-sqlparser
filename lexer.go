@@ -3,6 +3,8 @@ package sqlparser
 import (
 	"bytes"
 	"fmt"
+
+	"github.com/hashicorp/go-multierror"
 )
 
 var keywords = map[string]int{
@@ -93,7 +95,7 @@ type Lexer struct {
 	literal []byte
 
 	statementIdx int
-	errors       map[int][]error
+	errors       map[int]error
 	syntaxError  error
 
 	// This is used to solve the ambigous grammar rules:
@@ -112,7 +114,7 @@ type Lexer struct {
 
 // AddError keeps track of errors per statement for syntatically valid statements.
 func (l *Lexer) AddError(err error) {
-	l.errors[l.statementIdx] = append(l.errors[l.statementIdx], err)
+	l.errors[l.statementIdx] = multierror.Append(l.errors[l.statementIdx], err)
 }
 
 // Error is used for syntatically not valid statements.
