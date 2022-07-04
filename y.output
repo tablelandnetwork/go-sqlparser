@@ -297,7 +297,7 @@ state 31
 state 32
 	identifier:  IDENTIFIER.    (231)
 
-	.  reduce 231 (src line 1302)
+	.  reduce 231 (src line 1298)
 
 
 state 33
@@ -318,19 +318,19 @@ state 34
 state 35
 	privilege:  INSERT.    (228)
 
-	.  reduce 228 (src line 1287)
+	.  reduce 228 (src line 1283)
 
 
 state 36
 	privilege:  UPDATE.    (229)
 
-	.  reduce 229 (src line 1292)
+	.  reduce 229 (src line 1288)
 
 
 state 37
 	privilege:  DELETE.    (230)
 
-	.  reduce 230 (src line 1296)
+	.  reduce 230 (src line 1292)
 
 
 state 38

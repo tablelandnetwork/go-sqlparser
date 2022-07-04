@@ -2222,10 +2222,6 @@ yydefault:
 	case 227:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
-			if len(yyDollar[1].privileges) == 3 {
-				yylex.(*Lexer).AddError(&ErrGrantPrivilegesCountExceeded{PrivilegesCount: len(yyDollar[1].privileges) + 1, MaxAllowed: 3})
-			}
-
 			if _, ok := yyDollar[1].privileges[yyDollar[3].string]; ok {
 				yylex.(*Lexer).AddError(&ErrGrantRepeatedPrivilege{Privilege: yyDollar[3].string})
 			}

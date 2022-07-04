@@ -3683,13 +3683,6 @@ func TestGrant(t *testing.T) {
 			},
 		},
 		{
-			name:        "grant number of privileges",
-			stmt:        "GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b'",
-			deparsed:    "",
-			expectedAST: nil,
-			expectedErr: &ErrGrantPrivilegesCountExceeded{PrivilegesCount: 4, MaxAllowed: 3},
-		},
-		{
 			name:        "grant repeated",
 			stmt:        "GRANT INSERT, DELETE, DELETE on t TO 'a', 'b'",
 			deparsed:    "",
@@ -4035,21 +4028,19 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 
 func TestMultipleErrors(t *testing.T) {
 	t.Parallel()
-	ast, err := Parse("GRANT INSERT, UPDATE, DELETE, delete on t TO 'a', 'b';")
-
+	ast, err := Parse("UPDATE t SET a = (select 1 from t2), b = unknown()")
 	require.NoError(t, err)
 	require.Len(t, ast.Errors, 1)
 
-	var e1 *ErrGrantPrivilegesCountExceeded
-	var e2 *ErrGrantRepeatedPrivilege
+	var e1 *ErrStatementContainsSubquery
+	var e2 *ErrNoSuchFunction
 	require.ErrorAs(t, ast.Errors[0], &e1)
 	require.ErrorAs(t, ast.Errors[0], &e2)
 	if errors.As(ast.Errors[0], &e1) {
-		require.Equal(t, 4, e1.PrivilegesCount)
-		require.Equal(t, 3, e1.MaxAllowed)
+		require.Equal(t, "update", e1.StatementKind)
 	}
 	if errors.As(ast.Errors[0], &e2) {
-		require.Equal(t, "delete", e2.Privilege)
+		require.Equal(t, "unknown", e2.FunctionName)
 	}
 }
 

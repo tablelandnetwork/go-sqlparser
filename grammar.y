@@ -1270,11 +1270,7 @@ privileges:
     $$ = Privileges(privileges)
   }
 | privileges ',' privilege
-  {
-    if len($1) == 3 {
-      yylex.(*Lexer).AddError(&ErrGrantPrivilegesCountExceeded{PrivilegesCount: len($1) + 1, MaxAllowed: 3})
-    }
-    
+  {    
     if _, ok := $1[$3]; ok {
       yylex.(*Lexer).AddError(&ErrGrantRepeatedPrivilege{Privilege: $3})
     } 

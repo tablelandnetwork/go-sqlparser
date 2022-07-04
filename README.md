@@ -7,7 +7,6 @@ With the parser, you can generate an AST from a SQL statement.
 
 This is inspired on the [xwb1989/sqlparser](https://github.com/xwb1989/sqlparser), with eyes on SQLite's [grammar](https://repo.or.cz/sqlite.git/blob/HEAD:/src/parse.y) and [spec](https://www.sqlite.org/lang.html).
 
-
 ## Generating the parser
 
 ```bash
