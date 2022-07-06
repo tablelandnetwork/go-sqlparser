@@ -1239,7 +1239,7 @@ yydefault:
 	case 41:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			yyVAL.identifier = Identifier(string(yyDollar[1].bytes))
+			yyVAL.identifier = Identifier(string(yyDollar[1].bytes[1 : len(yyDollar[1].bytes)-1]))
 		}
 	case 42:
 		yyDollar = yyS[yypt-4 : yypt+1]

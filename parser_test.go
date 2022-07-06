@@ -1715,6 +1715,72 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
+			name:     "case no else",
+			stmt:     "SELECT CASE c1 WHEN 0 THEN 'zero' WHEN 1 THEN 'one' END FROM t",
+			deparsed: "select case c1 when 0 then 'zero' when 1 then 'one' end from t",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: []SelectColumn{
+							&AliasedSelectColumn{
+								Expr: &CaseExpr{
+									Expr: &Column{Name: "c1"},
+									Whens: []*When{
+										{
+											Condition: &Value{Type: IntValue, Value: []byte("0")},
+											Value:     &Value{Type: StrValue, Value: []byte("zero")},
+										},
+										{
+											Condition: &Value{Type: IntValue, Value: []byte("1")},
+											Value:     &Value{Type: StrValue, Value: []byte("one")},
+										},
+									},
+								},
+							},
+						},
+						From: TableExprList{
+							&AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "case no expr",
+			stmt:     "SELECT CASE WHEN 0 THEN 'zero' WHEN 1 THEN 'one' END FROM t",
+			deparsed: "select case when 0 then 'zero' when 1 then 'one' end from t",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: []SelectColumn{
+							&AliasedSelectColumn{
+								Expr: &CaseExpr{
+									Expr: nil,
+									Whens: []*When{
+										{
+											Condition: &Value{Type: IntValue, Value: []byte("0")},
+											Value:     &Value{Type: StrValue, Value: []byte("zero")},
+										},
+										{
+											Condition: &Value{Type: IntValue, Value: []byte("1")},
+											Value:     &Value{Type: StrValue, Value: []byte("one")},
+										},
+									},
+								},
+							},
+						},
+						From: TableExprList{
+							&AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:     "simple-select",
 			stmt:     "SELECT * FROM t WHERE c1 > c2",
 			deparsed: "select * from t where c1 > c2",
@@ -1743,14 +1809,14 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "multiple-columns",
-			stmt:     "SELECT a, t.b, c1 as column, c2 as column2, * FROM t WHERE 1",
-			deparsed: "select a, t.b, c1 as column, c2 as column2, * from t where 1",
+			stmt:     "SELECT a, t.b bcol, c1 as column, c2 as 'column2', * FROM t WHERE 1",
+			deparsed: "select a, t.b as bcol, c1 as column, c2 as column2, * from t where 1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
 						SelectColumnList: SelectColumnList{
 							&AliasedSelectColumn{Expr: &Column{Name: "a"}},
-							&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t"}}},
+							&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t"}}, As: "bcol"},
 							&AliasedSelectColumn{Expr: &Column{Name: "c1"}, As: "column"},
 							&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "column2"},
 							&StarSelectColumn{},
@@ -2122,6 +2188,26 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
+			name:     "simple-select-alias-table-alt-string",
+			stmt:     "SELECT * FROM t 't'",
+			deparsed: "select * from t as t",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&StarSelectColumn{},
+						},
+						From: TableExprList{
+							&AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+								As:   "t",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:     "select-multiple-tables",
 			stmt:     "SELECT t.*, t2.c1 as column1 FROM t, t2",
 			deparsed: "select t.*, t2.c1 as column1 from t, t2",
@@ -2321,6 +2407,50 @@ func TestSelectStatement(t *testing.T) {
 								Using: ColumnList{
 									&Column{Name: "c1"},
 									&Column{Name: "c2"},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
+			name:     "table expr parenthesis join",
+			stmt:     "SELECT * FROM (t JOIN t2)",
+			deparsed: "select * from t join t2",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&StarSelectColumn{},
+						},
+						From: TableExprList{
+							&JoinTableExpr{
+								LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+								JoinOperator: JoinStr,
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "table expr parenthesis",
+			stmt:     "SELECT * FROM (t, t2)",
+			deparsed: "select * from (t, t2)",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&StarSelectColumn{},
+						},
+						From: TableExprList{
+							&ParenTableExpr{
+								TableExprList: TableExprList{
+									&AliasedTableExpr{Expr: &Table{Name: "t"}},
+									&AliasedTableExpr{Expr: &Table{Name: "t2"}},
 								},
 							},
 						},
@@ -3153,9 +3283,9 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table default",
-			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
-			deparsed:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'))",
-			expectedHash: "26c558fd4e4dfb28a9bd399d7872bd24576214a0676eb4a7d3f97362734a03d9",
+			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);",
+			deparsed:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT 1)",
+			expectedHash: "70a57145d62731d006bc23ede6126e3fe3f3f0a3954a87411edd2fb66ff59d7b",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3206,6 +3336,15 @@ func TestCreateTable(t *testing.T) {
 									&ColumnConstraintDefault{
 										Expr:        &Value{Type: StrValue, Value: []byte("foo")},
 										Parenthesis: true,
+									},
+								},
+							},
+							{
+								Name: &Column{Name: "f"},
+								Type: TypeIntStr,
+								Constraints: []ColumnConstraint{
+									&ColumnConstraintDefault{
+										Expr: &Value{Type: IntValue, Value: []byte("1")},
 									},
 								},
 							},

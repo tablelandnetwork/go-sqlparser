@@ -341,7 +341,7 @@ table_alias:
   }
 | STRING
   {
-    $$ = Identifier(string($1))
+    $$ = Identifier(string($1[1:len($1)-1]))
   }
 ;
 
