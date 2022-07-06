@@ -275,6 +275,26 @@ func (l *Lexer) Lex(lval *yySymType) (token int) {
 	}
 
 	switch ch := l.ch; ch {
+	case '"', '`', '[':
+		closingChar := map[byte]byte{
+			'"': '"',
+			'`': '`',
+			'[': ']',
+		}
+		l.readByte() // consume opening char
+		literal := l.readIdentifier()
+		if l.ch != closingChar[ch] {
+			l.literal = literal
+			return ERROR
+		}
+		l.readByte() // consume closing char
+
+		l.literal = literal
+		lval.bytes = literal
+		return IDENTIFIER
+	}
+
+	switch ch := l.ch; ch {
 	case '(', ')', ',', '&', '+', '*', '/', '%', '~', ';':
 		l.literal = []byte{ch}
 		l.readByte()

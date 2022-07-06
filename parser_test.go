@@ -2945,6 +2945,74 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "identifier delimiters",
+			stmt:     "SELECT t. a, `t2`.`b`, \"t3\".\"c\", [t4].[a]  FROM t JOIN `t2` JOIN \"t3\" JOIN [t4]",
+			deparsed: "select t.a, t2.b, t3.c, t4.a from t join t2 join t3 join t4",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&AliasedSelectColumn{
+								Expr: &Column{
+									Name: Identifier("a"),
+									TableRef: &Table{
+										Name: Identifier("t"),
+									},
+								},
+							},
+							&AliasedSelectColumn{
+								Expr: &Column{
+									Name: Identifier("b"),
+									TableRef: &Table{
+										Name: Identifier("t2"),
+									},
+								},
+							},
+							&AliasedSelectColumn{
+								Expr: &Column{
+									Name: Identifier("c"),
+									TableRef: &Table{
+										Name: Identifier("t3"),
+									},
+								},
+							},
+							&AliasedSelectColumn{
+								Expr: &Column{
+									Name: Identifier("a"),
+									TableRef: &Table{
+										Name: Identifier("t4"),
+									},
+								},
+							},
+						},
+						From: TableExprList{
+							&JoinTableExpr{
+								JoinOperator: "join",
+								LeftExpr: &JoinTableExpr{
+									JoinOperator: "join",
+									LeftExpr: &JoinTableExpr{
+										JoinOperator: "join",
+										LeftExpr: &AliasedTableExpr{
+											Expr: &Table{Name: Identifier("t")},
+										},
+										RightExpr: &AliasedTableExpr{
+											Expr: &Table{Name: Identifier("t2")},
+										},
+									},
+									RightExpr: &AliasedTableExpr{
+										Expr: &Table{Name: Identifier("t3")},
+									},
+								},
+								RightExpr: &AliasedTableExpr{
+									Expr: &Table{Name: Identifier("t4")},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -3065,6 +3133,57 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table simple",
 			stmt:         "CREATE TABLE t (a INT);",
+			deparsed:     "CREATE TABLE t (a INT)",
+			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CreateTable{
+						Table:       &Table{Name: "t"},
+						Constraints: []TableConstraint{},
+						Columns: []*ColumnDef{
+							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:         "create table backtick",
+			stmt:         "CREATE TABLE `t` (a INT);",
+			deparsed:     "CREATE TABLE t (a INT)",
+			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CreateTable{
+						Table:       &Table{Name: "t"},
+						Constraints: []TableConstraint{},
+						Columns: []*ColumnDef{
+							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:         "create table double quotes",
+			stmt:         "CREATE TABLE \"t\" (a INT);",
+			deparsed:     "CREATE TABLE t (a INT)",
+			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CreateTable{
+						Table:       &Table{Name: "t"},
+						Constraints: []TableConstraint{},
+						Columns: []*ColumnDef{
+							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:         "create table square brackets",
+			stmt:         "CREATE TABLE [t] (a INT);",
 			deparsed:     "CREATE TABLE t (a INT)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
