@@ -55,3 +55,9 @@ Resulting AST:
  })
 })
  ```
+
+## Generating syntax diagrams
+
+```bash
+make generate-diagrams
+```
