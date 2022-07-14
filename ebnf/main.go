@@ -14,7 +14,7 @@ type scanner struct {
 	insideBraces int
 }
 
-func (s *scanner) Scan() {
+func (s *scanner) scan() {
 	s.skipUntilStart()
 	s.readByte() // consume %
 	s.readByte() // consume %
@@ -80,7 +80,7 @@ func (s *scanner) skipUntilStart() {
 
 func main() {
 	if len(os.Args) <= 1 {
-		log.Fatalf("grammary as argument expected")
+		log.Fatalf("grammar filepath as argument expected")
 	}
 
 	dat, err := os.ReadFile(os.Args[1])
@@ -92,5 +92,5 @@ func main() {
 	s.input = dat
 	s.readByte()
 
-	s.Scan()
+	s.scan()
 }
