@@ -24,14 +24,14 @@ func (s *scanner) scan() {
 			break
 		}
 
-		if s.ch == '}' {
-			s.insideBraces--
+		if s.ch == '{' {
+			s.insideBraces++
 			s.readByte()
 			continue
 		}
 
-		if s.ch == '{' {
-			s.insideBraces++
+		if s.ch == '}' {
+			s.insideBraces--
 			s.readByte()
 			continue
 		}
