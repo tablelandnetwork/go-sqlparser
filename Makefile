@@ -9,3 +9,8 @@ test:
 generate:
 	go run golang.org/x/tools/cmd/goyacc@master -l -o yy_parser.go grammar.y
 .PHONY: generate
+
+# requires java
+generate-diagrams:
+	go run ebnf/main.go grammar.y | java -jar rr/rr.war -suppressebnf -color:#FFFFFF -out:diagrams.xhtml -
+.PHONY: generate-diagrams
