@@ -59,5 +59,7 @@ Resulting AST:
 ## Generating syntax diagrams
 
 ```bash
-make generate-diagrams
+make generate-diagrams 
 ```
+
+Requires Java 8 (or higher).
