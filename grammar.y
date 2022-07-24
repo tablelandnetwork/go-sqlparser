@@ -4,9 +4,13 @@ package sqlparser
 import "bytes"
 
 var keywordsNotAllowed = map[string]struct{}{
+  // non-deterministic keywords
 	"CURRENT_TIME":      {},
 	"CURRENT_DATE":      {},
 	"CURRENT_TIMESTAMP": {},
+
+  // SQLite reserved keywords
+  "REFERENCES" : {},
 }
 
 %}
