@@ -121,7 +121,8 @@ func TestSelectStatement(t *testing.T) {
 							&AliasedSelectColumn{
 								Expr: &Value{
 									Type:  StrValue,
-									Value: []byte("anything betwen single quotes is a string")},
+									Value: []byte("anything betwen single quotes is a string"),
+								},
 							},
 						},
 						From: TableExprList{
@@ -527,7 +528,8 @@ func TestSelectStatement(t *testing.T) {
 									Operator: UMinusStr,
 									Expr: &UnaryExpr{
 										Operator: UMinusStr,
-										Expr:     &Column{Name: "a"}},
+										Expr:     &Column{Name: "a"},
+									},
 								},
 							},
 						},
@@ -3040,6 +3042,7 @@ func TestSelectStatement(t *testing.T) {
 
 					_, err = db.Exec(tc.stmt)
 					require.NoError(t, err)
+					require.NoError(t, db.Close())
 				} else {
 					require.ErrorAs(t, ast.Errors[0], &tc.expectedErr)
 				}
@@ -3649,6 +3652,7 @@ func TestCreateTable(t *testing.T) {
 				// test AST SQL generation against SQLite3
 				_, err = db.Exec(ast.String())
 				require.NoError(t, err)
+				require.NoError(t, db.Close())
 			}
 		}(tc))
 	}
@@ -3753,7 +3757,6 @@ func TestInsert(t *testing.T) {
 			}
 		}(tc))
 	}
-
 }
 
 func TestDelete(t *testing.T) {
@@ -4600,4 +4603,26 @@ func TestParallel(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+// This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.
+func TestReservedKeywords(t *testing.T) {
+	// https://www.sqlite.org/lang_keywords.html
+	allSQLiteKeywords := []string{"ABORT", "ACTION", "ADD", "AFTER", "ALL", "ALTER", "ALWAYS", "ANALYZE", "AND", "AS", "ASC", "ATTACH", "AUTOINCREMENT", "BEFORE", "BEGIN", "BETWEEN", "BY", "CASCADE", "CASE", "CAST", "CHECK", "COLLATE", "COLUMN", "COMMIT", "CONFLICT", "CONSTRAINT", "CREATE", "CROSS", "CURRENT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "DATABASE", "DEFAULT", "DEFERRABLE", "DEFERRED", "DELETE", "DESC", "DETACH", "DISTINCT", "DO", "DROP", "EACH", "ELSE", "END", "ESCAPE", "EXCEPT", "EXCLUDE", "EXCLUSIVE", "EXISTS", "EXPLAIN", "FAIL", "FILTER", "FIRST", "FOLLOWING", "FOR", "FOREIGN", "FROM", "FULL", "GENERATED", "GLOB", "GROUP", "GROUPS", "HAVING", "IF", "IGNORE", "IMMEDIATE", "IN", "INDEX", "INDEXED", "INITIALLY", "INNER", "INSERT", "INSTEAD", "INTERSECT", "INTO", "IS", "ISNULL", "JOIN", "KEY", "LAST", "LEFT", "LIKE", "LIMIT", "MATCH", "MATERIALIZED", "NATURAL", "NO", "NOT", "NOTHING", "NOTNULL", "NULL", "NULLS", "OF", "OFFSET", "ON", "OR", "ORDER", "OTHERS", "OUTER", "OVER", "PARTITION", "PLAN", "PRAGMA", "PRECEDING", "PRIMARY", "QUERY", "RAISE", "RANGE", "RECURSIVE", "REFERENCES", "REGEXP", "REINDEX", "RELEASE", "RENAME", "REPLACE", "RESTRICT", "RETURNING", "RIGHT", "ROLLBACK", "ROW", "ROWS", "SAVEPOINT", "SELECT", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", "TIES", "TO", "TRANSACTION", "TRIGGER", "UNBOUNDED", "UNION", "UNIQUE", "UPDATE", "USING", "VACUUM", "VALUES", "VIEW", "VIRTUAL", "WHEN", "WHERE", "WINDOW", "WITH", "WITHOUT"}
+
+	for _, keyword := range allSQLiteKeywords {
+		// open a different db for each keyword
+		db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+		require.NoError(t, err)
+
+		// create table with keyword as identifier
+		_, err = db.Exec(fmt.Sprintf("CREATE TABLE t (%s TEXT)", keyword))
+		if err == nil {
+			fmt.Printf("%s: unreserved\n", keyword)
+		} else {
+			fmt.Printf("%s: reserved\n", keyword)
+		}
+
+		require.NoError(t, db.Close())
+	}
 }

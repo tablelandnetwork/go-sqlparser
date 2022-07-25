@@ -4,13 +4,33 @@ package sqlparser
 import "bytes"
 
 var keywordsNotAllowed = map[string]struct{}{
-  // non-deterministic keywords
+  // We don't allow non-deterministic keywords as identifiers. 
 	"CURRENT_TIME":      {},
 	"CURRENT_DATE":      {},
 	"CURRENT_TIMESTAMP": {},
 
-  // SQLite reserved keywords
+  // SQLite reserved keywords that are not part of Tableland spec.
+  // We can't allow them as identifiers because it will throw an error in SQLite.
+  //
+  // SQLite has more reserved keywords (eg. CREATE, INSERT, ...). But those are part of the Tableland grammar,
+  // that means that the parser already checks from them.
+  //
+  // These were identified by running the `TestReservedKeywords` test.
   "REFERENCES" : {},
+  "ADD": {},
+  "ALTER": {},
+  "AUTOINCREMENT": {},
+  "COMMIT": {},
+  "DEFERRABLE": {},
+  "DROP": {},
+  "EXCEPT": {},
+  "FOREIGN": {},
+  "INDEX": {},
+  "INTERSECT": {},
+  "NOTHING": {},
+  "RETURNING": {},
+  "TRANSACTION": {},
+  "UNION": {},
 }
 
 %}
