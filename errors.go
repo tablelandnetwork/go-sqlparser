@@ -2,6 +2,17 @@ package sqlparser
 
 import "fmt"
 
+// ErrSyntaxError indicates a syntax error.
+type ErrSyntaxError struct {
+	YaccError string
+	Position  int
+	Literal   string
+}
+
+func (e *ErrSyntaxError) Error() string {
+	return fmt.Sprintf("%s at position %d near '%s'", e.YaccError, e.Position, string(e.Literal))
+}
+
 // ErrKeywordIsNotAllowed indicates an error for keyword that is not allowed (eg CURRENT_TIME).
 type ErrKeywordIsNotAllowed struct {
 	Keyword string
@@ -82,4 +93,11 @@ type ErrGrantRepeatedPrivilege struct {
 
 func (e *ErrGrantRepeatedPrivilege) Error() string {
 	return fmt.Sprintf("repeated privilege: %s", e.Privilege)
+}
+
+// ErrMultiplePrimaryKey indicates a that a CREATE statement has more than one primary key.
+type ErrMultiplePrimaryKey struct{}
+
+func (e *ErrMultiplePrimaryKey) Error() string {
+	return "has more than one primary key"
 }

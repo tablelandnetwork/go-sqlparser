@@ -2,7 +2,6 @@ package sqlparser
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/hashicorp/go-multierror"
 )
@@ -119,7 +118,7 @@ func (l *Lexer) AddError(err error) {
 
 // Error is used for syntatically not valid statements.
 func (l *Lexer) Error(e string) {
-	l.syntaxError = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
+	l.syntaxError = &ErrSyntaxError{YaccError: e, Position: l.position, Literal: string(l.literal)}
 }
 
 func (l *Lexer) Lex(lval *yySymType) (token int) {

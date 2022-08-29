@@ -33,6 +33,8 @@ var keywordsNotAllowed = map[string]struct{}{
   "UNION": {},
 }
 
+var createStmtHasPrimaryKey = false
+
 %}
 
 %union{
@@ -1129,10 +1131,16 @@ table_constraint_list_opt:
 table_constraint_list:
   ',' table_constraint
   {
+    if _, ok := $2.(*TableConstraintPrimaryKey); ok {
+      createStmtHasPrimaryKey = true
+    }
     $$ = []TableConstraint{$2}
   }
 | table_constraint_list ','  table_constraint
   {
+    if _, ok := $3.(*TableConstraintPrimaryKey); ok && createStmtHasPrimaryKey {
+      yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+    }
     $$ = append($1, $3)
   }
 ;

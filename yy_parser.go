@@ -35,6 +35,8 @@ var keywordsNotAllowed = map[string]struct{}{
 	"UNION":         {},
 }
 
+var createStmtHasPrimaryKey = false
+
 type yySymType struct {
 	yys               int
 	bool              bool
@@ -2099,11 +2101,17 @@ yydefault:
 	case 203:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
+			if _, ok := yyDollar[2].tableConstraint.(*TableConstraintPrimaryKey); ok {
+				createStmtHasPrimaryKey = true
+			}
 			yyVAL.tableConstraints = []TableConstraint{yyDollar[2].tableConstraint}
 		}
 	case 204:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
+			if _, ok := yyDollar[3].tableConstraint.(*TableConstraintPrimaryKey); ok && createStmtHasPrimaryKey {
+				yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+			}
 			yyVAL.tableConstraints = append(yyDollar[1].tableConstraints, yyDollar[3].tableConstraint)
 		}
 	case 205:
