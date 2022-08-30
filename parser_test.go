@@ -4156,7 +4156,7 @@ func TestKeywordsNotAllowed(t *testing.T) {
 
 	for keyword := range keywordsNotAllowed {
 		ast, err := Parse(fmt.Sprintf("select %s from t", keyword))
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrKeywordIsNotAllowed
@@ -4164,6 +4164,7 @@ func TestKeywordsNotAllowed(t *testing.T) {
 		if errors.As(ast.Errors[0], &e) {
 			require.Equal(t, keyword, e.Keyword)
 		}
+		require.ErrorAs(t, err, &e)
 	}
 }
 
@@ -4178,7 +4179,7 @@ func TestLimits(t *testing.T) {
 		}
 
 		ast, err := Parse(fmt.Sprintf("insert into t (a) values ('%s')", text))
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrTextTooLong
@@ -4187,6 +4188,7 @@ func TestLimits(t *testing.T) {
 			require.Equal(t, len(text), e.Length)
 			require.Equal(t, MaxBlobLength, e.MaxAllowed)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 
 	t.Run("max blob length", func(t *testing.T) {
@@ -4197,7 +4199,7 @@ func TestLimits(t *testing.T) {
 		}
 
 		ast, err := Parse(fmt.Sprintf("insert into t (a) values (x'%s')", blob))
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrBlobTooBig
@@ -4206,6 +4208,7 @@ func TestLimits(t *testing.T) {
 			require.Equal(t, len(blob), e.Length)
 			require.Equal(t, MaxBlobLength, e.MaxAllowed)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 
 	t.Run("max columns allowed", func(t *testing.T) {
@@ -4224,7 +4227,7 @@ func TestLimits(t *testing.T) {
 		columnsDef = append([]string{"a INT"}, columnsDef...)
 
 		ast, err := Parse(fmt.Sprintf("create table t (%s);", strings.Join(columnsDef, ", ")))
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrTooManyColumns
@@ -4233,6 +4236,7 @@ func TestLimits(t *testing.T) {
 			require.Equal(t, len(columnsDef), e.ColumnCount)
 			require.Equal(t, MaxAllowedColumns, e.MaxAllowed)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 }
 
@@ -4240,7 +4244,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 	t.Parallel()
 	t.Run("insert", func(t *testing.T) {
 		ast, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrStatementContainsSubquery
@@ -4248,11 +4252,12 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 		if errors.As(ast.Errors[0], &e) {
 			require.Equal(t, "insert", e.StatementKind)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 
 	t.Run("update update expr", func(t *testing.T) {
 		ast, err := Parse("update t set a = (select 1 FROM t limit 1)")
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrStatementContainsSubquery
@@ -4260,11 +4265,12 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 		if errors.As(ast.Errors[0], &e) {
 			require.Equal(t, "update", e.StatementKind)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 
 	t.Run("update where", func(t *testing.T) {
 		ast, err := Parse("update foo set a=1 where a=(select a from bar limit 1) and b=1")
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrStatementContainsSubquery
@@ -4272,11 +4278,12 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 		if errors.As(ast.Errors[0], &e) {
 			require.Equal(t, "update", e.StatementKind)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 
 	t.Run("delete", func(t *testing.T) {
 		ast, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
-		require.NoError(t, err)
+		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
 		var e *ErrStatementContainsSubquery
@@ -4284,13 +4291,14 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 		if errors.As(ast.Errors[0], &e) {
 			require.Equal(t, "delete", e.StatementKind)
 		}
+		require.ErrorAs(t, err, &e)
 	})
 }
 
 func TestMultipleErrors(t *testing.T) {
 	t.Parallel()
 	ast, err := Parse("UPDATE t SET a = (select 1 from t2), b = unknown()")
-	require.NoError(t, err)
+	require.Error(t, err)
 	require.Len(t, ast.Errors, 1)
 
 	var e1 *ErrStatementContainsSubquery
@@ -4303,6 +4311,8 @@ func TestMultipleErrors(t *testing.T) {
 	if errors.As(ast.Errors[0], &e2) {
 		require.Equal(t, "unknown", e2.FunctionName)
 	}
+
+	require.ErrorAs(t, err, &e1)
 }
 
 func TestParallel(t *testing.T) {
@@ -4603,6 +4613,53 @@ func TestParallel(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+
+func TestCreateTableMultiplePrimaryKey(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		stmt string
+	}{
+		{
+			name: "table constraints",
+			stmt: "CREATE TABLE t (a INT, b INT, PRIMARY KEY (a), PRIMARY KEY (b));",
+		},
+		{
+			name: "same column constraints",
+			stmt: "CREATE TABLE t (a INT PRIMARY KEY PRIMARY KEY);",
+		},
+		{
+			name: "different columns constraints",
+			stmt: "CREATE TABLE t (a INT PRIMARY KEY, b INT PRIMARY KEY);",
+		},
+		{
+			name: "mixed constraints",
+			stmt: "CREATE TABLE t (a INT PRIMARY KEY, b INT, PRIMARY KEY (b));",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			ast, err := Parse(tc.stmt)
+			require.Error(t, err)
+			require.Len(t, ast.Errors, 1)
+
+			var e *ErrMultiplePrimaryKey
+			require.ErrorAs(t, ast.Errors[0], &e)
+			require.ErrorAs(t, err, &e)
+
+			// check the stmt in sqlite to make sure sqlite also throws an error
+			db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+			require.NoError(t, err)
+
+			_, err = db.Exec(tc.stmt)
+			require.Error(t, err)
+			require.ErrorContains(t, err, "has more than one primary key")
+		})
+	}
 }
 
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.

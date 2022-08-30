@@ -21,8 +21,8 @@ func yyParsePooled(yylex yyLexer) int {
 }
 
 func Parse(statement string) (*AST, error) {
-	//yyErrorVerbose = true
-	//yyDebug = 4
+	// yyErrorVerbose = true
+	// yyDebug = 4
 
 	if len(statement) == 0 {
 		return &AST{}, nil
@@ -40,6 +40,7 @@ func Parse(statement string) (*AST, error) {
 
 	if len(lexer.errors) != 0 {
 		lexer.ast.Errors = lexer.errors
+		return lexer.ast, lexer.errors[0]
 	}
 	return lexer.ast, nil
 }

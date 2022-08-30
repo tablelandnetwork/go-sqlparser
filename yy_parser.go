@@ -1968,11 +1968,21 @@ yydefault:
 	case 177:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
+			if _, ok := yyDollar[1].columnConstraint.(*ColumnConstraintPrimaryKey); ok {
+				if yylex.(*Lexer).createStmtHasPrimaryKey {
+					yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+				} else {
+					yylex.(*Lexer).createStmtHasPrimaryKey = true
+				}
+			}
 			yyVAL.columnConstraints = []ColumnConstraint{yyDollar[1].columnConstraint}
 		}
 	case 178:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
+			if _, ok := yyDollar[2].columnConstraint.(*ColumnConstraintPrimaryKey); ok && yylex.(*Lexer).createStmtHasPrimaryKey {
+				yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+			}
 			yyVAL.columnConstraints = append(yyDollar[1].columnConstraints, yyDollar[2].columnConstraint)
 		}
 	case 179:
@@ -2099,11 +2109,21 @@ yydefault:
 	case 203:
 		yyDollar = yyS[yypt-2 : yypt+1]
 		{
+			if _, ok := yyDollar[2].tableConstraint.(*TableConstraintPrimaryKey); ok {
+				if yylex.(*Lexer).createStmtHasPrimaryKey {
+					yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+				} else {
+					yylex.(*Lexer).createStmtHasPrimaryKey = true
+				}
+			}
 			yyVAL.tableConstraints = []TableConstraint{yyDollar[2].tableConstraint}
 		}
 	case 204:
 		yyDollar = yyS[yypt-3 : yypt+1]
 		{
+			if _, ok := yyDollar[3].tableConstraint.(*TableConstraintPrimaryKey); ok && yylex.(*Lexer).createStmtHasPrimaryKey {
+				yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+			}
 			yyVAL.tableConstraints = append(yyDollar[1].tableConstraints, yyDollar[3].tableConstraint)
 		}
 	case 205:

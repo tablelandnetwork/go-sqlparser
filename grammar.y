@@ -1004,10 +1004,20 @@ column_constraints_opt:
 column_constraints:
   column_constraint
   {
+    if _, ok := $1.(*ColumnConstraintPrimaryKey); ok {
+      if yylex.(*Lexer).createStmtHasPrimaryKey {
+        yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+      } else {
+        yylex.(*Lexer).createStmtHasPrimaryKey = true
+      }
+    }
     $$ = []ColumnConstraint{$1}
   }
 | column_constraints column_constraint
   {
+    if _, ok := $2.(*ColumnConstraintPrimaryKey); ok && yylex.(*Lexer).createStmtHasPrimaryKey {
+      yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+    }
     $$ = append($1, $2)
   }
 ;
@@ -1129,10 +1139,20 @@ table_constraint_list_opt:
 table_constraint_list:
   ',' table_constraint
   {
+    if _, ok := $2.(*TableConstraintPrimaryKey); ok {
+      if yylex.(*Lexer).createStmtHasPrimaryKey {
+        yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+      } else {
+        yylex.(*Lexer).createStmtHasPrimaryKey = true
+      }
+    }
     $$ = []TableConstraint{$2}
   }
 | table_constraint_list ','  table_constraint
   {
+    if _, ok := $3.(*TableConstraintPrimaryKey); ok && yylex.(*Lexer).createStmtHasPrimaryKey {
+      yylex.(*Lexer).AddError(&ErrMultiplePrimaryKey{})
+    }
     $$ = append($1, $3)
   }
 ;

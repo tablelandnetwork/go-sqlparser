@@ -297,7 +297,7 @@ state 31
 state 32
 	identifier:  IDENTIFIER.    (231)
 
-	.  reduce 231 (src line 1322)
+	.  reduce 231 (src line 1342)
 
 
 state 33
@@ -312,25 +312,25 @@ state 33
 state 34
 	privileges:  privilege.    (226)
 
-	.  reduce 226 (src line 1289)
+	.  reduce 226 (src line 1309)
 
 
 state 35
 	privilege:  INSERT.    (228)
 
-	.  reduce 228 (src line 1307)
+	.  reduce 228 (src line 1327)
 
 
 state 36
 	privilege:  UPDATE.    (229)
 
-	.  reduce 229 (src line 1312)
+	.  reduce 229 (src line 1332)
 
 
 state 37
 	privilege:  DELETE.    (230)
 
-	.  reduce 230 (src line 1316)
+	.  reduce 230 (src line 1336)
 
 
 state 38
@@ -756,19 +756,19 @@ state 67
 state 68
 	numeric_literal:  INTEGRAL.    (195)
 
-	.  reduce 195 (src line 1090)
+	.  reduce 195 (src line 1100)
 
 
 state 69
 	numeric_literal:  FLOAT.    (196)
 
-	.  reduce 196 (src line 1095)
+	.  reduce 196 (src line 1105)
 
 
 state 70
 	numeric_literal:  HEXNUM.    (197)
 
-	.  reduce 197 (src line 1099)
+	.  reduce 197 (src line 1109)
 
 
 state 71
@@ -785,7 +785,7 @@ state 72
 
 	'('  shift 140
 	DEFAULT  shift 139
-	.  reduce 210 (src line 1173)
+	.  reduce 210 (src line 1193)
 
 	column_name_list_opt  goto 138
 
@@ -2175,7 +2175,7 @@ state 140
 state 141
 	delete_stmt:  DELETE FROM table_name where_opt.    (214)
 
-	.  reduce 214 (src line 1195)
+	.  reduce 214 (src line 1215)
 
 
 state 142
@@ -2227,19 +2227,19 @@ state 144
 	common_update_list:  common_update_list.',' update_expression 
 
 	','  shift 216
-	.  reduce 216 (src line 1215)
+	.  reduce 216 (src line 1235)
 
 
 state 145
 	update_list:  paren_update_list.    (217)
 
-	.  reduce 217 (src line 1220)
+	.  reduce 217 (src line 1240)
 
 
 state 146
 	common_update_list:  update_expression.    (218)
 
-	.  reduce 218 (src line 1226)
+	.  reduce 218 (src line 1246)
 
 
 state 147
@@ -2275,7 +2275,7 @@ state 150
 state 151
 	privileges:  privileges ',' privilege.    (227)
 
-	.  reduce 227 (src line 1296)
+	.  reduce 227 (src line 1316)
 
 
 state 152
@@ -3781,7 +3781,7 @@ state 207
 	table_constraint_list_opt: .    (201)
 
 	','  shift 252
-	.  reduce 201 (src line 1119)
+	.  reduce 201 (src line 1129)
 
 	table_constraint_list  goto 253
 	table_constraint_list_opt  goto 251
@@ -3816,7 +3816,7 @@ state 210
 state 211
 	insert_stmt:  INSERT INTO table_name DEFAULT VALUES.    (209)
 
-	.  reduce 209 (src line 1167)
+	.  reduce 209 (src line 1187)
 
 
 state 212
@@ -3905,7 +3905,7 @@ state 214
 state 215
 	update_stmt:  UPDATE table_name SET update_list where_opt.    (215)
 
-	.  reduce 215 (src line 1205)
+	.  reduce 215 (src line 1225)
 
 
 state 216
@@ -4537,7 +4537,7 @@ state 252
 
 	IDENTIFIER  shift 32
 	CONSTRAINT  shift 303
-	.  reduce 188 (src line 1054)
+	.  reduce 188 (src line 1064)
 
 	column_name  goto 209
 	constraint_name  goto 302
@@ -4550,7 +4550,7 @@ state 253
 	table_constraint_list:  table_constraint_list.',' table_constraint 
 
 	','  shift 304
-	.  reduce 202 (src line 1123)
+	.  reduce 202 (src line 1133)
 
 
 state 254
@@ -4561,7 +4561,7 @@ state 254
 	','  reduce 175 (src line 994)
 	')'  reduce 175 (src line 994)
 	CONSTRAINT  shift 303
-	.  reduce 188 (src line 1054)
+	.  reduce 188 (src line 1064)
 
 	constraint_name  goto 308
 	column_constraint  goto 307
@@ -4609,7 +4609,7 @@ state 261
 	insert_rows:  insert_rows.',' '(' expr_list ')' 
 
 	','  shift 309
-	.  reduce 208 (src line 1155)
+	.  reduce 208 (src line 1175)
 
 
 state 262
@@ -4660,13 +4660,13 @@ state 263
 state 264
 	column_name_list_opt:  '(' column_name_list ')'.    (211)
 
-	.  reduce 211 (src line 1177)
+	.  reduce 211 (src line 1197)
 
 
 state 265
 	common_update_list:  common_update_list ',' update_expression.    (219)
 
-	.  reduce 219 (src line 1234)
+	.  reduce 219 (src line 1254)
 
 
 state 266
@@ -4737,7 +4737,7 @@ state 267
 	JSON_EXTRACT_OP  shift 92
 	JSON_UNQUOTE_EXTRACT_OP  shift 93
 	COLLATE  shift 104
-	.  reduce 221 (src line 1256)
+	.  reduce 221 (src line 1276)
 
 	cmp_op  goto 94
 	cmp_inequality_op  goto 95
@@ -4749,13 +4749,13 @@ state 268
 	roles:  roles.',' STRING 
 
 	','  shift 313
-	.  reduce 222 (src line 1263)
+	.  reduce 222 (src line 1283)
 
 
 state 269
 	roles:  STRING.    (224)
 
-	.  reduce 224 (src line 1278)
+	.  reduce 224 (src line 1298)
 
 
 state 270
@@ -4763,7 +4763,7 @@ state 270
 	roles:  roles.',' STRING 
 
 	','  shift 313
-	.  reduce 223 (src line 1270)
+	.  reduce 223 (src line 1290)
 
 
 state 271
@@ -5375,7 +5375,7 @@ state 300
 state 301
 	table_constraint_list:  ',' table_constraint.    (203)
 
-	.  reduce 203 (src line 1129)
+	.  reduce 203 (src line 1139)
 
 
 state 302
@@ -5402,7 +5402,7 @@ state 304
 	constraint_name: .    (188)
 
 	CONSTRAINT  shift 303
-	.  reduce 188 (src line 1054)
+	.  reduce 188 (src line 1064)
 
 	constraint_name  goto 302
 	table_constraint  goto 335
@@ -5421,7 +5421,7 @@ state 306
 	','  reduce 176 (src line 998)
 	')'  reduce 176 (src line 998)
 	CONSTRAINT  shift 303
-	.  reduce 188 (src line 1054)
+	.  reduce 188 (src line 1064)
 
 	constraint_name  goto 308
 	column_constraint  goto 336
@@ -5867,19 +5867,19 @@ state 333
 state 334
 	constraint_name:  CONSTRAINT identifier.    (189)
 
-	.  reduce 189 (src line 1058)
+	.  reduce 189 (src line 1068)
 
 
 state 335
 	table_constraint_list:  table_constraint_list ',' table_constraint.    (204)
 
-	.  reduce 204 (src line 1134)
+	.  reduce 204 (src line 1151)
 
 
 state 336
 	column_constraints:  column_constraints column_constraint.    (178)
 
-	.  reduce 178 (src line 1009)
+	.  reduce 178 (src line 1016)
 
 
 state 337
@@ -5899,7 +5899,7 @@ state 338
 state 339
 	column_constraint:  constraint_name UNIQUE.    (181)
 
-	.  reduce 181 (src line 1024)
+	.  reduce 181 (src line 1034)
 
 
 state 340
@@ -5984,7 +5984,7 @@ state 344
 state 345
 	insert_rows:  '(' expr_list ')'.    (212)
 
-	.  reduce 212 (src line 1184)
+	.  reduce 212 (src line 1204)
 
 
 state 346
@@ -6026,7 +6026,7 @@ state 346
 state 347
 	roles:  roles ',' STRING.    (225)
 
-	.  reduce 225 (src line 1283)
+	.  reduce 225 (src line 1303)
 
 
 state 348
@@ -6349,14 +6349,14 @@ state 358
 
 	ASC  shift 381
 	DESC  shift 382
-	.  reduce 190 (src line 1064)
+	.  reduce 190 (src line 1074)
 
 	primary_key_order  goto 380
 
 state 359
 	column_constraint:  constraint_name NOT NULL.    (180)
 
-	.  reduce 180 (src line 1020)
+	.  reduce 180 (src line 1030)
 
 
 state 360
@@ -6432,13 +6432,13 @@ state 361
 state 362
 	column_constraint:  constraint_name DEFAULT literal_value.    (184)
 
-	.  reduce 184 (src line 1036)
+	.  reduce 184 (src line 1046)
 
 
 state 363
 	column_constraint:  constraint_name DEFAULT signed_number.    (185)
 
-	.  reduce 185 (src line 1040)
+	.  reduce 185 (src line 1050)
 
 
 state 364
@@ -6854,19 +6854,19 @@ state 379
 state 380
 	column_constraint:  constraint_name PRIMARY KEY primary_key_order.    (179)
 
-	.  reduce 179 (src line 1015)
+	.  reduce 179 (src line 1025)
 
 
 state 381
 	primary_key_order:  ASC.    (191)
 
-	.  reduce 191 (src line 1068)
+	.  reduce 191 (src line 1078)
 
 
 state 382
 	primary_key_order:  DESC.    (192)
 
-	.  reduce 192 (src line 1072)
+	.  reduce 192 (src line 1082)
 
 
 state 383
@@ -7010,13 +7010,13 @@ state 384
 state 385
 	signed_number:  '+' numeric_literal.    (193)
 
-	.  reduce 193 (src line 1078)
+	.  reduce 193 (src line 1088)
 
 
 state 386
 	signed_number:  '-' numeric_literal.    (194)
 
-	.  reduce 194 (src line 1083)
+	.  reduce 194 (src line 1093)
 
 
 state 387
@@ -7098,13 +7098,13 @@ state 388
 state 389
 	insert_rows:  insert_rows ',' '(' expr_list ')'.    (213)
 
-	.  reduce 213 (src line 1189)
+	.  reduce 213 (src line 1209)
 
 
 state 390
 	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list ')'.    (220)
 
-	.  reduce 220 (src line 1240)
+	.  reduce 220 (src line 1260)
 
 
 state 391
@@ -7258,25 +7258,25 @@ state 399
 state 400
 	table_constraint:  constraint_name UNIQUE '(' column_name_list ')'.    (206)
 
-	.  reduce 206 (src line 1145)
+	.  reduce 206 (src line 1165)
 
 
 state 401
 	table_constraint:  constraint_name CHECK '(' expr ')'.    (207)
 
-	.  reduce 207 (src line 1149)
+	.  reduce 207 (src line 1169)
 
 
 state 402
 	column_constraint:  constraint_name CHECK '(' expr ')'.    (182)
 
-	.  reduce 182 (src line 1028)
+	.  reduce 182 (src line 1038)
 
 
 state 403
 	column_constraint:  constraint_name DEFAULT '(' expr ')'.    (183)
 
-	.  reduce 183 (src line 1032)
+	.  reduce 183 (src line 1042)
 
 
 state 404
@@ -7320,7 +7320,7 @@ state 405
 
 	STORED  shift 414
 	VIRTUAL  shift 415
-	.  reduce 198 (src line 1105)
+	.  reduce 198 (src line 1115)
 
 	is_stored  goto 413
 
@@ -7484,7 +7484,7 @@ state 410
 state 411
 	table_constraint:  constraint_name PRIMARY KEY '(' column_name_list ')'.    (205)
 
-	.  reduce 205 (src line 1140)
+	.  reduce 205 (src line 1160)
 
 
 state 412
@@ -7559,19 +7559,19 @@ state 412
 state 413
 	column_constraint:  constraint_name AS '(' expr ')' is_stored.    (187)
 
-	.  reduce 187 (src line 1048)
+	.  reduce 187 (src line 1058)
 
 
 state 414
 	is_stored:  STORED.    (199)
 
-	.  reduce 199 (src line 1109)
+	.  reduce 199 (src line 1119)
 
 
 state 415
 	is_stored:  VIRTUAL.    (200)
 
-	.  reduce 200 (src line 1113)
+	.  reduce 200 (src line 1123)
 
 
 state 416
@@ -7592,14 +7592,14 @@ state 418
 
 	STORED  shift 414
 	VIRTUAL  shift 415
-	.  reduce 198 (src line 1105)
+	.  reduce 198 (src line 1115)
 
 	is_stored  goto 419
 
 state 419
 	column_constraint:  constraint_name GENERATED ALWAYS AS '(' expr ')' is_stored.    (186)
 
-	.  reduce 186 (src line 1044)
+	.  reduce 186 (src line 1054)
 
 
 112 terminals, 82 nonterminals

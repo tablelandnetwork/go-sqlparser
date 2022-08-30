@@ -2,7 +2,6 @@ package sqlparser
 
 import (
 	"bytes"
-	"fmt"
 
 	"github.com/hashicorp/go-multierror"
 )
@@ -110,6 +109,9 @@ type Lexer struct {
 	lastToken int
 
 	ast *AST
+
+	// This is used to check if CREATE stmt has more than one primary key
+	createStmtHasPrimaryKey bool
 }
 
 // AddError keeps track of errors per statement for syntatically valid statements.
@@ -119,7 +121,7 @@ func (l *Lexer) AddError(err error) {
 
 // Error is used for syntatically not valid statements.
 func (l *Lexer) Error(e string) {
-	l.syntaxError = fmt.Errorf("%s at position %v near '%s'", e, l.position, string(l.literal))
+	l.syntaxError = &ErrSyntaxError{YaccError: e, Position: l.position, Literal: string(l.literal)}
 }
 
 func (l *Lexer) Lex(lval *yySymType) (token int) {
