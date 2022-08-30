@@ -4657,6 +4657,7 @@ func TestCreateTableMultiplePrimaryKey(t *testing.T) {
 
 			_, err = db.Exec(tc.stmt)
 			require.Error(t, err)
+			require.ErrorContains(t, err, "has more than one primary key")
 		})
 	}
 }
