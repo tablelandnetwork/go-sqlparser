@@ -109,6 +109,9 @@ type Lexer struct {
 	lastToken int
 
 	ast *AST
+
+	// This is used to check if CREATE stmt has more than one primary key
+	createStmtHasPrimaryKey bool
 }
 
 // AddError keeps track of errors per statement for syntatically valid statements.
