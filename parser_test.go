@@ -4618,49 +4618,47 @@ func TestParallel(t *testing.T) {
 func TestCreateTableMultiplePrimaryKey(t *testing.T) {
 	t.Parallel()
 
-	t.Run("table constraints", func(t *testing.T) {
-		t.Parallel()
-		ast, err := Parse("CREATE TABLE t (a INT, b INT, PRIMARY KEY (a), PRIMARY KEY (b));")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
+	tests := []struct {
+		name string
+		stmt string
+	}{
+		{
+			name: "table constraints",
+			stmt: "CREATE TABLE t (a INT, b INT, PRIMARY KEY (a), PRIMARY KEY (b));",
+		},
+		{
+			name: "same column constraints",
+			stmt: "CREATE TABLE t (a INT PRIMARY KEY PRIMARY KEY);",
+		},
+		{
+			name: "different columns constraints",
+			stmt: "CREATE TABLE t (a INT PRIMARY KEY, b INT PRIMARY KEY);",
+		},
+		{
+			name: "mixed constraints",
+			stmt: "CREATE TABLE t (a INT PRIMARY KEY, b INT, PRIMARY KEY (b));",
+		},
+	}
 
-		var e *ErrMultiplePrimaryKey
-		require.ErrorAs(t, ast.Errors[0], &e)
-		require.ErrorAs(t, err, &e)
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			ast, err := Parse(tc.stmt)
+			require.Error(t, err)
+			require.Len(t, ast.Errors, 1)
 
-	t.Run("same column constraints", func(t *testing.T) {
-		t.Parallel()
-		ast, err := Parse("CREATE TABLE t (a INT PRIMARY KEY PRIMARY KEY);")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
+			var e *ErrMultiplePrimaryKey
+			require.ErrorAs(t, ast.Errors[0], &e)
+			require.ErrorAs(t, err, &e)
 
-		var e *ErrMultiplePrimaryKey
-		require.ErrorAs(t, ast.Errors[0], &e)
-		require.ErrorAs(t, err, &e)
-	})
+			// check the stmt in sqlite to make sure sqlite also throws an error
+			db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+			require.NoError(t, err)
 
-	t.Run("different columns constraints", func(t *testing.T) {
-		t.Parallel()
-		ast, err := Parse("CREATE TABLE t (a INT PRIMARY KEY, b INT PRIMARY KEY);")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrMultiplePrimaryKey
-		require.ErrorAs(t, ast.Errors[0], &e)
-		require.ErrorAs(t, err, &e)
-	})
-
-	t.Run("mixed constraints", func(t *testing.T) {
-		t.Parallel()
-		ast, err := Parse("CREATE TABLE t (a INT PRIMARY KEY, b INT, PRIMARY KEY (b));")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrMultiplePrimaryKey
-		require.ErrorAs(t, ast.Errors[0], &e)
-		require.ErrorAs(t, err, &e)
-	})
+			_, err = db.Exec(tc.stmt)
+			require.Error(t, err)
+		})
+	}
 }
 
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.
