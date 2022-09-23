@@ -79,12 +79,12 @@ var AllowedFunctions = map[string]struct{}{
 	"trunc":   {},
 
 	// date & time functions
-	"date":      {},
-	"time":      {},
-	"datetime":  {},
-	"julianday": {},
-	"unixepoch": {},
-	"strftime":  {},
+	// "date":      {},
+	// "time":      {},
+	// "datetime":  {},
+	// "julianday": {},
+	// "unixepoch": {},
+	// "strftime":  {},
 
 	// json functions
 	"json":              {},
