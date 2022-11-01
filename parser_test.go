@@ -3676,6 +3676,7 @@ func TestInsert(t *testing.T) {
 		stmt        string
 		deparsed    string
 		expectedAST *AST
+		expectedErr error
 	}
 
 	tests := []testCase{
@@ -3743,6 +3744,241 @@ func TestInsert(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "upsert do nothing",
+			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING;",
+			deparsed: "insert into t (id) values (1) on conflict do nothing",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "t"},
+						Columns: ColumnList{
+							&Column{Name: "id"},
+						},
+						Rows: []Exprs{
+							{
+								&Value{Type: IntValue, Value: []byte("1")},
+							},
+						},
+						DefaultValues: false,
+						Upsert: Upsert{
+							&OnConflictClause{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "upsert do nothing with target",
+			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING;",
+			deparsed: "insert into t (id) values (1) on conflict (id) do nothing",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "t"},
+						Columns: ColumnList{
+							&Column{Name: "id"},
+						},
+						Rows: []Exprs{
+							{
+								&Value{Type: IntValue, Value: []byte("1")},
+							},
+						},
+						DefaultValues: false,
+						Upsert: Upsert{
+							&OnConflictClause{
+								Target: &OnConflictTarget{
+									Columns: []*Column{
+										{Name: "id"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "upsert do update with target",
+			stmt:     "INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1;",
+			deparsed: "insert into t (id, count) values (1, 1) on conflict (id) do update set count = count + 1",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "t"},
+						Columns: ColumnList{
+							&Column{Name: "id"},
+							&Column{Name: "count"},
+						},
+						Rows: []Exprs{
+							{
+								&Value{Type: IntValue, Value: []byte("1")},
+								&Value{Type: IntValue, Value: []byte("1")},
+							},
+						},
+						DefaultValues: false,
+						Upsert: Upsert{
+							&OnConflictClause{
+								Target: &OnConflictTarget{
+									Columns: []*Column{
+										{Name: "id"},
+									},
+								},
+								DoUpdate: &OnConflictUpdate{
+									Exprs: []*UpdateExpr{
+										{
+											Column: &Column{Name: "count"},
+											Expr: &BinaryExpr{
+												Operator: PlusStr,
+												Left:     &Column{Name: "count"},
+												Right:    &Value{Type: IntValue, Value: []byte("1")},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "upsert do update with target excluded",
+			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;",
+			deparsed: "insert into phonebook (name, phonenumber) values ('Alice', '704-555-1212') on conflict (name) do update set phonenumber = excluded.phonenumber",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "phonebook"},
+						Columns: ColumnList{
+							&Column{Name: "name"},
+							&Column{Name: "phonenumber"},
+						},
+						Rows: []Exprs{
+							{
+								&Value{Type: StrValue, Value: []byte("Alice")},
+								&Value{Type: StrValue, Value: []byte("704-555-1212")},
+							},
+						},
+						DefaultValues: false,
+						Upsert: Upsert{
+							&OnConflictClause{
+								Target: &OnConflictTarget{
+									Columns: []*Column{
+										{Name: "name"},
+									},
+								},
+								DoUpdate: &OnConflictUpdate{
+									Exprs: []*UpdateExpr{
+										{
+											Column: &Column{Name: "phonenumber"},
+											Expr: &Column{
+												TableRef: &Table{Name: "excluded"},
+												Name:     "phonenumber",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "upsert do update with target excluded with where",
+			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';",
+			deparsed: "insert into phonebook (name, phonenumber) values ('Alice', '704-555-1212') on conflict (name) do update set phonenumber = excluded.phonenumber where excluded.phonenumber != ''",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "phonebook"},
+						Columns: ColumnList{
+							&Column{Name: "name"},
+							&Column{Name: "phonenumber"},
+						},
+						Rows: []Exprs{
+							{
+								&Value{Type: StrValue, Value: []byte("Alice")},
+								&Value{Type: StrValue, Value: []byte("704-555-1212")},
+							},
+						},
+						DefaultValues: false,
+						Upsert: Upsert{
+							&OnConflictClause{
+								Target: &OnConflictTarget{
+									Columns: []*Column{
+										{Name: "name"},
+									},
+								},
+								DoUpdate: &OnConflictUpdate{
+									Exprs: []*UpdateExpr{
+										{
+											Column: &Column{Name: "phonenumber"},
+											Expr: &Column{
+												TableRef: &Table{Name: "excluded"},
+												Name:     "phonenumber",
+											},
+										},
+									},
+									Where: &Where{
+										Type: WhereStr,
+										Expr: &CmpExpr{
+											Operator: NotEqualStr,
+											Left: &Column{
+												TableRef: &Table{Name: "excluded"},
+												Name:     "phonenumber",
+											},
+											Right: &Value{Type: StrValue, Value: []byte("")},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "upsert multiple clauses",
+			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING ON CONFLICT DO NOTHING;",
+			deparsed: "insert into t (id) values (1) on conflict (id) do nothing on conflict do nothing",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "t"},
+						Columns: ColumnList{
+							&Column{Name: "id"},
+						},
+						Rows: []Exprs{
+							{
+								&Value{Type: IntValue, Value: []byte("1")},
+							},
+						},
+						DefaultValues: false,
+						Upsert: Upsert{
+							&OnConflictClause{
+								Target: &OnConflictTarget{
+									Columns: ColumnList{
+										{
+											Name: "id",
+										},
+									},
+								},
+							},
+							&OnConflictClause{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:        "upsert multiple clauses missing target",
+			stmt:        "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING ON CONFLICT DO NOTHING;",
+			deparsed:    "insert into t (id) values (1) on conflict do nothing on conflict do nothing",
+			expectedAST: nil,
+			expectedErr: &ErrUpsertMissingTarget{},
+		},
 	}
 
 	for _, tc := range tests {
@@ -3750,10 +3986,14 @@ func TestInsert(t *testing.T) {
 			return func(t *testing.T) {
 				t.Parallel()
 				ast, err := Parse(tc.stmt)
-				require.NoError(t, err)
-				require.Len(t, ast.Errors, 0)
-				require.Equal(t, tc.expectedAST, ast)
-				require.Equal(t, tc.deparsed, ast.String())
+				if tc.expectedErr == nil {
+					require.NoError(t, err)
+					require.Len(t, ast.Errors, 0)
+					require.Equal(t, tc.expectedAST, ast)
+					require.Equal(t, tc.deparsed, ast.String())
+				} else {
+					require.ErrorAs(t, ast.Errors[0], &tc.expectedErr)
+				}
 			}
 		}(tc))
 	}
@@ -4276,7 +4516,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 		var e *ErrStatementContainsSubquery
 		require.ErrorAs(t, ast.Errors[0], &e)
 		if errors.As(ast.Errors[0], &e) {
-			require.Equal(t, "update", e.StatementKind)
+			require.Equal(t, "where", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
 	})
@@ -4290,6 +4530,20 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 		require.ErrorAs(t, ast.Errors[0], &e)
 		if errors.As(ast.Errors[0], &e) {
 			require.Equal(t, "delete", e.StatementKind)
+		}
+		require.ErrorAs(t, err, &e)
+	})
+
+	t.Run("upsert", func(t *testing.T) {
+		ast, err := Parse("INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1 WHERE (SELECT 1 FROM t2);")
+		require.Error(t, err)
+		fmt.Println(err)
+		require.Len(t, ast.Errors, 1)
+
+		var e *ErrStatementContainsSubquery
+		require.ErrorAs(t, ast.Errors[0], &e)
+		if errors.As(ast.Errors[0], &e) {
+			require.Equal(t, "where", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
 	})

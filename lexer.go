@@ -81,6 +81,9 @@ var keywords = map[string]int{
 	"GRANT":      GRANT,
 	"TO":         TO,
 	"REVOKE":     REVOKE,
+	"CONFLICT":   CONFLICT,
+	"DO":         DO,
+	"NOTHING":    NOTHING,
 }
 
 const EOF = 0

@@ -1088,7 +1088,7 @@ func (*ColumnConstraintGenerated) iColumnConstraint()  {}
 type ColumnConstraintPrimaryKey struct {
 	Name  Identifier
 	Order string
-	//ConflictClause *ConflictClause
+	// ConflictClause *ConflictClause
 }
 
 // String returns the string representation of the node.
@@ -1113,7 +1113,7 @@ const (
 // ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
 type ColumnConstraintNotNull struct {
 	Name Identifier
-	//ConflictClause *ConflictClause
+	// ConflictClause *ConflictClause
 }
 
 // String returns the string representation of the node.
@@ -1128,7 +1128,7 @@ func (node *ColumnConstraintNotNull) String() string {
 // ColumnConstraintUnique represents a UNIQUE column constraint for CREATE TABLE.
 type ColumnConstraintUnique struct {
 	Name Identifier
-	//ConflictClause *ConflictClause
+	// ConflictClause *ConflictClause
 }
 
 // String returns the string representation of the node.
@@ -1269,6 +1269,7 @@ type Insert struct {
 	Columns       ColumnList
 	Rows          []Exprs
 	DefaultValues bool
+	Upsert        Upsert
 
 	// RETURNING clause is not accepted in the parser.
 	ReturningClause Exprs
@@ -1293,7 +1294,55 @@ func (node *Insert) String() string {
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return fmt.Sprintf("insert into %s%s values %s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), returning)
+	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), node.Upsert.String(), returning)
+}
+
+// Upsert represents an upsert clause, which is a list of on conflict clause.
+type Upsert []*OnConflictClause
+
+func (node Upsert) String() string {
+	if len(node) == 0 {
+		return ""
+	}
+
+	var clauses []string
+	for _, clause := range node {
+		clauses = append(clauses, fmt.Sprintf("on conflict%s", clause.String()))
+	}
+
+	return fmt.Sprintf(" %s", strings.Join(clauses, " "))
+}
+
+type OnConflictClause struct {
+	Target   *OnConflictTarget
+	DoUpdate *OnConflictUpdate
+}
+
+func (node *OnConflictClause) String() string {
+	var target string
+	if node.Target != nil {
+		target = fmt.Sprintf("%s%s", node.Target.Columns.String(), node.Target.Where.String())
+	}
+
+	if node.DoUpdate == nil {
+		return fmt.Sprintf("%s do nothing", target)
+	}
+
+	var exprs []string
+	for _, expr := range node.DoUpdate.Exprs {
+		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
+	}
+	return fmt.Sprintf("%s do update set %s%s", target, strings.Join(exprs, ", "), node.DoUpdate.Where.String())
+}
+
+type OnConflictTarget struct {
+	Columns ColumnList
+	Where   *Where
+}
+
+type OnConflictUpdate struct {
+	Exprs []*UpdateExpr
+	Where *Where
 }
 
 // Delete represents an DELETE statement.

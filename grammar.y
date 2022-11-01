@@ -27,7 +27,6 @@ var keywordsNotAllowed = map[string]struct{}{
   "FOREIGN": {},
   "INDEX": {},
   "INTERSECT": {},
-  "NOTHING": {},
   "RETURNING": {},
   "TRANSACTION": {},
   "UNION": {},
@@ -81,6 +80,10 @@ var keywordsNotAllowed = map[string]struct{}{
   strings []string
   privileges Privileges
   stmts []Statement
+  upsertClause Upsert
+  onConflictClauseList []*OnConflictClause
+  onConflictClause *OnConflictClause
+  onConflictTarget *OnConflictTarget
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -91,7 +94,7 @@ var keywordsNotAllowed = map[string]struct{}{
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
-%token <empty> INSERT INTO VALUES DELETE UPDATE SET
+%token <empty> INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 %token <empty> GRANT TO REVOKE
 
 %left <empty> JOIN
@@ -154,6 +157,10 @@ var keywordsNotAllowed = map[string]struct{}{
 %type <strings> roles
 %type <privileges> privileges
 %type <stmts> stmts multi_stmts
+%type <upsertClause> upsert_clause_opt 
+%type <onConflictClauseList> on_conflict_clause_list
+%type <onConflictClause> on_conflict_clause
+%type <onConflictTarget> conflict_target_opt
 
 %%
 start: 
@@ -1173,7 +1180,7 @@ table_constraint:
 ;
 
 insert_stmt:
-  INSERT INTO table_name column_name_list_opt VALUES insert_rows
+  INSERT INTO table_name column_name_list_opt VALUES insert_rows upsert_clause_opt
   {
     for _, row := range $6 {
       for _, expr := range row {
@@ -1182,7 +1189,7 @@ insert_stmt:
 				}
 			}
     }
-    $$ = &Insert{Table: $3, Columns: $4, Rows: $6}
+    $$ = &Insert{Table: $3, Columns: $4, Rows: $6, Upsert: $7}
   }
 | INSERT INTO table_name DEFAULT VALUES
   {
@@ -1212,6 +1219,75 @@ insert_rows:
   }
 ;
 
+upsert_clause_opt:
+  {
+    $$ = nil
+  }
+| on_conflict_clause_list
+  {
+    allConflictClausesExpectLast := $1[0:len($1) - 1];
+    for _, clause := range allConflictClausesExpectLast {
+      if clause.Target == nil {
+        yylex.(*Lexer).AddError(&ErrUpsertMissingTarget{})
+      }
+    }
+    $$ = $1
+  }
+;
+
+on_conflict_clause_list:
+  on_conflict_clause
+  {
+    $$ = []*OnConflictClause{$1}
+  }
+| on_conflict_clause_list on_conflict_clause
+  {
+    $$ = append($1, $2)
+  }
+;
+
+on_conflict_clause:
+  ON CONFLICT conflict_target_opt DO NOTHING
+  {
+    $$ = &OnConflictClause{
+      Target: $3,
+    }
+  }
+| ON CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt
+  {
+    if $8 != nil && $8.Expr.ContainsSubquery() {
+      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
+    }
+
+    $$ = &OnConflictClause{
+      Target: $3,
+      DoUpdate: &OnConflictUpdate{
+        Exprs: $7, 
+        Where: $8,
+      },
+    }
+  }
+;
+
+conflict_target_opt:
+  {
+    $$ = nil
+  }
+| '(' column_name_list ')' where_opt
+  {
+    if $4 != nil && $4.Expr.ContainsSubquery() {
+      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
+    }
+
+    $$ = &OnConflictTarget{
+      Columns : $2,
+      Where: $4,
+    }
+  }
+;
+
+
+
 delete_stmt:
   DELETE FROM table_name where_opt
   {
@@ -1226,7 +1302,7 @@ update_stmt:
   UPDATE table_name SET update_list where_opt
   {
     if $5 != nil && $5.Expr.ContainsSubquery() {
-      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
+      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
     }
     $$ = &Update{Table: $2, Exprs: $4, Where: $5}
   }
