@@ -1829,18 +1829,20 @@ yydefault:
 	case 148:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
-			if _, ok := AllowedFunctions[string(yyDollar[1].identifier)]; !ok {
+			lowered := strings.ToLower(string(yyDollar[1].identifier))
+			if _, ok := AllowedFunctions[lowered]; !ok {
 				yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string(yyDollar[1].identifier)})
 			}
-			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].identifier)), Distinct: yyDollar[3].bool, Args: yyDollar[4].exprs, Filter: yyDollar[6].where}
+			yyVAL.expr = &FuncExpr{Name: Identifier(lowered), Distinct: yyDollar[3].bool, Args: yyDollar[4].exprs, Filter: yyDollar[6].where}
 		}
 	case 149:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			if _, ok := AllowedFunctions[strings.ToLower(string(yyDollar[1].identifier))]; !ok {
+			lowered := strings.ToLower(string(yyDollar[1].identifier))
+			if _, ok := AllowedFunctions[lowered]; !ok {
 				yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string(yyDollar[1].identifier)})
 			}
-			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].identifier)), Distinct: false, Args: nil, Filter: yyDollar[5].where}
+			yyVAL.expr = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: yyDollar[5].where}
 		}
 	case 150:
 		yyDollar = yyS[yypt-0 : yypt+1]

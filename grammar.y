@@ -1,7 +1,10 @@
 %{
 package sqlparser
 
-import "bytes"
+import (
+  "bytes"
+  "strings"
+)
 
 var keywordsNotAllowed = map[string]struct{}{
   // We don't allow non-deterministic keywords as identifiers. 
@@ -869,17 +872,19 @@ function_call_keyword:
 function_call_generic:
   identifier '(' distinct_function_opt expr_list_opt ')' filter_opt
   {
-    if _, ok := AllowedFunctions[string($1)]; !ok {
+    lowered := strings.ToLower(string($1))
+    if _, ok := AllowedFunctions[lowered]; !ok {
       yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string($1)})
     }
-    $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: $3, Args: $4, Filter: $6}
+    $$ = &FuncExpr{Name: Identifier(lowered), Distinct: $3, Args: $4, Filter: $6}
   }
 | identifier '(' '*' ')' filter_opt
   {
-    if _, ok := AllowedFunctions[string($1)]; !ok {
+    lowered := strings.ToLower(string($1))
+    if _, ok := AllowedFunctions[lowered]; !ok {
       yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string($1)})
     }
-    $$ = &FuncExpr{Name: Identifier(string($1)), Distinct: false, Args: nil, Filter: $5}
+    $$ = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: $5}
   }
 ;
 
