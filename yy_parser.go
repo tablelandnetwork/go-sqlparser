@@ -3,7 +3,10 @@ package sqlparser
 
 import __yyfmt__ "fmt"
 
-import "bytes"
+import (
+	"bytes"
+	"strings"
+)
 
 var keywordsNotAllowed = map[string]struct{}{
 	// We don't allow non-deterministic keywords as identifiers.
@@ -1834,7 +1837,7 @@ yydefault:
 	case 149:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			if _, ok := AllowedFunctions[string(yyDollar[1].identifier)]; !ok {
+			if _, ok := AllowedFunctions[strings.ToLower(string(yyDollar[1].identifier))]; !ok {
 				yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string(yyDollar[1].identifier)})
 			}
 			yyVAL.expr = &FuncExpr{Name: Identifier(string(yyDollar[1].identifier)), Distinct: false, Args: nil, Filter: yyDollar[5].where}

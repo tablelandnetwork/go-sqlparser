@@ -1022,9 +1022,9 @@ func (node *CreateTable) String() string {
 	}
 
 	if node.StrictMode {
-		return fmt.Sprintf("CREATE TABLE %s (%s) STRICT", node.Table.String(), column)
+		return fmt.Sprintf("create table %s (%s) strict", node.Table.String(), column)
 	} else {
-		return fmt.Sprintf("CREATE TABLE %s (%s)", node.Table.String(), column)
+		return fmt.Sprintf("create table %s (%s)", node.Table.String(), column)
 	}
 }
 
@@ -1032,7 +1032,7 @@ func (node *CreateTable) String() string {
 func (node *CreateTable) StructureHash() string {
 	cols := make([]string, len(node.Columns))
 	for i := range node.Columns {
-		cols[i] = fmt.Sprintf("%s:%s", node.Columns[i].Name.String(), node.Columns[i].Type)
+		cols[i] = fmt.Sprintf("%s:%s", node.Columns[i].Name.String(), strings.ToUpper(node.Columns[i].Type))
 	}
 	stringifiedColDef := strings.Join(cols, ",")
 	sh := sha256.New()
@@ -1063,12 +1063,12 @@ func (node *ColumnDef) String() string {
 
 // Types for ColumnDef type.
 const (
-	TypeIntStr     = "INT"
-	TypeIntegerStr = "INTEGER"
-	TypeRealStr    = "REAL"
-	TypeTextStr    = "TEXT"
-	TypeBlobStr    = "BLOB"
-	TypeAnyStr     = "ANY"
+	TypeIntStr     = "int"
+	TypeIntegerStr = "integer"
+	TypeRealStr    = "real"
+	TypeTextStr    = "text"
+	TypeBlobStr    = "blob"
+	TypeAnyStr     = "any"
 )
 
 // ColumnConstraint is used for parsing column constraint info from SQL.
@@ -1095,19 +1095,19 @@ type ColumnConstraintPrimaryKey struct {
 func (node *ColumnConstraintPrimaryKey) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 
 	if node.Order == ColumnConstraintPrimaryKeyOrderEmpty {
-		return fmt.Sprintf("%sPRIMARY KEY", constraintName)
+		return fmt.Sprintf("%sprimary key", constraintName)
 	}
-	return fmt.Sprintf("%sPRIMARY KEY %s", constraintName, node.Order)
+	return fmt.Sprintf("%sprimary key %s", constraintName, node.Order)
 }
 
 const (
 	ColumnConstraintPrimaryKeyOrderEmpty = ""
-	ColumnConstraintPrimaryKeyOrderAsc   = "ASC"
-	ColumnConstraintPrimaryKeyOrderDesc  = "DESC"
+	ColumnConstraintPrimaryKeyOrderAsc   = "asc"
+	ColumnConstraintPrimaryKeyOrderDesc  = "desc"
 )
 
 // ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
@@ -1120,9 +1120,9 @@ type ColumnConstraintNotNull struct {
 func (node *ColumnConstraintNotNull) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
-	return fmt.Sprintf("%sNOT NULL", constraintName)
+	return fmt.Sprintf("%snot null", constraintName)
 }
 
 // ColumnConstraintUnique represents a UNIQUE column constraint for CREATE TABLE.
@@ -1135,9 +1135,9 @@ type ColumnConstraintUnique struct {
 func (node *ColumnConstraintUnique) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
-	return fmt.Sprintf("%sUNIQUE", constraintName)
+	return fmt.Sprintf("%sunique", constraintName)
 }
 
 // ColumnConstraintCheck represents a CHECK column constraint for CREATE TABLE.
@@ -1150,9 +1150,9 @@ type ColumnConstraintCheck struct {
 func (node *ColumnConstraintCheck) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
-	return fmt.Sprintf("%sCHECK(%s)", constraintName, node.Expr.String())
+	return fmt.Sprintf("%scheck(%s)", constraintName, node.Expr.String())
 }
 
 // ColumnConstraintDefault represents a DEFAULT column constraint for CREATE TABLE.
@@ -1166,12 +1166,12 @@ type ColumnConstraintDefault struct {
 func (node *ColumnConstraintDefault) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 	if node.Parenthesis {
-		return fmt.Sprintf("%sDEFAULT (%s)", constraintName, node.Expr.String())
+		return fmt.Sprintf("%sdefault (%s)", constraintName, node.Expr.String())
 	}
-	return fmt.Sprintf("%sDEFAULT %s", constraintName, node.Expr.String())
+	return fmt.Sprintf("%sdefault %s", constraintName, node.Expr.String())
 }
 
 // ColumnConstraintGenerated represents a GENERATED ALWAYS column constraint for CREATE TABLE.
@@ -1190,17 +1190,17 @@ type ColumnConstraintGenerated struct {
 func (node *ColumnConstraintGenerated) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 	var b strings.Builder
 	if node.GeneratedAlways {
-		b.WriteString(fmt.Sprintf("%sGENERATED ALWAYS AS (%s)", constraintName, node.Expr.String()))
+		b.WriteString(fmt.Sprintf("%sgenerated always as (%s)", constraintName, node.Expr.String()))
 	} else {
-		b.WriteString(fmt.Sprintf("%sAS (%s)", constraintName, node.Expr.String()))
+		b.WriteString(fmt.Sprintf("%sas (%s)", constraintName, node.Expr.String()))
 	}
 
 	if node.IsStored {
-		b.WriteString(" STORED")
+		b.WriteString(" stored")
 	}
 
 	return b.String()
@@ -1225,10 +1225,10 @@ type TableConstraintPrimaryKey struct {
 func (node *TableConstraintPrimaryKey) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sPRIMARY KEY%s", constraintName, node.Columns.String())
+	return fmt.Sprintf("%sprimary key%s", constraintName, node.Columns.String())
 }
 
 // TableConstraintUnique is a UNIQUE constraint for table definition.
@@ -1241,10 +1241,10 @@ type TableConstraintUnique struct {
 func (node *TableConstraintUnique) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sUNIQUE%s", constraintName, node.Columns.String())
+	return fmt.Sprintf("%sunique%s", constraintName, node.Columns.String())
 }
 
 // TableConstraintCheck is a CHECK constraint for table definition.
@@ -1257,10 +1257,10 @@ type TableConstraintCheck struct {
 func (node *TableConstraintCheck) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("CONSTRAINT %s ", node.Name.String())
+		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sCHECK(%s)", constraintName, node.Expr.String())
+	return fmt.Sprintf("%scheck(%s)", constraintName, node.Expr.String())
 }
 
 // Insert represents an INSERT statement.
