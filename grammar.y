@@ -1225,8 +1225,8 @@ upsert_clause_opt:
   }
 | on_conflict_clause_list
   {
-    allConflictClausesExpectLast := $1[0:len($1) - 1];
-    for _, clause := range allConflictClausesExpectLast {
+    allConflictClausesExceptLast := $1[0:len($1) - 1];
+    for _, clause := range allConflictClausesExceptLast {
       if clause.Target == nil {
         yylex.(*Lexer).AddError(&ErrUpsertMissingTarget{})
       }

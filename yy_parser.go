@@ -2198,8 +2198,8 @@ yydefault:
 	case 215:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			allConflictClausesExpectLast := yyDollar[1].onConflictClauseList[0 : len(yyDollar[1].onConflictClauseList)-1]
-			for _, clause := range allConflictClausesExpectLast {
+			allConflictClausesExceptLast := yyDollar[1].onConflictClauseList[0 : len(yyDollar[1].onConflictClauseList)-1]
+			for _, clause := range allConflictClausesExceptLast {
 				if clause.Target == nil {
 					yylex.(*Lexer).AddError(&ErrUpsertMissingTarget{})
 				}
