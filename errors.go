@@ -101,3 +101,11 @@ type ErrMultiplePrimaryKey struct{}
 func (e *ErrMultiplePrimaryKey) Error() string {
 	return "has more than one primary key"
 }
+
+// ErrUpsertMissingTarget indicates a missing conflict target.
+// The conflict target may be omitted on the last ON CONFLICT clause in the INSERT statement, but is required for all other ON CONFLICT clause.
+type ErrUpsertMissingTarget struct{}
+
+func (e *ErrUpsertMissingTarget) Error() string {
+	return "has a missing conflict target"
+}
