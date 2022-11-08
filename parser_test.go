@@ -2855,8 +2855,58 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
+			name:     "function call upper",
+			stmt:     "SELECT COUNT(c1) FROM t",
+			deparsed: "select count(c1) from t",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&AliasedSelectColumn{
+								Expr: &FuncExpr{
+									Name: "count",
+									Args: Exprs{
+										&Column{Name: "c1"},
+									},
+								},
+							},
+						},
+						From: TableExprList{
+							&AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name:     "function call star",
 			stmt:     "SELECT count(*) FROM t",
+			deparsed: "select count(*) from t",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&AliasedSelectColumn{
+								Expr: &FuncExpr{
+									Name: "count",
+									Args: nil,
+								},
+							},
+						},
+						From: TableExprList{
+							&AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "function call star upper",
+			stmt:     "SELECT COUNT(*) FROM t",
 			deparsed: "select count(*) from t",
 			expectedAST: &AST{
 				Statements: []Statement{
