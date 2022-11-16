@@ -109,3 +109,10 @@ type ErrUpsertMissingTarget struct{}
 func (e *ErrUpsertMissingTarget) Error() string {
 	return "has a missing conflict target"
 }
+
+// ErrRowIDNotAllowed indicate a reference to the columns rowid, _rowid_, or oid in an INSERT, UPDATE or CREATE statement.
+type ErrRowIDNotAllowed struct{}
+
+func (e *ErrRowIDNotAllowed) Error() string {
+	return "rowid is not allowed"
+}

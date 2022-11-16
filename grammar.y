@@ -35,6 +35,15 @@ var keywordsNotAllowed = map[string]struct{}{
   "UNION": {},
 }
 
+func isRowID(column Identifier) bool {
+	lowered := strings.ToLower(string(column))
+	if lowered == "rowid" || lowered == "_rowid_ " || lowered == "oid" {
+		return true
+	}
+
+	return false
+}
+
 %}
 
 %union{
@@ -60,6 +69,8 @@ var keywordsNotAllowed = map[string]struct{}{
   tableExpr TableExpr
   joinTableExpr *JoinTableExpr
   columnList ColumnList
+  indexedColumnList IndexedColumnList
+  indexedColumn *IndexedColumn
   subquery *Subquery
   colTuple ColTuple
   statement Statement
@@ -87,6 +98,7 @@ var keywordsNotAllowed = map[string]struct{}{
   onConflictClauseList []*OnConflictClause
   onConflictClause *OnConflictClause
   onConflictTarget *OnConflictTarget
+  collateOpt Identifier
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -123,7 +135,7 @@ var keywordsNotAllowed = map[string]struct{}{
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege
 %type <column> column_name 
-%type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name identifier
+%type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name identifier collate_opt
 %type <SelectColumn> select_column
 %type <SelectColumnList> select_column_list
 %type <table> table_name
@@ -139,6 +151,8 @@ var keywordsNotAllowed = map[string]struct{}{
 %type <tableExpr> table_expr
 %type <joinTableExpr> join_clause join_constraint
 %type <columnList> column_name_list column_name_list_opt
+%type <indexedColumnList> indexed_column_list
+%type <indexedColumn> indexed_column
 %type <subquery> subquery
 %type <colTuple> col_tuple
 %type <bool> distinct_function_opt is_stored
@@ -972,7 +986,35 @@ create_table_stmt:
     if len($5) > MaxAllowedColumns {
       yylex.(*Lexer).AddError(&ErrTooManyColumns{ColumnCount: len($5), MaxAllowed: MaxAllowedColumns})
     }
-    $$ = &CreateTable{Table: $3, Columns: $5, Constraints: $6}
+
+    // We have to replace a primary key table constraint with an equivalent column constraint primary key,
+    // so we can add the autoincrement flag, as part of the rules of the Tableland Protocol.
+    // 
+    // That happens because a primary key table constraint that references a single INTEGER column
+    // would be an alias to rowid. For cases where a column becomes an alias to rowid we want to force the AUTOINCREMENT.
+    // 
+    // The exception to the above rule is when a table constraint primary key has order DESC. In that case, we replace with an 
+    // equivalent column constrain without forcing AUTOINCREMENT.
+    var tableConstraintPK *TableConstraintPrimaryKey
+    var index int
+    for i, tableConstraint := range $6 {
+      if tcpk, ok := tableConstraint.(*TableConstraintPrimaryKey); ok && len(tcpk.Columns) == 1 {
+        tableConstraintPK = tcpk
+        index = i
+      }
+    }
+
+    for _, columnDef := range $5 {
+      if columnDef.Type == TypeIntegerStr && !columnDef.HasPrimaryKey(){
+        if tableConstraintPK != nil && columnDef.Column.Name == tableConstraintPK.Columns[0].Column.Name {
+          forceAutoincrement := tableConstraintPK.Columns[0].Order != PrimaryKeyOrderDesc
+          columnDef.Constraints = append(columnDef.Constraints, &ColumnConstraintPrimaryKey{Name: tableConstraintPK.Name, AutoIncrement: forceAutoincrement, Order: tableConstraintPK.Columns[0].Order})
+          $6 = append($6[:index], $6[index+1:]...)
+        }
+      }
+    }
+
+    $$ = &CreateTable{Table: $3, ColumnsDef: $5, Constraints: $6}
   }
 ;
 
@@ -990,7 +1032,20 @@ column_def_list:
 column_def:
   column_name type_name column_constraints_opt
   {
-    $$ = &ColumnDef{Name: $1, Type: $2, Constraints: $3}
+    if isRowID($1.Name) {
+      yylex.(*Lexer).AddError(&ErrRowIDNotAllowed{})
+    }
+
+    if $2 == TypeIntegerStr {
+      for _, constraint := range $3 {
+        if primaryKey, ok := constraint.(*ColumnConstraintPrimaryKey); ok {
+          if primaryKey.Order != PrimaryKeyOrderDesc {
+            primaryKey.AutoIncrement = true
+          }
+        }
+      }
+    }
+    $$ = &ColumnDef{Column: $1, Type: $2, Constraints: $3}
   }
 ;
 
@@ -1085,15 +1140,15 @@ constraint_name:
 
 primary_key_order:
   {
-    $$ = ColumnConstraintPrimaryKeyOrderEmpty
+    $$ = PrimaryKeyOrderEmpty
   }
 |  ASC
   {
-    $$ = ColumnConstraintPrimaryKeyOrderAsc
+    $$ = PrimaryKeyOrderAsc
   }
 | DESC
   {
-    $$ = ColumnConstraintPrimaryKeyOrderDesc
+    $$ = PrimaryKeyOrderDesc
   }
 ;
 
@@ -1170,7 +1225,7 @@ table_constraint_list:
 ;
 
 table_constraint:
-  constraint_name PRIMARY KEY '(' column_name_list ')'
+  constraint_name PRIMARY KEY '(' indexed_column_list ')'
   {
     $$ = &TableConstraintPrimaryKey{Name: $1, Columns: $5}
   }
@@ -1184,9 +1239,43 @@ table_constraint:
   }
 ;
 
+indexed_column_list:
+  indexed_column
+  {
+    $$ = IndexedColumnList{$1}
+  }
+| indexed_column_list ',' indexed_column
+  {
+    $$ = append($1, $3)
+  }
+;
+
+indexed_column:
+  column_name collate_opt primary_key_order
+  {
+    $$ = &IndexedColumn{Column : $1, CollationName: $2, Order: $3}
+  }
+;
+
+collate_opt:
+  {
+    $$ = Identifier("")
+  }
+| COLLATE identifier
+  {
+    $$ = Identifier(string($2))
+  }
+;
+
 insert_stmt:
   INSERT INTO table_name column_name_list_opt VALUES insert_rows upsert_clause_opt
   {
+    for i := 0; i < len($4); i++ {
+      if isRowID($4[i].Name) {
+        yylex.(*Lexer).AddError(&ErrRowIDNotAllowed{})
+      }
+    }
+
     for _, row := range $6 {
       for _, expr := range row {
 				if expr.ContainsSubquery() {
@@ -1347,6 +1436,9 @@ paren_update_list:
     } else {
       exprs := make([]*UpdateExpr, len($2))
       for i := 0; i < len($2); i++ {
+        if isRowID($2[i].Name) {
+          yylex.(*Lexer).AddError(&ErrRowIDNotAllowed{})
+        }
         exprs[i] = &UpdateExpr{Column: $2[i], Expr: $6[i]}
       }
       $$ = exprs
@@ -1357,6 +1449,9 @@ paren_update_list:
 update_expression:
   column_name '=' expr
   {
+    if isRowID($1.Name) {
+      yylex.(*Lexer).AddError(&ErrRowIDNotAllowed{})
+    }
     $$ = &UpdateExpr{Column: $1, Expr: $3}
   }
 ;

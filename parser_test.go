@@ -3193,8 +3193,8 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						ColumnsDef: []*ColumnDef{
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3210,8 +3210,8 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						ColumnsDef: []*ColumnDef{
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3227,8 +3227,8 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						ColumnsDef: []*ColumnDef{
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3244,8 +3244,8 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+						ColumnsDef: []*ColumnDef{
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3261,13 +3261,13 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
-							{Name: &Column{Name: "b"}, Type: TypeIntegerStr, Constraints: []ColumnConstraint{}},
-							{Name: &Column{Name: "c"}, Type: TypeRealStr, Constraints: []ColumnConstraint{}},
-							{Name: &Column{Name: "d"}, Type: TypeTextStr, Constraints: []ColumnConstraint{}},
-							{Name: &Column{Name: "e"}, Type: TypeBlobStr, Constraints: []ColumnConstraint{}},
-							{Name: &Column{Name: "f"}, Type: TypeAnyStr, Constraints: []ColumnConstraint{}},
+						ColumnsDef: []*ColumnDef{
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "b"}, Type: TypeIntegerStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "c"}, Type: TypeRealStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "d"}, Type: TypeTextStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "e"}, Type: TypeBlobStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "f"}, Type: TypeAnyStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3283,15 +3283,15 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "id"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
-									&ColumnConstraintPrimaryKey{Order: ColumnConstraintPrimaryKeyOrderEmpty},
+									&ColumnConstraintPrimaryKey{Order: PrimaryKeyOrderEmpty},
 								},
 							},
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3307,15 +3307,15 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "id"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
-									&ColumnConstraintPrimaryKey{Order: ColumnConstraintPrimaryKeyOrderAsc},
+									&ColumnConstraintPrimaryKey{Order: PrimaryKeyOrderAsc},
 								},
 							},
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3331,15 +3331,15 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "id"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
-									&ColumnConstraintPrimaryKey{Order: ColumnConstraintPrimaryKeyOrderDesc},
+									&ColumnConstraintPrimaryKey{Order: PrimaryKeyOrderDesc},
 								},
 							},
-							{Name: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3355,20 +3355,20 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "id"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
-									&ColumnConstraintPrimaryKey{Order: ColumnConstraintPrimaryKeyOrderEmpty},
+									&ColumnConstraintPrimaryKey{Order: PrimaryKeyOrderEmpty},
 									&ColumnConstraintNotNull{
 										Name: "nn",
 									},
 								},
 							},
 							{
-								Name: &Column{Name: "id2"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id2"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintNotNull{},
 								},
@@ -3388,17 +3388,17 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "id"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintUnique{},
 								},
 							},
 							{
-								Name: &Column{Name: "id2"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id2"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintUnique{
 										Name: "un",
@@ -3420,10 +3420,10 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "a"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "a"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintCheck{
 										Expr: &CmpExpr{
@@ -3435,8 +3435,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "id2"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id2"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintCheck{
 										Name: "check_constraint",
@@ -3463,10 +3463,10 @@ func TestCreateTable(t *testing.T) {
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "a"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "a"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
 										Name: "default_constraint",
@@ -3475,8 +3475,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "b"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "b"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
 										Expr: &Value{Type: FloatValue, Value: []byte("-1.1")},
@@ -3484,8 +3484,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "c"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "c"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
 										Expr: &Value{Type: HexNumValue, Value: []byte("0x1")},
@@ -3493,8 +3493,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "d"},
-								Type: TypeTextStr,
+								Column: &Column{Name: "d"},
+								Type:   TypeTextStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
 										Expr: &Value{Type: StrValue, Value: []byte("foo")},
@@ -3502,8 +3502,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "e"},
-								Type: TypeTextStr,
+								Column: &Column{Name: "e"},
+								Type:   TypeTextStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
 										Expr:        &Value{Type: StrValue, Value: []byte("foo")},
@@ -3512,8 +3512,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "f"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "f"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
 										Expr: &Value{Type: IntValue, Value: []byte("1")},
@@ -3528,36 +3528,37 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table generated",
 			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed:     "create table t (a integer constraint pk primary key, b int, c text, d int constraint gen generated always as (a * abs(b)), e text generated always as (substr(c, b, b + 1)) stored, f text as (substr(c, b, b + 1)))",
+			deparsed:     "create table t (a integer constraint pk primary key autoincrement, b int, c text, d int constraint gen generated always as (a * abs(b)), e text generated always as (substr(c, b, b + 1)) stored, f text as (substr(c, b, b + 1)))",
 			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
 						Table:       &Table{Name: "t"},
 						Constraints: []TableConstraint{},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "a"},
-								Type: TypeIntegerStr,
+								Column: &Column{Name: "a"},
+								Type:   TypeIntegerStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintPrimaryKey{
-										Name: "pk",
+										Name:          "pk",
+										AutoIncrement: true,
 									},
 								},
 							},
 							{
-								Name:        &Column{Name: "b"},
+								Column:      &Column{Name: "b"},
 								Type:        TypeIntStr,
 								Constraints: []ColumnConstraint{},
 							},
 							{
-								Name:        &Column{Name: "c"},
+								Column:      &Column{Name: "c"},
 								Type:        TypeTextStr,
 								Constraints: []ColumnConstraint{},
 							},
 							{
-								Name: &Column{Name: "d"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "d"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintGenerated{
 										Name:            "gen",
@@ -3576,8 +3577,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "e"},
-								Type: TypeTextStr,
+								Column: &Column{Name: "e"},
+								Type:   TypeTextStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintGenerated{
 										GeneratedAlways: true,
@@ -3598,8 +3599,8 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name: &Column{Name: "f"},
-								Type: TypeTextStr,
+								Column: &Column{Name: "f"},
+								Type:   TypeTextStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintGenerated{
 										GeneratedAlways: false,
@@ -3633,10 +3634,10 @@ func TestCreateTable(t *testing.T) {
 				Statements: []Statement{
 					&CreateTable{
 						Table: &Table{Name: "t"},
-						Columns: []*ColumnDef{
+						ColumnsDef: []*ColumnDef{
 							{
-								Name: &Column{Name: "id"},
-								Type: TypeIntStr,
+								Column: &Column{Name: "id"},
+								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintNotNull{
 										Name: "nm",
@@ -3644,7 +3645,7 @@ func TestCreateTable(t *testing.T) {
 								},
 							},
 							{
-								Name:        &Column{Name: "id2"},
+								Column:      &Column{Name: "id2"},
 								Type:        TypeIntStr,
 								Constraints: []ColumnConstraint{},
 							},
@@ -3652,8 +3653,10 @@ func TestCreateTable(t *testing.T) {
 						Constraints: []TableConstraint{
 							&TableConstraintPrimaryKey{
 								Name: "pk",
-								Columns: ColumnList{
-									&Column{Name: "id"},
+								Columns: IndexedColumnList{
+									&IndexedColumn{
+										Column: &Column{Name: "id"},
+									},
 								},
 							},
 							&TableConstraintUnique{
@@ -3669,6 +3672,104 @@ func TestCreateTable(t *testing.T) {
 									Operator: GreaterThanStr,
 									Left:     &Column{Name: "id"},
 									Right:    &Value{Type: IntValue, Value: []byte("0")},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:         "create table replace table constraint",
+			stmt:         "CREATE TABLE t(x INTEGER, PRIMARY KEY (x));",
+			deparsed:     "create table t (x integer primary key autoincrement)",
+			expectedHash: "858688370cc6ddf501ebbfe878877e83edeaaf247d1e12faff8bb77ce904e935",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CreateTable{
+						Table: &Table{Name: "t"},
+						ColumnsDef: []*ColumnDef{
+							{
+								Column: &Column{Name: "x"},
+								Type:   TypeIntegerStr,
+								Constraints: []ColumnConstraint{
+									&ColumnConstraintPrimaryKey{
+										Name:          "",
+										AutoIncrement: true,
+									},
+								},
+							},
+						},
+						Constraints: []TableConstraint{},
+					},
+				},
+			},
+		},
+		{
+			name:         "create table replace table constraint with name",
+			stmt:         "CREATE TABLE t(x INTEGER, CONSTRAINT pk PRIMARY KEY (x));",
+			deparsed:     "create table t (x integer constraint pk primary key autoincrement)",
+			expectedHash: "858688370cc6ddf501ebbfe878877e83edeaaf247d1e12faff8bb77ce904e935",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CreateTable{
+						Table: &Table{Name: "t"},
+						ColumnsDef: []*ColumnDef{
+							{
+								Column: &Column{Name: "x"},
+								Type:   TypeIntegerStr,
+								Constraints: []ColumnConstraint{
+									&ColumnConstraintPrimaryKey{
+										Name:          "pk",
+										AutoIncrement: true,
+									},
+								},
+							},
+						},
+						Constraints: []TableConstraint{},
+					},
+				},
+			},
+		},
+		{
+			name:         "create table replace table constraint middle",
+			stmt:         "CREATE TABLE t(x INTEGER NOT NULL, b INT, check(b>0), PRIMARY KEY (x DESC), UNIQUE (b));",
+			deparsed:     "create table t (x integer not null primary key desc, b int, check(b > 0), unique (b))",
+			expectedHash: "783f0ed7cc77247b44f69325d3c865b05ebdbc9c8087d367d685ea63af87fdbd",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CreateTable{
+						Table: &Table{Name: "t"},
+						ColumnsDef: []*ColumnDef{
+							{
+								Column: &Column{Name: "x"},
+								Type:   TypeIntegerStr,
+								Constraints: []ColumnConstraint{
+									&ColumnConstraintNotNull{},
+									&ColumnConstraintPrimaryKey{
+										Name:          "",
+										AutoIncrement: false,
+										Order:         "desc",
+									},
+								},
+							},
+							{
+								Column:      &Column{Name: "b"},
+								Type:        TypeIntStr,
+								Constraints: []ColumnConstraint{},
+							},
+						},
+						Constraints: []TableConstraint{
+							&TableConstraintCheck{
+								Expr: &CmpExpr{
+									Operator: GreaterThanStr,
+									Left:     &Column{Name: "b"},
+									Right:    &Value{Type: IntValue, Value: []byte("0")},
+								},
+							},
+							&TableConstraintUnique{
+								Columns: ColumnList{
+									&Column{Name: "b"},
 								},
 							},
 						},
@@ -3716,6 +3817,77 @@ func TestCreateTableStrict(t *testing.T) {
 	ast.Statements[0].(*CreateTable).StrictMode = true
 
 	require.Equal(t, "create table t (a int) strict", ast.String())
+}
+
+func TestCreateTableAutoIncrementRules(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name     string
+		stmt     string
+		deparsed string
+	}
+
+	// - CREATE TABLE t(a INTEGER PRIMARY KEY) -> automatically injects AUTOINCREMENT
+	// - CREATE TABLE t(a INTEGER PRIMARY KEY DESC) -> as is, since isn't an alias.
+	// - CREATE TABLE t(a XXXX PRIMARY KEY) where XXXX isn't INTEGER, as is.
+	// - CREATE TABLE t(a INTEGER, PRIMARY KEY(a ASC)) -> automatically transformed to first bullet
+	// - CREATE TABLE t(a INTEGER, PRIMARY KEY(a DESC)) -> automatically transformed to second bullet, because if we don't do this it means an alias.
+
+	tests := []testCase{
+		{
+			"integer primary key forces autoincrement",
+			"CREATE TABLE t (a INTEGER PRIMARY KEY)",
+			"create table t (a integer primary key autoincrement)",
+		},
+		{
+			"integer primary key desc",
+			"CREATE TABLE t (a INTEGER PRIMARY KEY DESC)",
+			"create table t (a integer primary key desc)",
+		},
+		{
+			"non integer primary key",
+			"CREATE TABLE t (a INT PRIMARY KEY)",
+			"create table t (a int primary key)",
+		},
+		{
+			"integer table primary key forces autoincrement",
+			"CREATE TABLE t (a INTEGER, PRIMARY KEY(a ASC))",
+			"create table t (a integer primary key asc autoincrement)",
+		},
+		{
+			"integer table primary key desc",
+			"CREATE TABLE t (a INTEGER, PRIMARY KEY(a DESC))",
+			"create table t (a integer primary key desc)",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+				require.NoError(t, err)
+				require.Len(t, ast.Errors, 0)
+				require.Equal(t, tc.deparsed, ast.String())
+
+				// test all CREATE statements against SQLite3
+				db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+				require.NoError(t, err)
+
+				_, err = db.Exec(tc.stmt)
+				require.NoError(t, err)
+
+				_, err = db.Exec(fmt.Sprintf("DROP TABLE %s", ast.Statements[0].(*CreateTable).Table.Name))
+				require.NoError(t, err)
+
+				// test AST SQL generation against SQLite3
+				_, err = db.Exec(ast.String())
+				require.NoError(t, err)
+				require.NoError(t, db.Close())
+			}
+		}(tc))
+	}
 }
 
 func TestInsert(t *testing.T) {
@@ -4878,6 +5050,18 @@ func TestParallel(t *testing.T) {
 			deparsed: "create table t (id int primary key, a int)",
 		},
 		{
+			stmt:     "CREATE TABLE t (id INTEGER PRIMARY KEY, a INT);",
+			deparsed: "create table t (id integer primary key autoincrement, a int)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INTEGER PRIMARY KEY ASC, a INT);",
+			deparsed: "create table t (id integer primary key asc autoincrement, a int)",
+		},
+		{
+			stmt:     "CREATE TABLE t (id INTEGER PRIMARY KEY DESC, a INT);",
+			deparsed: "create table t (id integer primary key desc, a int)",
+		},
+		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
 			deparsed: "create table t (id int primary key asc, a int)",
 		},
@@ -4962,6 +5146,78 @@ func TestCreateTableMultiplePrimaryKey(t *testing.T) {
 			_, err = db.Exec(tc.stmt)
 			require.Error(t, err)
 			require.ErrorContains(t, err, "has more than one primary key")
+		})
+	}
+}
+
+func TestRowIDReferences(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name string
+		stmt string
+	}{
+		{
+			name: "create table rowid",
+			stmt: "CREATE TABLE t (rowid INT);",
+		},
+		{
+			name: "create table _rowid_",
+			stmt: "CREATE TABLE t (_rowid_ INT);",
+		},
+		{
+			name: "create table oid",
+			stmt: "CREATE TABLE t (oid INT);",
+		},
+		{
+			name: "insert rowid",
+			stmt: "INSERT INTO t (rowid) VALUES (1);",
+		},
+		{
+			name: "insert _rowid_",
+			stmt: "INSERT INTO t (_rowid_) VALUES (1);",
+		},
+		{
+			name: "insert oid",
+			stmt: "INSERT INTO t (oid) VALUES (1);",
+		},
+		{
+			name: "update rowid",
+			stmt: "update t set rowid = 1;",
+		},
+		{
+			name: "update _rowid_",
+			stmt: "update t set _rowid_ = 1;",
+		},
+		{
+			name: "update oid",
+			stmt: "update t set oid = 1;",
+		},
+		{
+			name: "update paren rowid",
+			stmt: "update t set (rowid) = (1);",
+		},
+		{
+			name: "update paren _rowid_",
+			stmt: "update t set (_rowid_) = (1);",
+		},
+		{
+			name: "update paren oid",
+			stmt: "update t set (oid) = (1);",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
+			ast, err := Parse(tc.stmt)
+			require.Error(t, err)
+			require.Len(t, ast.Errors, 1)
+
+			var e *ErrRowIDNotAllowed
+			require.ErrorAs(t, ast.Errors[0], &e)
+			require.ErrorAs(t, err, &e)
+			require.ErrorContains(t, err, "rowid is not allowed")
 		})
 	}
 }
