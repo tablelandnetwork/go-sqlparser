@@ -198,109 +198,34 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
-			name:     "float",
-			stmt:     "SELECT 1.2 FROM t",
-			deparsed: "select 1.2 from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &Value{Type: FloatValue, Value: []byte("1.2")},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
+			name:        "float",
+			stmt:        "SELECT 1.2 FROM t",
+			deparsed:    "select 1.2 from t",
+			expectedErr: &ErrNumericLiteralFloat{Value: []byte("1.2")},
 		},
 		{
-			name:     "float-starts-zero",
-			stmt:     "SELECT 0.2 FROM t",
-			deparsed: "select 0.2 from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &Value{Type: FloatValue, Value: []byte("0.2")},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
+			name:        "float-starts-zero",
+			stmt:        "SELECT 0.2 FROM t",
+			deparsed:    "select 0.2 from t",
+			expectedErr: &ErrNumericLiteralFloat{Value: []byte("0.2")},
 		},
 		{
-			name:     "float-starts-dot",
-			stmt:     "SELECT .2 FROM t",
-			deparsed: "select .2 from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &Value{Type: FloatValue, Value: []byte(".2")},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
+			name:        "float-starts-dot",
+			stmt:        "SELECT .2 FROM t",
+			deparsed:    "select .2 from t",
+			expectedErr: &ErrNumericLiteralFloat{Value: []byte(".2")},
 		},
 		{
-			name:     "float-expoent",
-			stmt:     "SELECT 1e2 FROM t",
-			deparsed: "select 1e2 from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &Value{Type: FloatValue, Value: []byte("1e2")},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
+			name:        "float-expoent",
+			stmt:        "SELECT 1e2 FROM t",
+			deparsed:    "select 1e2 from t",
+			expectedErr: &ErrNumericLiteralFloat{Value: []byte("1e2")},
 		},
 		{
-			name:     "float-expoent-upper",
-			stmt:     "SELECT 1E2 FROM t",
-			deparsed: "select 1E2 from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &Value{Type: FloatValue, Value: []byte("1E2")},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
+			name:        "float-expoent-upper",
+			stmt:        "SELECT 1E2 FROM t",
+			deparsed:    "select 1E2 from t",
+			expectedErr: &ErrNumericLiteralFloat{Value: []byte("1E2")},
 		},
 		{
 			name:     "hex",
@@ -471,28 +396,10 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
-			name:     "minus-float",
-			stmt:     "SELECT -2.3 FROM t",
-			deparsed: "select -2.3 from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &UnaryExpr{
-									Operator: UMinusStr,
-									Expr:     &Value{Type: FloatValue, Value: []byte("2.3")},
-								},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
+			name:        "minus-float",
+			stmt:        "SELECT -2.3 FROM t",
+			deparsed:    "select -2.3 from t",
+			expectedErr: &ErrNumericLiteralFloat{Value: []byte("-2.3")},
 		},
 		{
 			name:     "minus-column",
@@ -1114,32 +1021,6 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
-			name:     "cast-to-real",
-			stmt:     "SELECT CAST (a AS REAL) FROM t",
-			deparsed: "select cast (a as real) from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &ConvertExpr{
-									Expr: &Column{
-										Name: "a",
-									},
-									Type: RealStr,
-								},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
 			name:     "cast-to-none",
 			stmt:     "SELECT CAST (a AS none) FROM t",
 			deparsed: "select cast (a as none) from t",
@@ -1153,32 +1034,6 @@ func TestSelectStatement(t *testing.T) {
 										Name: "a",
 									},
 									Type: NoneStr,
-								},
-							},
-						},
-						From: TableExprList{
-							&AliasedTableExpr{
-								Expr: &Table{Name: "t"},
-							},
-						},
-					},
-				},
-			},
-		},
-		{
-			name:     "cast-to-numeric",
-			stmt:     "SELECT CAST (a AS numeric) FROM t",
-			deparsed: "select cast (a as numeric) from t",
-			expectedAST: &AST{
-				Statements: []Statement{
-					&Select{
-						SelectColumnList: []SelectColumn{
-							&AliasedSelectColumn{
-								Expr: &ConvertExpr{
-									Expr: &Column{
-										Name: "a",
-									},
-									Type: NumericStr,
 								},
 							},
 						},
@@ -3253,9 +3108,9 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table types",
-			stmt:         "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
-			deparsed:     "create table t (a int, b integer, c real, d text, e blob, f any)",
-			expectedHash: "0670bf7a857084333a128354b6f6c6cc1772c9c22bbfeba256c77012fa50fdba",
+			stmt:         "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB, e ANY);",
+			deparsed:     "create table t (a int, b integer, c text, d blob, e any)",
+			expectedHash: "f3f82e433af896787c5d7695c8e874f71392f2f4bd2590783120b7368e1dde22",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3264,10 +3119,9 @@ func TestCreateTable(t *testing.T) {
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
 							{Column: &Column{Name: "b"}, Type: TypeIntegerStr, Constraints: []ColumnConstraint{}},
-							{Column: &Column{Name: "c"}, Type: TypeRealStr, Constraints: []ColumnConstraint{}},
-							{Column: &Column{Name: "d"}, Type: TypeTextStr, Constraints: []ColumnConstraint{}},
-							{Column: &Column{Name: "e"}, Type: TypeBlobStr, Constraints: []ColumnConstraint{}},
-							{Column: &Column{Name: "f"}, Type: TypeAnyStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "c"}, Type: TypeTextStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "d"}, Type: TypeBlobStr, Constraints: []ColumnConstraint{}},
+							{Column: &Column{Name: "e"}, Type: TypeAnyStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -3455,8 +3309,8 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table default",
-			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);",
-			deparsed:     "create table t (a int constraint default_constraint default 0, b int default -1.1, c int default 0x1, d text default 'foo', e text default ('foo'), f int default 1)",
+			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);",
+			deparsed:     "create table t (a int constraint default_constraint default 0, b int default 1, c int default 0x1, d text default 'foo', e text default ('foo'), f int default 1)",
 			expectedHash: "70a57145d62731d006bc23ede6126e3fe3f3f0a3954a87411edd2fb66ff59d7b",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3479,7 +3333,7 @@ func TestCreateTable(t *testing.T) {
 								Type:   TypeIntStr,
 								Constraints: []ColumnConstraint{
 									&ColumnConstraintDefault{
-										Expr: &Value{Type: FloatValue, Value: []byte("-1.1")},
+										Expr: &Value{Type: IntValue, Value: []byte("1")},
 									},
 								},
 							},
@@ -4826,26 +4680,6 @@ func TestParallel(t *testing.T) {
 			deparsed: "select -12 from t",
 		},
 		{
-			stmt:     "SELECT 1.2 FROM t",
-			deparsed: "select 1.2 from t",
-		},
-		{
-			stmt:     "SELECT 0.2 FROM t",
-			deparsed: "select 0.2 from t",
-		},
-		{
-			stmt:     "SELECT .2 FROM t",
-			deparsed: "select .2 from t",
-		},
-		{
-			stmt:     "SELECT 1e2 FROM t",
-			deparsed: "select 1e2 from t",
-		},
-		{
-			stmt:     "SELECT 1E2 FROM t",
-			deparsed: "select 1E2 from t",
-		},
-		{
 			stmt:     "SELECT 0xAF12 FROM t",
 			deparsed: "select 0xAF12 from t",
 		},
@@ -4876,10 +4710,6 @@ func TestParallel(t *testing.T) {
 		{
 			stmt:     "SELECT _also_column FROM t",
 			deparsed: "select _also_column from t",
-		},
-		{
-			stmt:     "SELECT -2.3 FROM t",
-			deparsed: "select -2.3 from t",
 		},
 		{
 			stmt:     "SELECT -a FROM t",
@@ -4950,16 +4780,8 @@ func TestParallel(t *testing.T) {
 			deparsed: "select cast (1 as text) from t",
 		},
 		{
-			stmt:     "SELECT CAST (a AS REAL) FROM t",
-			deparsed: "select cast (a as real) from t",
-		},
-		{
 			stmt:     "SELECT CAST (a AS none) FROM t",
 			deparsed: "select cast (a as none) from t",
-		},
-		{
-			stmt:     "SELECT CAST (a AS numeric) FROM t",
-			deparsed: "select cast (a as numeric) from t",
 		},
 		{
 			stmt:     "SELECT CAST (a AS integer) FROM t",
@@ -5042,8 +4864,8 @@ func TestParallel(t *testing.T) {
 			deparsed: "create table t (a int)",
 		},
 		{
-			stmt:     "CREATE TABLE t (a INT, b INTEGER, c REAL, d TEXT, e BLOB, f ANY);",
-			deparsed: "create table t (a int, b integer, c real, d text, e blob, f any)",
+			stmt:     "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB, e ANY);",
+			deparsed: "create table t (a int, b integer, c text, d blob, e any)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
@@ -5082,8 +4904,8 @@ func TestParallel(t *testing.T) {
 			deparsed: "create table t (a int check(a > 2), id2 int constraint check_constraint check(a > 2))",
 		},
 		{
-			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT -1.1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
-			deparsed: "create table t (a int constraint default_constraint default 0, b int default -1.1, c int default 0x1, d text default 'foo', e text default ('foo'))",
+			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
+			deparsed: "create table t (a int constraint default_constraint default 0, b int default 1, c int default 0x1, d text default 'foo', e text default ('foo'))",
 		},
 	}
 

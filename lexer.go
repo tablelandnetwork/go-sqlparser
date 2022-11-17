@@ -15,8 +15,6 @@ var keywords = map[string]int{
 	"NULL":       NULL,
 	"NONE":       NONE,
 	"INTEGER":    INTEGER,
-	"NUMERIC":    NUMERIC,
-	"REAL":       REAL,
 	"TEXT":       TEXT,
 	"CAST":       CAST,
 	"AS":         AS,

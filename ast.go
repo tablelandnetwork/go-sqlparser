@@ -736,8 +736,6 @@ type ConvertType string
 
 const (
 	NoneStr    = ConvertType("none")
-	RealStr    = ConvertType("real")
-	NumericStr = ConvertType("numeric")
 	TextStr    = ConvertType("text")
 	IntegerStr = ConvertType("integer")
 )
@@ -1112,7 +1110,6 @@ func (node *ColumnDef) HasPrimaryKey() bool {
 const (
 	TypeIntStr     = "int"
 	TypeIntegerStr = "integer"
-	TypeRealStr    = "real"
 	TypeTextStr    = "text"
 	TypeBlobStr    = "blob"
 	TypeAnyStr     = "any"

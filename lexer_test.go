@@ -9,7 +9,7 @@ func TestLexer(t *testing.T) {
 		_hello 123 1.3 0.1232 'string'
 		0xAF273 X'AF273' x'AF273' true false 
 		null TRUE FALSE NULL NONE 
-		INTEGER NUMERIC REAL TEXT CAST 
+		INTEGER TEXT CAST
 		AS ( , ) AND 
 		OR NOT = != > 
 		< >= <= <> ->
@@ -31,7 +31,7 @@ func TestLexer(t *testing.T) {
 		IDENTIFIER, INTEGRAL, FLOAT, FLOAT, STRING,
 		HEXNUM, BLOBVAL, BLOBVAL, TRUE, FALSE,
 		NULL, TRUE, FALSE, NULL, NONE,
-		INTEGER, NUMERIC, REAL, TEXT, CAST,
+		INTEGER, TEXT, CAST,
 		AS, '(', ',', ')', ANDOP,
 		OR, NOT, '=', NE, '>',
 		'<', GE, LE, NE, JSON_EXTRACT_OP,
