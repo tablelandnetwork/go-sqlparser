@@ -875,6 +875,42 @@ func (node ColumnList) String() string {
 	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
 }
 
+// IndexedColumn represents a indexed column.
+type IndexedColumn struct {
+	Column        *Column
+	CollationName Identifier
+	Order         string
+}
+
+// String returns the string representation of the node.
+func (node *IndexedColumn) String() string {
+	if !node.CollationName.IsEmpty() {
+		return fmt.Sprintf("%s COLLATE %s %s", node.Column.String(), node.CollationName, node.Order)
+	}
+
+	if node.Order != PrimaryKeyOrderEmpty {
+		return fmt.Sprintf("%s %s", node.Column.String(), node.Order)
+	}
+	return node.Column.String()
+}
+
+// IndexedColumnList is a list of indexed columns.
+type IndexedColumnList []*IndexedColumn
+
+// String returns the string representation of the node.
+func (node IndexedColumnList) String() string {
+	if len(node) == 0 {
+		return ""
+	}
+
+	var strs []string
+	for _, col := range node {
+		strs = append(strs, col.String())
+	}
+
+	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
+}
+
 // Exprs represents a list of expressions.
 type Exprs []Expr
 
@@ -997,7 +1033,7 @@ func (node Identifier) IsEmpty() bool {
 // CreateTable represents a CREATE TABLE statement.
 type CreateTable struct {
 	Table       *Table
-	Columns     []*ColumnDef
+	ColumnsDef  []*ColumnDef
 	Constraints []TableConstraint
 
 	// This is the only TableOption supported in the AST.
@@ -1009,7 +1045,7 @@ type CreateTable struct {
 // String returns the string representation of the node.
 func (node *CreateTable) String() string {
 	columns := []string{}
-	for _, column := range node.Columns {
+	for _, column := range node.ColumnsDef {
 		columns = append(columns, column.String())
 	}
 	column := strings.Join(columns, ", ")
@@ -1030,9 +1066,9 @@ func (node *CreateTable) String() string {
 
 // StructureHash returns the hash of the structure of the statement.
 func (node *CreateTable) StructureHash() string {
-	cols := make([]string, len(node.Columns))
-	for i := range node.Columns {
-		cols[i] = fmt.Sprintf("%s:%s", node.Columns[i].Name.String(), strings.ToUpper(node.Columns[i].Type))
+	cols := make([]string, len(node.ColumnsDef))
+	for i := range node.ColumnsDef {
+		cols[i] = fmt.Sprintf("%s:%s", node.ColumnsDef[i].Column.String(), strings.ToUpper(node.ColumnsDef[i].Type))
 	}
 	stringifiedColDef := strings.Join(cols, ",")
 	sh := sha256.New()
@@ -1043,7 +1079,7 @@ func (node *CreateTable) StructureHash() string {
 
 // ColumnDef represents the column definition of a CREATE TABLE statement.
 type ColumnDef struct {
-	Name        *Column
+	Column      *Column
 	Type        string
 	Constraints []ColumnConstraint
 }
@@ -1058,7 +1094,18 @@ func (node *ColumnDef) String() string {
 		}
 		constraint = " " + strings.Join(constraints, " ")
 	}
-	return fmt.Sprintf("%s %s%s", node.Name, node.Type, constraint)
+	return fmt.Sprintf("%s %s%s", node.Column, node.Type, constraint)
+}
+
+// HasPrimaryKey checks if column definition has a primary key constraint.
+func (node *ColumnDef) HasPrimaryKey() bool {
+	for _, constraint := range node.Constraints {
+		if _, ok := constraint.(*ColumnConstraintPrimaryKey); ok {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Types for ColumnDef type.
@@ -1086,8 +1133,9 @@ func (*ColumnConstraintGenerated) iColumnConstraint()  {}
 
 // ColumnConstraintPrimaryKey represents a PRIMARY KEY column constraint for CREATE TABLE.
 type ColumnConstraintPrimaryKey struct {
-	Name  Identifier
-	Order string
+	Name          Identifier
+	Order         string
+	AutoIncrement bool
 	// ConflictClause *ConflictClause
 }
 
@@ -1098,16 +1146,21 @@ func (node *ColumnConstraintPrimaryKey) String() string {
 		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 
-	if node.Order == ColumnConstraintPrimaryKeyOrderEmpty {
-		return fmt.Sprintf("%sprimary key", constraintName)
+	var autoIncrement string
+	if node.AutoIncrement {
+		autoIncrement = " autoincrement"
 	}
-	return fmt.Sprintf("%sprimary key %s", constraintName, node.Order)
+
+	if node.Order == PrimaryKeyOrderEmpty {
+		return fmt.Sprintf("%sprimary key%s", constraintName, autoIncrement)
+	}
+	return fmt.Sprintf("%sprimary key %s%s", constraintName, node.Order, autoIncrement)
 }
 
 const (
-	ColumnConstraintPrimaryKeyOrderEmpty = ""
-	ColumnConstraintPrimaryKeyOrderAsc   = "asc"
-	ColumnConstraintPrimaryKeyOrderDesc  = "desc"
+	PrimaryKeyOrderEmpty = ""
+	PrimaryKeyOrderAsc   = "asc"
+	PrimaryKeyOrderDesc  = "desc"
 )
 
 // ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
@@ -1218,7 +1271,7 @@ func (*TableConstraintCheck) iTableConstraint()      {}
 // TableConstraintPrimaryKey is a PRIMARY KEY constraint for table definition.
 type TableConstraintPrimaryKey struct {
 	Name    Identifier
-	Columns ColumnList
+	Columns IndexedColumnList
 }
 
 // String returns the string representation of the node.
