@@ -104,7 +104,7 @@ func isRowID(column Identifier) bool {
 %token ERROR 
 %token <empty> TRUE FALSE NULL AND
 %token <empty> '(' ',' ')' '.' ';'
-%token <empty> NONE INTEGER NUMERIC REAL TEXT CAST AS
+%token <empty> NONE INTEGER TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
@@ -829,9 +829,7 @@ between_op:
 convert_type:
   NONE { $$ = NoneStr}
 | TEXT { $$ = TextStr}
-| REAL { $$ = RealStr}
 | INTEGER { $$ = IntegerStr}
-| NUMERIC { $$ = NumericStr}
 ;
 
 col_tuple:
@@ -1046,7 +1044,6 @@ column_def:
 type_name:
   INT { $$ = TypeIntStr}
 | INTEGER { $$ = TypeIntegerStr}
-| REAL { $$ = TypeRealStr}
 | TEXT { $$ = TypeTextStr}
 | BLOB { $$ = TypeBlobStr}
 | ANY { $$ = TypeAnyStr}
@@ -1165,6 +1162,7 @@ numeric_literal:
   }
 | FLOAT
   {
+    yylex.(*Lexer).AddError(&ErrNumericLiteralFloat{Value: $1})
     $$ = &Value{Type: FloatValue, Value: $1}
   }
 | HEXNUM

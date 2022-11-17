@@ -110,9 +110,18 @@ func (e *ErrUpsertMissingTarget) Error() string {
 	return "has a missing conflict target"
 }
 
-// ErrRowIDNotAllowed indicate a reference to the columns rowid, _rowid_, or oid in an INSERT, UPDATE or CREATE statement.
+// ErrRowIDNotAllowed indicates a reference to the columns rowid, _rowid_, or oid in an INSERT, UPDATE or CREATE statement.
 type ErrRowIDNotAllowed struct{}
 
 func (e *ErrRowIDNotAllowed) Error() string {
 	return "rowid is not allowed"
+}
+
+// ErrNumericLiteralFloat indicates a literal numeric float is being used.
+type ErrNumericLiteralFloat struct {
+	Value []byte
+}
+
+func (e *ErrNumericLiteralFloat) Error() string {
+	return "literal numeric floats are not allowed"
 }
