@@ -1099,10 +1099,6 @@ func (node *ColumnDef) String() string {
 
 // HasPrimaryKey checks if column definition has a primary key constraint.
 func (node *ColumnDef) HasPrimaryKey() bool {
-	if len(node.Constraints) == 0 {
-		return false
-	}
-
 	for _, constraint := range node.Constraints {
 		if _, ok := constraint.(*ColumnConstraintPrimaryKey); ok {
 			return true

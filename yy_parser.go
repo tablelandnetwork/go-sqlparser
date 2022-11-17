@@ -38,8 +38,7 @@ var keywordsNotAllowed = map[string]struct{}{
 }
 
 func isRowID(column Identifier) bool {
-	lowered := strings.ToLower(string(column))
-	if lowered == "rowid" || lowered == "_rowid_ " || lowered == "oid" {
+	if strings.EqualFold(string(column), "rowid") || strings.EqualFold(string(column), "_rowid_") || strings.EqualFold(string(column), "oid") {
 		return true
 	}
 
@@ -1950,22 +1949,17 @@ yydefault:
 			// would be an alias to rowid. For cases where a column becomes an alias to rowid we want to force the AUTOINCREMENT.
 			//
 			// The exception to the above rule is when a table constraint primary key has order DESC. In that case, we replace with an
-			// equivalent column constrain without forcing AUTOINCREMENT.
-			var tableConstraintPK *TableConstraintPrimaryKey
-			var index int
-			for i, tableConstraint := range yyDollar[6].tableConstraints {
-				if tcpk, ok := tableConstraint.(*TableConstraintPrimaryKey); ok && len(tcpk.Columns) == 1 {
-					tableConstraintPK = tcpk
-					index = i
-				}
-			}
-
-			for _, columnDef := range yyDollar[5].columnDefList {
-				if columnDef.Type == TypeIntegerStr && !columnDef.HasPrimaryKey() {
-					if tableConstraintPK != nil && columnDef.Column.Name == tableConstraintPK.Columns[0].Column.Name {
-						forceAutoincrement := tableConstraintPK.Columns[0].Order != PrimaryKeyOrderDesc
-						columnDef.Constraints = append(columnDef.Constraints, &ColumnConstraintPrimaryKey{Name: tableConstraintPK.Name, AutoIncrement: forceAutoincrement, Order: tableConstraintPK.Columns[0].Order})
-						yyDollar[6].tableConstraints = append(yyDollar[6].tableConstraints[:index], yyDollar[6].tableConstraints[index+1:]...)
+			// equivalent column constrain without forcing AUTOINCREMENT and avoiding being interpreted as an alias.
+			for index, tableConstraint := range yyDollar[6].tableConstraints {
+				if tableConstraintPK, ok := tableConstraint.(*TableConstraintPrimaryKey); ok && len(tableConstraintPK.Columns) == 1 {
+					for _, columnDef := range yyDollar[5].columnDefList {
+						if columnDef.Type == TypeIntegerStr && !columnDef.HasPrimaryKey() {
+							if tableConstraintPK != nil && columnDef.Column.Name == tableConstraintPK.Columns[0].Column.Name {
+								forceAutoincrement := tableConstraintPK.Columns[0].Order != PrimaryKeyOrderDesc
+								columnDef.Constraints = append(columnDef.Constraints, &ColumnConstraintPrimaryKey{Name: tableConstraintPK.Name, AutoIncrement: forceAutoincrement, Order: tableConstraintPK.Columns[0].Order})
+								yyDollar[6].tableConstraints = append(yyDollar[6].tableConstraints[:index], yyDollar[6].tableConstraints[index+1:]...)
+							}
+						}
 					}
 				}
 			}
