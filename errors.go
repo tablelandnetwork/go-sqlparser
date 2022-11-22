@@ -123,5 +123,5 @@ type ErrNumericLiteralFloat struct {
 }
 
 func (e *ErrNumericLiteralFloat) Error() string {
-	return "literal numeric floats are not allowed"
+	return fmt.Sprintf("literal numeric float is not allowed: %s", string(e.Value))
 }
