@@ -56,15 +56,14 @@ func isRowID(column Identifier) bool {
   convertType ConvertType
   when *When
   whens []*When
-  SelectColumn SelectColumn
-  SelectColumnList SelectColumnList
+  selectColumn SelectColumn
+  selectColumnList SelectColumnList
   selectStmt *Select
   where *Where
   limit *Limit
   orderBy OrderBy
   orderingTerm *OrderingTerm
   nulls NullsType
-  tableExprList TableExprList
   tableExpr TableExpr
   joinTableExpr *JoinTableExpr
   columnList ColumnList
@@ -98,6 +97,7 @@ func isRowID(column Identifier) bool {
   onConflictClause *OnConflictClause
   onConflictTarget *OnConflictTarget
   collateOpt Identifier
+  joinOperator *JoinOperator
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
@@ -111,7 +111,7 @@ func isRowID(column Identifier) bool {
 %token <empty> INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 %token <empty> GRANT TO REVOKE
 
-%left <empty> JOIN
+%left <empty> RIGHT FULL INNER LEFT NATURAL OUTER CROSS JOIN
 %left <empty> ON USING
 
 %left <empty> OR
@@ -135,8 +135,8 @@ func isRowID(column Identifier) bool {
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege
 %type <column> column_name 
 %type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name identifier collate_opt
-%type <SelectColumn> select_column
-%type <SelectColumnList> select_column_list
+%type <selectColumn> select_column
+%type <selectColumnList> select_column_list
 %type <table> table_name
 %type <where> where_opt having_opt filter_opt
 %type <convertType> convert_type
@@ -146,15 +146,14 @@ func isRowID(column Identifier) bool {
 %type <orderBy> order_by_opt order_list
 %type <orderingTerm> ordering_term
 %type <nulls> nulls
-%type <tableExprList> table_expr_list from_clause
-%type <tableExpr> table_expr
+%type <tableExpr> table_expr from_clause
 %type <joinTableExpr> join_clause join_constraint
 %type <columnList> column_name_list column_name_list_opt
 %type <indexedColumnList> indexed_column_list
 %type <indexedColumn> indexed_column
 %type <subquery> subquery
 %type <colTuple> col_tuple
-%type <bool> distinct_function_opt is_stored
+%type <bool> distinct_function_opt is_stored natural_opt outer_opt
 %type <columnDefList> column_def_list
 %type <columnDef> column_def
 %type <columnConstraint> column_constraint
@@ -177,6 +176,7 @@ func isRowID(column Identifier) bool {
 %type <onConflictClauseList> on_conflict_clause_list
 %type <onConflictClause> on_conflict_clause
 %type <onConflictTarget> conflict_target_opt
+%type <joinOperator> join_op
 
 %%
 start: 
@@ -264,6 +264,7 @@ select_stmt:
             Limit: $9,
          }
   }
+;
 
 distinct_opt:
   {
@@ -328,24 +329,13 @@ col_alias:
 ;
 
 from_clause:
-  FROM table_expr_list
+  FROM table_expr
   {
     $$ = $2
   }
 | FROM join_clause
   {
-    $$ = TableExprList{$2}
-  }
-;
-
-table_expr_list:
-  table_expr
-  {
-    $$ = TableExprList{$1}
-  }
-| table_expr_list ',' table_expr
-  {
-    $$ = append($$, $3)
+    $$ = $2
   }
 ;
 
@@ -358,9 +348,9 @@ table_expr:
   {
     $$ = &AliasedTableExpr{Expr: &Subquery{Select: $2}, As: $4}
   }
-| '(' table_expr_list ')'
+| '(' table_expr ')'
   {
-    $$ = &ParenTableExpr{TableExprList: $2}
+    $$ = &ParenTableExpr{TableExpr: $2}
   }
 |  '(' join_clause ')'
   {
@@ -393,27 +383,78 @@ table_alias:
 ;
 
 join_clause:
-  table_expr JOIN table_expr join_constraint
+  table_expr join_op table_expr join_constraint
   {
     if $4 == nil {
-      $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: JoinStr, RightExpr: $3}
+      $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: $2, RightExpr: $3}
     } else {
       $4.LeftExpr = $1
-      $4.JoinOperator = JoinStr
+      $4.JoinOperator = $2
       $4.RightExpr = $3
       $$ = $4
     }
   }
-| join_clause JOIN table_expr join_constraint
+| join_clause join_op table_expr join_constraint
   {
     if $4 == nil {
-      $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: JoinStr, RightExpr: $3}
+      $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: $2, RightExpr: $3}
     } else {
       $4.LeftExpr = $1
-      $4.JoinOperator = JoinStr
+      $4.JoinOperator = $2
       $4.RightExpr = $3
       $$ = $4
     }
+  }
+;
+
+join_op:
+  JOIN
+  {
+    $$ = &JoinOperator{Op: JoinStr}
+  }
+| ','
+  {
+    $$ =  &JoinOperator{Op: JoinStr}
+  }
+| CROSS JOIN
+  {
+    $$ =  &JoinOperator{Op: JoinStr}
+  }
+| natural_opt LEFT outer_opt JOIN
+  {
+    $$ =  &JoinOperator{Op: LeftJoinStr, Natural: $1, Outer: $3}
+  }
+| natural_opt RIGHT outer_opt JOIN
+  {
+    $$ =  &JoinOperator{Op: RightJoinStr, Natural: $1, Outer: $3}
+  }
+| natural_opt FULL outer_opt JOIN
+  {
+    $$ =  &JoinOperator{Op: FullJoinStr, Natural: $1, Outer: $3}
+  }
+| natural_opt INNER JOIN
+  {
+    $$ =  &JoinOperator{Op: InnerJoinStr, Natural: $1}
+  }
+;
+
+natural_opt:
+  {
+    $$ = false
+  }
+| NATURAL
+  {
+    $$ = true
+  }
+;
+
+outer_opt:
+  {
+    $$ = false
+  }
+| OUTER
+  {
+    $$ = true
   }
 ;
 
@@ -421,7 +462,7 @@ join_constraint:
   {
     $$ = nil
   }
-| ON expr 
+| ON expr
   {
     $$ = &JoinTableExpr{On: $2}
   }
@@ -446,9 +487,9 @@ group_by_opt:
     $$ = nil
   }
 | GROUP BY expr_list
-{
-   $$ = $3
-}
+  {
+    $$ = $3
+  }
 ;
 
 having_opt:
@@ -456,9 +497,9 @@ having_opt:
     $$ = nil
   }
 | HAVING expr
-{
-   $$ = NewWhere(HavingStr, $2)
-}
+  {
+    $$ = NewWhere(HavingStr, $2)
+  }
 ;
 
 order_by_opt:

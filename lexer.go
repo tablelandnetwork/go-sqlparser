@@ -82,6 +82,13 @@ var keywords = map[string]int{
 	"CONFLICT":   CONFLICT,
 	"DO":         DO,
 	"NOTHING":    NOTHING,
+	"CROSS":      CROSS,
+	"LEFT":       LEFT,
+	"NATURAL":    NATURAL,
+	"OUTER":      OUTER,
+	"RIGHT":      RIGHT,
+	"FULL":       FULL,
+	"INNER":      INNER,
 }
 
 const EOF = 0

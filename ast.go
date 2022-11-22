@@ -100,7 +100,7 @@ func (*Revoke) iGrantOrRevokeStatement() {}
 type Select struct {
 	Distinct         string
 	SelectColumnList SelectColumnList
-	From             TableExprList
+	From             TableExpr
 	Where            *Where
 	GroupBy          GroupBy
 	Having           *Where
@@ -189,22 +189,6 @@ func (*AliasedTableExpr) iTableExpr() {}
 func (*ParenTableExpr) iTableExpr()   {}
 func (*JoinTableExpr) iTableExpr()    {}
 
-// TableExprList represents a list of table expressions.
-type TableExprList []TableExpr
-
-// String returns the string representation of the node.
-func (node TableExprList) String() string {
-	if len(node) == 0 {
-		return ""
-	}
-	var strs []string
-	for _, e := range node {
-		strs = append(strs, e.String())
-	}
-
-	return strings.Join(strs, ", ")
-}
-
 // AliasedTableExpr represents a table expression
 // coupled with an optional alias.
 // If As is empty, no alias was used.
@@ -246,20 +230,39 @@ func (node *Subquery) ContainsSubquery() bool {
 	return true
 }
 
-// ParenTableExpr represents a parenthesized list of TableExpr.
+// ParenTableExpr represents a parenthesized TableExpr.
 type ParenTableExpr struct {
-	TableExprList TableExprList
+	TableExpr TableExpr
 }
 
 // String returns the string representation of the node.
 func (node *ParenTableExpr) String() string {
-	return fmt.Sprintf("(%v)", node.TableExprList.String())
+	return fmt.Sprintf("(%v)", node.TableExpr.String())
+}
+
+// JoinOperator represents a join operator.
+type JoinOperator struct {
+	Op      string
+	Natural bool
+	Outer   bool
+}
+
+func (node *JoinOperator) String() string {
+	var natural string
+	if node.Natural {
+		natural = "natural "
+	}
+
+	if node.Outer {
+		node.Op = strings.Replace(node.Op, " ", " outer ", 1)
+	}
+	return fmt.Sprintf("%s%s", natural, node.Op)
 }
 
 // JoinTableExpr represents a TableExpr that's a JOIN operation.
 type JoinTableExpr struct {
 	LeftExpr     TableExpr
-	JoinOperator string
+	JoinOperator *JoinOperator
 	RightExpr    TableExpr
 	On           Expr
 	Using        ColumnList
@@ -267,26 +270,25 @@ type JoinTableExpr struct {
 
 // Kinds of JoinOperator.
 const (
-	JoinStr             = "join"
-	CrossJoinStr        = "cross join"
-	LeftJoinStr         = "left join"
-	RightJoinStr        = "right join"
-	NaturalJoinStr      = "natural join"
-	NaturalLeftJoinStr  = "natural left join"
-	NaturalRightJoinStr = "natural right join"
+	JoinStr = "join"
+
+	LeftJoinStr  = "left join"
+	RightJoinStr = "right join"
+	FullJoinStr  = "full join"
+	InnerJoinStr = "inner join"
 )
 
 // String returns the string representation of the node.
 func (node *JoinTableExpr) String() string {
 	if node.On != nil {
-		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.On.String())
+		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), node.On.String())
 	}
 
 	if node.Using != nil {
-		return fmt.Sprintf("%s %s %s using%s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String(), node.Using.String())
+		return fmt.Sprintf("%s %s %s using%s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), node.Using.String())
 	}
 
-	return fmt.Sprintf("%s %s %s", node.LeftExpr.String(), node.JoinOperator, node.RightExpr.String())
+	return fmt.Sprintf("%s %s %s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
 }
 
 // Where represents a WHERE or HAVING clause.
