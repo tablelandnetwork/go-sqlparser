@@ -2936,6 +2936,140 @@ func TestSelectStatement(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "select union",
+			stmt:     "SELECT a FROM t UNION SELECT a FROM t2",
+			deparsed: "select a from t union select a from t2",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CompoundSelect{
+						Left: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+						Type: CompoundUnionStr,
+						Right: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t2"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select union all",
+			stmt:     "SELECT a FROM t UNION ALL SELECT a FROM t2",
+			deparsed: "select a from t union all select a from t2",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CompoundSelect{
+						Left: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+						Type: CompoundUnionAllStr,
+						Right: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t2"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select except",
+			stmt:     "SELECT a FROM t EXCEPT SELECT a FROM t2",
+			deparsed: "select a from t except select a from t2",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CompoundSelect{
+						Left: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+						Type: CompoundExceptStr,
+						Right: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t2"},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "select intersect",
+			stmt:     "SELECT a FROM t INTERSECT SELECT a FROM t2 ORDER BY a",
+			deparsed: "select a from t intersect select a from t2 order by a asc",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CompoundSelect{
+						Left: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t"},
+							},
+						},
+						Type: CompoundIntersectStr,
+						Right: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t2"},
+							},
+						},
+						OrderBy: []*OrderingTerm{
+							{
+								Expr:      &Column{Name: "a"},
+								Direction: AscStr,
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
