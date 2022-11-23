@@ -89,6 +89,9 @@ var keywords = map[string]int{
 	"RIGHT":      RIGHT,
 	"FULL":       FULL,
 	"INNER":      INNER,
+	"UNION":      UNION,
+	"EXCEPT":     EXCEPT,
+	"INTERSECT":  INTERSECT,
 }
 
 const EOF = 0

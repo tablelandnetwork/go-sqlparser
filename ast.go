@@ -45,22 +45,24 @@ type Statement interface {
 	Node
 }
 
-func (*Select) iStatement()      {}
-func (*CreateTable) iStatement() {}
-func (*Insert) iStatement()      {}
-func (*Delete) iStatement()      {}
-func (*Update) iStatement()      {}
-func (*Grant) iStatement()       {}
-func (*Revoke) iStatement()      {}
+func (*Select) iStatement()         {}
+func (*CompoundSelect) iStatement() {}
+func (*CreateTable) iStatement()    {}
+func (*Insert) iStatement()         {}
+func (*Delete) iStatement()         {}
+func (*Update) iStatement()         {}
+func (*Grant) iStatement()          {}
+func (*Revoke) iStatement()         {}
 
-// ReadStatement is any SELECT statement.
+// ReadStatement is any SELECT statement or UNION statement.
 type ReadStatement interface {
 	iReadStatement()
 	iStatement()
 	Node
 }
 
-func (*Select) iReadStatement() {}
+func (*Select) iReadStatement()         {}
+func (*CompoundSelect) iReadStatement() {}
 
 // CreateTableStatement is any CREATE TABLE statement.
 type CreateTableStatement interface {
@@ -121,6 +123,27 @@ func (node *Select) String() string {
 		node.OrderBy.String(),
 		node.Limit.String(),
 	)
+}
+
+// Compound Select operation types
+const (
+	CompoundUnionStr     = "union"
+	CompoundUnionAllStr  = "union all"
+	CompoundIntersectStr = "intersect"
+	CompoundExceptStr    = "except"
+)
+
+// CompoundSelect represents a compound operation of selects.
+type CompoundSelect struct {
+	Left    *Select
+	Type    string
+	Right   *Select
+	Limit   *Limit
+	OrderBy OrderBy
+}
+
+func (node *CompoundSelect) String() string {
+	return fmt.Sprintf("%s %s %s%s%s", node.Left, node.Type, node.Right, node.Limit, node.OrderBy)
 }
 
 // Distinct/All
@@ -217,7 +240,7 @@ func (*Subquery) iSimpleTableExpr() {}
 
 // Subquery represents a subquery.
 type Subquery struct {
-	Select *Select
+	Select ReadStatement
 }
 
 // String returns the string representation of the node.

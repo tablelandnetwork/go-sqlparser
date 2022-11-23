@@ -26,13 +26,10 @@ var keywordsNotAllowed = map[string]struct{}{
   "COMMIT": {},
   "DEFERRABLE": {},
   "DROP": {},
-  "EXCEPT": {},
   "FOREIGN": {},
   "INDEX": {},
-  "INTERSECT": {},
   "RETURNING": {},
   "TRANSACTION": {},
-  "UNION": {},
 }
 
 func isRowID(column Identifier) bool {
@@ -58,7 +55,8 @@ func isRowID(column Identifier) bool {
   whens []*When
   selectColumn SelectColumn
   selectColumnList SelectColumnList
-  selectStmt *Select
+  readStmt ReadStatement
+  baseSelect *Select
   where *Where
   limit *Limit
   orderBy OrderBy
@@ -106,7 +104,7 @@ func isRowID(column Identifier) bool {
 %token <empty> '(' ',' ')' '.' ';'
 %token <empty> NONE INTEGER TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
-%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER
+%token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER UNION EXCEPT INTERSECT
 %token <empty> CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 %token <empty> INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 %token <empty> GRANT TO REVOKE
@@ -128,11 +126,12 @@ func isRowID(column Identifier) bool {
 %right <empty> '~' UNARY
 
 %type <statement> multi_stmt single_stmt
-%type <selectStmt> select_stmt
+%type <readStmt> select_stmt
+%type <baseSelect> base_select
 %type <createTableStmt> create_table_stmt
 %type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number
 %type <exprs> expr_list expr_list_opt group_by_opt
-%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege
+%type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege compound_op
 %type <column> column_name 
 %type <identifier> as_column_opt col_alias as_table_opt table_alias constraint_name identifier collate_opt
 %type <selectColumn> select_column
@@ -251,7 +250,39 @@ semicolon_opt:
 ;
 
 select_stmt:
-  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt order_by_opt limit_opt
+  base_select order_by_opt limit_opt
+  {
+    $1.OrderBy = $2
+    $1.Limit = $3
+    $$ = $1
+  }
+| base_select compound_op base_select order_by_opt limit_opt
+  {
+    $$ = &CompoundSelect{Type: $2, Left: $1, Right: $3, OrderBy: $4, Limit: $5}
+  }
+;
+
+compound_op:
+  UNION 
+  {
+    $$ = CompoundUnionStr
+  }
+| UNION ALL 
+  {
+    $$ = CompoundUnionAllStr
+  }
+| EXCEPT 
+  {
+    $$ = CompoundExceptStr
+  }
+| INTERSECT 
+  {
+    $$ = CompoundIntersectStr
+  }
+;
+
+base_select:
+  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt
   {
     $$ = &Select{
             Distinct: $2,
@@ -259,9 +290,7 @@ select_stmt:
             From: $4, 
             Where: $5, 
             GroupBy: GroupBy($6), 
-            Having: $7, 
-            OrderBy: $8,
-            Limit: $9,
+            Having: $7,
          }
   }
 ;
