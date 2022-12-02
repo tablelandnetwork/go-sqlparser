@@ -371,6 +371,7 @@ from_clause:
 table_expr:
   table_name as_table_opt
   {
+    $1.IsTarget = true
     $$ = &AliasedTableExpr{Expr: $1, As: $2}
   }
 | '(' select_stmt ')' as_table_opt
@@ -417,6 +418,10 @@ join_clause:
     if $4 == nil {
       $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: $2, RightExpr: $3}
     } else {
+      if $2.Natural {
+        yylex.(*Lexer).AddError(&ErrNaturalJoinWithOnOrUsingClause{})
+      }
+
       $4.LeftExpr = $1
       $4.JoinOperator = $2
       $4.RightExpr = $3
@@ -428,6 +433,10 @@ join_clause:
     if $4 == nil {
       $$ = &JoinTableExpr{LeftExpr: $1, JoinOperator: $2, RightExpr: $3}
     } else {
+      if $2.Natural {
+        yylex.(*Lexer).AddError(&ErrNaturalJoinWithOnOrUsingClause{})
+      }
+
       $4.LeftExpr = $1
       $4.JoinOperator = $2
       $4.RightExpr = $3
@@ -488,6 +497,7 @@ outer_opt:
 ;
 
 join_constraint:
+  %prec JOIN
   {
     $$ = nil
   }
@@ -608,7 +618,7 @@ limit_opt:
 table_name:
   identifier
   { 
-    $$ = &Table{Name : $1} 
+     $$ = &Table{Name: $1}
   }
 ;
 
@@ -1075,7 +1085,7 @@ create_table_stmt:
         }
       }
     }
-
+    $3.IsTarget = true
     $$ = &CreateTable{Table: $3, ColumnsDef: $5, Constraints: $6}
   }
 ;
@@ -1345,11 +1355,49 @@ insert_stmt:
 				}
 			}
     }
+    $3.IsTarget = true
     $$ = &Insert{Table: $3, Columns: $4, Rows: $6, Upsert: $7}
   }
 | INSERT INTO table_name DEFAULT VALUES
   {
+    $3.IsTarget = true
     $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{}, DefaultValues: true}
+  }
+| INSERT INTO table_name column_name_list_opt select_stmt upsert_clause_opt
+  {
+    $3.IsTarget = true
+
+    err := $5.walkSubtree(func(node Node) (bool, error) {
+      if _, ok := node.(*Subquery); ok {
+        return true, &ErrStatementContainsSubquery{StatementKind: "insert+select"}
+      }
+
+      if _, ok := node.(*JoinTableExpr); ok {
+        return true, &ErrContainsJoinTableExpr{}
+      }
+
+      return false, nil
+    })
+    if err != nil {
+       yylex.(*Lexer).AddError(err)
+    }
+
+    if sel, ok := $5.(*Select); ok {
+      if sel.Having != nil || sel.GroupBy != nil {
+        yylex.(*Lexer).AddError(&ErrHavingOrGroupByIsNotAllowed{})
+      }
+
+      if sel.OrderBy == nil {
+        sel.OrderBy = OrderBy{&OrderingTerm{Expr: &Column{Name: Identifier("rowid")}, Direction: AscStr, Nulls: NullsNil}}
+      } else {
+        sel.OrderBy = append(sel.OrderBy, &OrderingTerm{Expr: &Column{Name: Identifier("rowid")}, Direction: AscStr, Nulls: NullsNil})
+      }
+
+      $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{}, Select: sel, Upsert: $6}
+    } else {
+      yylex.(*Lexer).AddError(&ErrCompoudSelectNotAllowed{})
+      $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{},  Upsert: $6}
+    }
   }
 ;
 
@@ -1449,6 +1497,7 @@ delete_stmt:
     if $4 != nil && containsSubquery($4) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
     }
+    $3.IsTarget = true
     $$ = &Delete{Table: $3, Where: $4}
   }
 ;
@@ -1459,6 +1508,7 @@ update_stmt:
     if $5 != nil && containsSubquery($5) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
     }
+    $2.IsTarget = true
     $$ = &Update{Table: $2, Exprs: $4, Where: $5}
   }
 ;
@@ -1520,6 +1570,7 @@ update_expression:
 grant_stmt:
   GRANT privileges ON table_name TO roles
   {
+    $4.IsTarget = true
     $$ = &Grant{Table: $4, Privileges: $2, Roles: $6}
   }
 ;
@@ -1527,6 +1578,7 @@ grant_stmt:
 revoke_stmt:
   REVOKE privileges ON table_name FROM roles
   {
+    $4.IsTarget = true
     $$ = &Revoke{Table: $4, Privileges: $2, Roles: $6}
   }
 ;
