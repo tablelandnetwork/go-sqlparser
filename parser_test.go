@@ -4717,6 +4717,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 			require.Equal(t, "insert", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
+		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("update update expr", func(t *testing.T) {
@@ -4730,6 +4731,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 			require.Equal(t, "update", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
+		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("update where", func(t *testing.T) {
@@ -4743,6 +4745,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 			require.Equal(t, "where", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
+		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("delete", func(t *testing.T) {
@@ -4756,6 +4759,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 			require.Equal(t, "delete", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
+		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("upsert", func(t *testing.T) {
@@ -4770,6 +4774,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 			require.Equal(t, "where", e.StatementKind)
 		}
 		require.ErrorAs(t, err, &e)
+		require.Equal(t, true, containsSubquery(ast))
 	})
 }
 
@@ -5190,6 +5195,24 @@ func TestRowIDReferences(t *testing.T) {
 			require.ErrorContains(t, err, "rowid is not allowed")
 		})
 	}
+}
+
+func TestGetUniqueTableReferences(t *testing.T) {
+	t.Parallel()
+
+	t.Run("nil", func(t *testing.T) {
+		t.Parallel()
+		require.ElementsMatch(t, []string{}, GetUniqueTableReferences(nil))
+	})
+
+	t.Run("select", func(t *testing.T) {
+		t.Parallel()
+
+		sql := "SELECT t.id, t3.* FROM t, t2 JOIN t3 JOIN (SELECT * FROM t4);"
+		ast, err := Parse(sql)
+		require.NoError(t, err)
+		require.ElementsMatch(t, []string{"t", "t3", "t2", "t4"}, GetUniqueTableReferences(ast))
+	})
 }
 
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.

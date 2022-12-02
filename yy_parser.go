@@ -2354,7 +2354,7 @@ yydefault:
 
 			for _, row := range yyDollar[6].insertRows {
 				for _, expr := range row {
-					if expr.ContainsSubquery() {
+					if containsSubquery(expr) {
 						yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "insert"})
 					}
 				}
@@ -2422,7 +2422,7 @@ yydefault:
 	case 236:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			if yyDollar[8].where != nil && yyDollar[8].where.Expr.ContainsSubquery() {
+			if yyDollar[8].where != nil && containsSubquery(yyDollar[8].where) {
 				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
 			}
 
@@ -2442,7 +2442,7 @@ yydefault:
 	case 238:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			if yyDollar[4].where != nil && yyDollar[4].where.Expr.ContainsSubquery() {
+			if yyDollar[4].where != nil && containsSubquery(yyDollar[4].where) {
 				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
 			}
 
@@ -2454,7 +2454,7 @@ yydefault:
 	case 239:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			if yyDollar[4].where != nil && yyDollar[4].where.Expr.ContainsSubquery() {
+			if yyDollar[4].where != nil && containsSubquery(yyDollar[4].where) {
 				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
 			}
 			yyVAL.deleteStmt = &Delete{Table: yyDollar[3].table, Where: yyDollar[4].where}
@@ -2462,7 +2462,7 @@ yydefault:
 	case 240:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			if yyDollar[5].where != nil && yyDollar[5].where.Expr.ContainsSubquery() {
+			if yyDollar[5].where != nil && containsSubquery(yyDollar[5].where) {
 				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
 			}
 			yyVAL.updateStmt = &Update{Table: yyDollar[2].table, Exprs: yyDollar[4].updateList, Where: yyDollar[5].where}
@@ -2480,7 +2480,7 @@ yydefault:
 	case 243:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			if yyDollar[1].updateExpression.Expr.ContainsSubquery() {
+			if containsSubquery(yyDollar[1].updateExpression.Expr) {
 				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
 			}
 			yyVAL.updateList = []*UpdateExpr{yyDollar[1].updateExpression}

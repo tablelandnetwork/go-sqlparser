@@ -13,6 +13,7 @@ import (
 // Node represents a node in the AST.
 type Node interface {
 	String() string
+	walkSubtree(visit Visit) error
 }
 
 // AST represents the root Node of the AST.
@@ -31,6 +32,18 @@ func (node *AST) String() string {
 		stmts = append(stmts, stmt.String())
 	}
 	return strings.Join(stmts, "; ")
+}
+
+func (node *AST) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	for _, n := range node.Statements {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (ast *AST) PrettyPrint() {
@@ -125,6 +138,23 @@ func (node *Select) String() string {
 	)
 }
 
+func (node *Select) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(
+		visit,
+		node.SelectColumnList,
+		node.From,
+		node.Where,
+		node.GroupBy,
+		node.Having,
+		node.Limit,
+		node.OrderBy,
+	)
+}
+
 // Compound Select operation types
 const (
 	CompoundUnionStr     = "union"
@@ -146,6 +176,13 @@ func (node *CompoundSelect) String() string {
 	return fmt.Sprintf("%s %s %s%s%s", node.Left, node.Type, node.Right, node.Limit, node.OrderBy)
 }
 
+func (node *CompoundSelect) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Left, node.Right, node.Limit, node.OrderBy)
+}
+
 // Distinct/All
 const (
 	DistinctStr = "distinct "
@@ -163,6 +200,16 @@ func (node SelectColumnList) String() string {
 	}
 
 	return strings.Join(colsStr, ", ")
+}
+
+func (node SelectColumnList) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // SelectColumn represents a SELECT column.
@@ -187,6 +234,13 @@ func (node *StarSelectColumn) String() string {
 	return "*"
 }
 
+func (node *StarSelectColumn) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.TableRef)
+}
+
 // AliasedSelectColumn defines an aliased SELECT column.
 type AliasedSelectColumn struct {
 	Expr Expr
@@ -200,6 +254,13 @@ func (node *AliasedSelectColumn) String() string {
 	}
 
 	return node.Expr.String()
+}
+
+func (node *AliasedSelectColumn) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Expr, node.As)
 }
 
 // TableExpr represents an expression referenced by FROM.
@@ -229,6 +290,14 @@ func (node *AliasedTableExpr) String() string {
 	return fmt.Sprintf("%s as %s", node.Expr.String(), node.As.String())
 }
 
+func (node *AliasedTableExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Expr, node.As)
+}
+
 // SimpleTableExpr represents a direct table reference or a subquery.
 type SimpleTableExpr interface {
 	iSimpleTableExpr()
@@ -248,9 +317,11 @@ func (node *Subquery) String() string {
 	return fmt.Sprintf("(%s)", node.Select.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *Subquery) ContainsSubquery() bool {
-	return true
+func (node *Subquery) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Select)
 }
 
 // ParenTableExpr represents a parenthesized TableExpr.
@@ -261,6 +332,14 @@ type ParenTableExpr struct {
 // String returns the string representation of the node.
 func (node *ParenTableExpr) String() string {
 	return fmt.Sprintf("(%v)", node.TableExpr.String())
+}
+
+func (node *ParenTableExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.TableExpr)
 }
 
 // JoinOperator represents a join operator.
@@ -280,6 +359,10 @@ func (node *JoinOperator) String() string {
 		node.Op = strings.Replace(node.Op, " ", " outer ", 1)
 	}
 	return fmt.Sprintf("%s%s", natural, node.Op)
+}
+
+func (node *JoinOperator) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // JoinTableExpr represents a TableExpr that's a JOIN operation.
@@ -314,6 +397,14 @@ func (node *JoinTableExpr) String() string {
 	return fmt.Sprintf("%s %s %s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
 }
 
+func (node *JoinTableExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.LeftExpr, node.JoinOperator, node.RightExpr, node.On, node.Using)
+}
+
 // Where represents a WHERE or HAVING clause.
 type Where struct {
 	Type string
@@ -343,6 +434,13 @@ func (node *Where) String() string {
 	return fmt.Sprintf(" %s %s", node.Type, node.Expr.String())
 }
 
+func (node *Where) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Expr)
+}
+
 // GroupBy represents a GROUP BY clause.
 type GroupBy Exprs
 
@@ -359,6 +457,16 @@ func (node GroupBy) String() string {
 	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
 }
 
+func (node GroupBy) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // OrderBy represents an ORDER BY clause.
 type OrderBy []*OrderingTerm
 
@@ -373,6 +481,15 @@ func (node OrderBy) String() string {
 	}
 
 	return fmt.Sprintf(" order by %s", strings.Join(strs, ", "))
+}
+
+func (node OrderBy) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // OrderingTerm represents an ordering term expression.
@@ -417,6 +534,13 @@ func (node *OrderingTerm) String() string {
 	return fmt.Sprintf("%s %s%s", node.Expr.String(), node.Direction, nullsStr)
 }
 
+func (node *OrderingTerm) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Expr)
+}
+
 // Limit represents the LIMIT clause.
 type Limit struct {
 	Limit  Expr
@@ -436,12 +560,17 @@ func (node *Limit) String() string {
 	return fmt.Sprintf(" limit %s offset %s", node.Limit.String(), node.Offset.String())
 }
 
+func (node *Limit) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Limit, node.Offset)
+}
+
 // Expr represents an expr node in the AST.
 type Expr interface {
 	iExpr()
-
-	// ContainsSubquery returns true is a Subquery is found recursively.
-	ContainsSubquery() bool
 	Node
 }
 
@@ -476,9 +605,8 @@ func (node *NullValue) String() string {
 	return "null"
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *NullValue) ContainsSubquery() bool {
-	return false
+func (node *NullValue) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // BoolValue represents booleans.
@@ -493,9 +621,8 @@ func (node BoolValue) String() string {
 	return "false"
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node BoolValue) ContainsSubquery() bool {
-	return false
+func (node BoolValue) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // Value represents a single value.
@@ -531,9 +658,8 @@ func (node *Value) String() string {
 	return value
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *Value) ContainsSubquery() bool {
-	return false
+func (node *Value) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // UnaryExpr represents a unary value expression.
@@ -557,9 +683,11 @@ func (node *UnaryExpr) String() string {
 	return fmt.Sprintf("%s%s", node.Operator, node.Expr.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node UnaryExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *UnaryExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Expr)
 }
 
 // BinaryExpr represents a binary value expression.
@@ -589,9 +717,11 @@ func (node *BinaryExpr) String() string {
 	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *BinaryExpr) ContainsSubquery() bool {
-	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+func (node *BinaryExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Left, node.Right)
 }
 
 // CmpExpr represents the comparison of two expressions.
@@ -630,9 +760,11 @@ func (node *CmpExpr) String() string {
 	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *CmpExpr) ContainsSubquery() bool {
-	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+func (node *CmpExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Left, node.Right, node.Escape)
 }
 
 // AndExpr represents an AND expression.
@@ -648,9 +780,12 @@ func (node *AndExpr) String() string {
 	return fmt.Sprintf("%s and %s", node.Left.String(), node.Right.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *AndExpr) ContainsSubquery() bool {
-	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+func (node *AndExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Left, node.Right)
 }
 
 // OrExpr represents an OR expression.
@@ -666,9 +801,12 @@ func (node *OrExpr) String() string {
 	return fmt.Sprintf("%s or %s", node.Left.String(), node.Right.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *OrExpr) ContainsSubquery() bool {
-	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+func (node *OrExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Left, node.Right)
 }
 
 // NotExpr represents an NOT expression.
@@ -684,9 +822,12 @@ func (node *NotExpr) String() string {
 	return fmt.Sprintf("not %s", node.Expr.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *NotExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *NotExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Expr)
 }
 
 // IsExpr represents a IS expression
@@ -699,9 +840,12 @@ func (node *IsExpr) String() string {
 	return fmt.Sprintf("%s is %s", node.Left.String(), node.Right.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *IsExpr) ContainsSubquery() bool {
-	return node.Left.ContainsSubquery() || node.Right.ContainsSubquery()
+func (node *IsExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Left, node.Right)
 }
 
 // IsNullExpr represents a IS expression
@@ -714,9 +858,12 @@ func (node *IsNullExpr) String() string {
 	return fmt.Sprintf("%s isnull", node.Expr.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *IsNullExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *IsNullExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Expr)
 }
 
 // NotNullExpr represents a IS expression
@@ -729,9 +876,12 @@ func (node *NotNullExpr) String() string {
 	return fmt.Sprintf("%s notnull", node.Expr.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *NotNullExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *NotNullExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Expr)
 }
 
 // CollateExpr the COLLATE operator
@@ -745,9 +895,12 @@ func (node *CollateExpr) String() string {
 	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *CollateExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *CollateExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Expr, node.CollationName)
 }
 
 // ConvertExpr represents a CAST expression.
@@ -770,9 +923,12 @@ func (node *ConvertExpr) String() string {
 	return fmt.Sprintf("cast (%s as %s)", node.Expr.String(), string(node.Type))
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *ConvertExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *ConvertExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Expr)
 }
 
 // BetweenExpr represents a BETWEEN or a NOT BETWEEN expression.
@@ -793,9 +949,11 @@ func (node *BetweenExpr) String() string {
 	return fmt.Sprintf("%s %s %s and %s", node.Left.String(), node.Operator, node.From.String(), node.To.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *BetweenExpr) ContainsSubquery() bool {
-	return node.Left.ContainsSubquery() || node.From.ContainsSubquery() || node.To.ContainsSubquery()
+func (node *BetweenExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Left, node.From, node.To)
 }
 
 // When represents a WHEN sub-expression.
@@ -835,21 +993,22 @@ func (node *CaseExpr) String() string {
 	return b.String()
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *CaseExpr) ContainsSubquery() bool {
-	var containsSubquery bool
-	if node.Expr != nil {
-		containsSubquery = node.Expr.ContainsSubquery()
+func (node *CaseExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	if err := Walk(visit, node.Expr); err != nil {
+		return nil
 	}
 
 	for _, when := range node.Whens {
-		containsSubquery = containsSubquery || when.Condition.ContainsSubquery() || when.Value.ContainsSubquery()
+		if err := Walk(visit, when.Condition, when.Value); err != nil {
+			return err
+		}
 	}
 
-	if node.Else != nil {
-		containsSubquery = containsSubquery || node.Else.ContainsSubquery()
-	}
-	return containsSubquery
+	return Walk(visit, node.Else)
 }
 
 // Table represents a table.
@@ -860,6 +1019,13 @@ type Table struct {
 // String returns the string representation of the node.
 func (node *Table) String() string {
 	return node.Name.String()
+}
+
+func (node *Table) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Name)
 }
 
 // Column represents a column.
@@ -876,9 +1042,12 @@ func (node *Column) String() string {
 	return node.Name.String()
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *Column) ContainsSubquery() bool {
-	return false
+func (node *Column) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.TableRef)
 }
 
 // ColumnList is a list of columns.
@@ -896,6 +1065,16 @@ func (node ColumnList) String() string {
 	}
 
 	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
+}
+
+func (node ColumnList) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // IndexedColumn represents a indexed column.
@@ -917,6 +1096,14 @@ func (node *IndexedColumn) String() string {
 	return node.Column.String()
 }
 
+func (node *IndexedColumn) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Column, node.CollationName)
+}
+
 // IndexedColumnList is a list of indexed columns.
 type IndexedColumnList []*IndexedColumn
 
@@ -934,6 +1121,16 @@ func (node IndexedColumnList) String() string {
 	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
 }
 
+func (node IndexedColumnList) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Exprs represents a list of expressions.
 type Exprs []Expr
 
@@ -947,13 +1144,14 @@ func (node Exprs) String() string {
 	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node Exprs) ContainsSubquery() bool {
-	var contains bool
-	for _, expr := range node {
-		contains = contains || expr.ContainsSubquery()
+func (node Exprs) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
 	}
-	return contains
+
+	return nil
 }
 
 // ExistsExpr represents a EXISTS expression.
@@ -966,9 +1164,12 @@ func (node *ExistsExpr) String() string {
 	return fmt.Sprintf("exists %s", node.Subquery.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *ExistsExpr) ContainsSubquery() bool {
-	return true
+func (node *ExistsExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Subquery)
 }
 
 // ColTuple represents a list of column values for IN operator.
@@ -1011,18 +1212,12 @@ func (node *FuncExpr) String() string {
 	return fmt.Sprintf("%s%s%s", node.Name.String(), argsStr[:1]+distinct+argsStr[1:], filter)
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *FuncExpr) ContainsSubquery() bool {
-	var contains bool
-	for _, arg := range node.Args {
-		contains = contains || arg.ContainsSubquery()
+func (node *FuncExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
 	}
 
-	if node.Filter != nil {
-		contains = contains || node.Filter.Expr.ContainsSubquery()
-	}
-
-	return contains
+	return Walk(visit, node.Name, node.Args, node.Filter)
 }
 
 // ParenExpr represents a (expr) expression.
@@ -1035,9 +1230,11 @@ func (node *ParenExpr) String() string {
 	return fmt.Sprintf("(%s)", node.Expr.String())
 }
 
-// ContainsSubquery returns true is a Subquery is found recursively.
-func (node *ParenExpr) ContainsSubquery() bool {
-	return node.Expr.ContainsSubquery()
+func (node *ParenExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Expr)
 }
 
 // Identifier represents a Column, Table and Function name identifier.
@@ -1046,6 +1243,10 @@ type Identifier string
 // String returns the string representation of the node.
 func (node Identifier) String() string {
 	return string(node)
+}
+
+func (node Identifier) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // IsEmpty returns if the identifier is empty.
@@ -1087,6 +1288,30 @@ func (node *CreateTable) String() string {
 	}
 }
 
+func (node *CreateTable) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	if err := Walk(visit, node.Table); err != nil {
+		return err
+	}
+
+	for _, n := range node.ColumnsDef {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	for _, n := range node.Constraints {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // StructureHash returns the hash of the structure of the statement.
 func (node *CreateTable) StructureHash() string {
 	cols := make([]string, len(node.ColumnsDef))
@@ -1118,6 +1343,24 @@ func (node *ColumnDef) String() string {
 		constraint = " " + strings.Join(constraints, " ")
 	}
 	return fmt.Sprintf("%s %s%s", node.Column, node.Type, constraint)
+}
+
+func (node *ColumnDef) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	if err := Walk(visit, node.Column); err != nil {
+		return err
+	}
+
+	for _, n := range node.Constraints {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 // HasPrimaryKey checks if column definition has a primary key constraint.
@@ -1179,6 +1422,14 @@ func (node *ColumnConstraintPrimaryKey) String() string {
 	return fmt.Sprintf("%sprimary key %s%s", constraintName, node.Order, autoIncrement)
 }
 
+func (node *ColumnConstraintPrimaryKey) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name)
+}
+
 const (
 	PrimaryKeyOrderEmpty = ""
 	PrimaryKeyOrderAsc   = "asc"
@@ -1200,6 +1451,14 @@ func (node *ColumnConstraintNotNull) String() string {
 	return fmt.Sprintf("%snot null", constraintName)
 }
 
+func (node *ColumnConstraintNotNull) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name)
+}
+
 // ColumnConstraintUnique represents a UNIQUE column constraint for CREATE TABLE.
 type ColumnConstraintUnique struct {
 	Name Identifier
@@ -1215,6 +1474,14 @@ func (node *ColumnConstraintUnique) String() string {
 	return fmt.Sprintf("%sunique", constraintName)
 }
 
+func (node *ColumnConstraintUnique) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name)
+}
+
 // ColumnConstraintCheck represents a CHECK column constraint for CREATE TABLE.
 type ColumnConstraintCheck struct {
 	Name Identifier
@@ -1228,6 +1495,14 @@ func (node *ColumnConstraintCheck) String() string {
 		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
 	}
 	return fmt.Sprintf("%scheck(%s)", constraintName, node.Expr.String())
+}
+
+func (node *ColumnConstraintCheck) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Expr)
 }
 
 // ColumnConstraintDefault represents a DEFAULT column constraint for CREATE TABLE.
@@ -1247,6 +1522,14 @@ func (node *ColumnConstraintDefault) String() string {
 		return fmt.Sprintf("%sdefault (%s)", constraintName, node.Expr.String())
 	}
 	return fmt.Sprintf("%sdefault %s", constraintName, node.Expr.String())
+}
+
+func (node *ColumnConstraintDefault) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Expr)
 }
 
 // ColumnConstraintGenerated represents a GENERATED ALWAYS column constraint for CREATE TABLE.
@@ -1281,6 +1564,14 @@ func (node *ColumnConstraintGenerated) String() string {
 	return b.String()
 }
 
+func (node *ColumnConstraintGenerated) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Expr)
+}
+
 type TableConstraint interface {
 	iTableConstraint()
 	Node
@@ -1306,6 +1597,14 @@ func (node *TableConstraintPrimaryKey) String() string {
 	return fmt.Sprintf("%sprimary key%s", constraintName, node.Columns.String())
 }
 
+func (node *TableConstraintPrimaryKey) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Columns)
+}
+
 // TableConstraintUnique is a UNIQUE constraint for table definition.
 type TableConstraintUnique struct {
 	Name    Identifier
@@ -1322,6 +1621,14 @@ func (node *TableConstraintUnique) String() string {
 	return fmt.Sprintf("%sunique%s", constraintName, node.Columns.String())
 }
 
+func (node *TableConstraintUnique) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Columns)
+}
+
 // TableConstraintCheck is a CHECK constraint for table definition.
 type TableConstraintCheck struct {
 	Name Identifier
@@ -1336,6 +1643,14 @@ func (node *TableConstraintCheck) String() string {
 	}
 
 	return fmt.Sprintf("%scheck(%s)", constraintName, node.Expr.String())
+}
+
+func (node *TableConstraintCheck) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Expr)
 }
 
 // Insert represents an INSERT statement.
@@ -1372,6 +1687,24 @@ func (node *Insert) String() string {
 	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), node.Upsert.String(), returning)
 }
 
+func (node *Insert) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	if err := Walk(visit, node.Table, node.Columns); err != nil {
+		return err
+	}
+
+	for _, n := range node.Rows {
+		if err := Walk(visit, n); err != nil {
+			return err
+		}
+	}
+
+	return Walk(visit, node.Upsert)
+}
+
 // Upsert represents an upsert clause, which is a list of on conflict clause.
 type Upsert []*OnConflictClause
 
@@ -1386,6 +1719,16 @@ func (node Upsert) String() string {
 	}
 
 	return fmt.Sprintf(" %s", strings.Join(clauses, " "))
+}
+
+func (node Upsert) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n); err != nil {
+			return nil
+		}
+	}
+
+	return nil
 }
 
 type OnConflictClause struct {
@@ -1403,11 +1746,14 @@ func (node *OnConflictClause) String() string {
 		return fmt.Sprintf("%s do nothing", target)
 	}
 
-	var exprs []string
-	for _, expr := range node.DoUpdate.Exprs {
-		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
+	return fmt.Sprintf("%s do update set %s%s", target, node.DoUpdate.Exprs.String(), node.DoUpdate.Where.String())
+}
+
+func (node *OnConflictClause) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
 	}
-	return fmt.Sprintf("%s do update set %s%s", target, strings.Join(exprs, ", "), node.DoUpdate.Where.String())
+	return Walk(visit, node.Target.Columns, node.Target.Where, node.DoUpdate.Exprs, node.DoUpdate.Where)
 }
 
 type OnConflictTarget struct {
@@ -1416,7 +1762,7 @@ type OnConflictTarget struct {
 }
 
 type OnConflictUpdate struct {
-	Exprs []*UpdateExpr
+	Exprs UpdateExprs
 	Where *Where
 }
 
@@ -1452,10 +1798,17 @@ func (node *Delete) AddWhereClause(where *Where) {
 	}
 }
 
+func (node *Delete) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Table, node.Where)
+}
+
 // Update represents an UPDATE statement.
 type Update struct {
 	Table *Table
-	Exprs []*UpdateExpr
+	Exprs UpdateExprs
 	Where *Where
 
 	// RETURNING clause is not accepted in the parser.
@@ -1468,16 +1821,20 @@ func (node *Update) String() string {
 	if node.ReturningClause != nil {
 		returning = fmt.Sprintf(" returning %s", node.ReturningClause.String())
 	}
-	var exprs []string
-	for _, expr := range node.Exprs {
-		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
-	}
-	return fmt.Sprintf("update %s set %s%s%s", node.Table.String(), strings.Join(exprs, ", "), node.Where.String(), returning)
+
+	return fmt.Sprintf("update %s set %s%s%s", node.Table.String(), node.Exprs.String(), node.Where.String(), returning)
 }
 
 // GetTable returns the table.
 func (node *Update) GetTable() *Table {
 	return node.Table
+}
+
+func (node *Update) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Table, node.Exprs, node.Where)
 }
 
 // AddWhereClause add a WHERE clause to UPDATE.
@@ -1494,6 +1851,26 @@ func (node *Update) AddWhereClause(where *Where) {
 			Right: where.Expr,
 		},
 	}
+}
+
+type UpdateExprs []*UpdateExpr
+
+func (node UpdateExprs) String() string {
+	var exprs []string
+	for _, expr := range node {
+		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
+	}
+
+	return strings.Join(exprs, ", ")
+}
+
+func (node UpdateExprs) walkSubtree(visit Visit) error {
+	for _, n := range node {
+		if err := Walk(visit, n.Column, n.Expr); err != nil {
+			return nil
+		}
+	}
+	return nil
 }
 
 // UpdateExpr represents an UPDATE SET expression (Column = Expr).
@@ -1529,6 +1906,13 @@ func (node *Grant) GetPrivileges() Privileges {
 	return node.Privileges
 }
 
+func (node *Grant) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Privileges, node.Table)
+}
+
 // Privileges represents the GRANT privilges (INSERT, UPDATE, DELETE).
 type Privileges map[string]struct{}
 
@@ -1546,6 +1930,10 @@ func (node Privileges) String() string {
 
 func (node Privileges) Len() int {
 	return len(node)
+}
+
+func (node Privileges) walkSubtree(visit Visit) error {
+	return nil
 }
 
 // Revoke represents a REVOKE statement.
@@ -1573,4 +1961,11 @@ func (node *Revoke) GetTable() *Table {
 // GetPrivileges returns the privileges.
 func (node *Revoke) GetPrivileges() Privileges {
 	return node.Privileges
+}
+
+func (node *Revoke) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+	return Walk(visit, node.Privileges, node.Table)
 }

@@ -1340,7 +1340,7 @@ insert_stmt:
 
     for _, row := range $6 {
       for _, expr := range row {
-				if expr.ContainsSubquery() {
+				if containsSubquery(expr) {
           yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "insert"})
 				}
 			}
@@ -1362,7 +1362,6 @@ column_name_list_opt:
     $$ = $2
   }
 ;
-
 
 insert_rows:
   '(' expr_list ')'
@@ -1411,7 +1410,7 @@ on_conflict_clause:
   }
 | ON CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt
   {
-    if $8 != nil && $8.Expr.ContainsSubquery() {
+    if $8 != nil && containsSubquery($8) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
     }
 
@@ -1431,7 +1430,7 @@ conflict_target_opt:
   }
 | '(' column_name_list ')' where_opt
   {
-    if $4 != nil && $4.Expr.ContainsSubquery() {
+    if $4 != nil && containsSubquery($4) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
     }
 
@@ -1447,7 +1446,7 @@ conflict_target_opt:
 delete_stmt:
   DELETE FROM table_name where_opt
   {
-    if $4 != nil && $4.Expr.ContainsSubquery() {
+    if $4 != nil && containsSubquery($4) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
     }
     $$ = &Delete{Table: $3, Where: $4}
@@ -1457,7 +1456,7 @@ delete_stmt:
 update_stmt:
   UPDATE table_name SET update_list where_opt
   {
-    if $5 != nil && $5.Expr.ContainsSubquery() {
+    if $5 != nil && containsSubquery($5) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
     }
     $$ = &Update{Table: $2, Exprs: $4, Where: $5}
@@ -1478,7 +1477,7 @@ update_list:
 common_update_list:
   update_expression
   {
-    if $1.Expr.ContainsSubquery() {
+    if containsSubquery($1.Expr) {
       yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
     }
     $$ = []*UpdateExpr{$1}
