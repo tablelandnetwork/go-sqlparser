@@ -125,3 +125,40 @@ type ErrNumericLiteralFloat struct {
 func (e *ErrNumericLiteralFloat) Error() string {
 	return fmt.Sprintf("literal numeric float is not allowed: %s", string(e.Value))
 }
+
+// ErrCompoudSelectNotAllowed indicates that a compound SELECT is not allowed.
+type ErrCompoudSelectNotAllowed struct{}
+
+func (e *ErrCompoudSelectNotAllowed) Error() string {
+	return "compound select is not allowed"
+}
+
+// ErrContainsJoinTableExpr indicates that a node contains a JOIN.
+type ErrContainsJoinTableExpr struct{}
+
+func (e *ErrContainsJoinTableExpr) Error() string {
+	return "JOIN is not allowed"
+}
+
+// ErrHavingOrGroupByIsNotAllowed indicates that a node contains a JOIN.
+type ErrHavingOrGroupByIsNotAllowed struct{}
+
+func (e *ErrHavingOrGroupByIsNotAllowed) Error() string {
+	return "HAVING or GROUP BY clauses are not allowed"
+}
+
+// ErrNaturalJoinWithOnOrUsingClause indicates that a ON or USING clause is used together with a NATURAL JOIN.
+type ErrNaturalJoinWithOnOrUsingClause struct{}
+
+func (e *ErrNaturalJoinWithOnOrUsingClause) Error() string {
+	return "a NATURAL join may not have an ON or USING clause"
+}
+
+// ErrTableNameWrongFormat indicates that a table's name has the wrong format.
+type ErrTableNameWrongFormat struct {
+	Name string
+}
+
+func (e *ErrTableNameWrongFormat) Error() string {
+	return fmt.Sprintf("table name has wrong format: %s", e.Name)
+}

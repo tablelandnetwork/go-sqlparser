@@ -39,7 +39,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -58,7 +58,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -77,7 +77,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -96,7 +96,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -118,7 +118,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -137,7 +137,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -156,7 +156,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -175,7 +175,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -224,7 +224,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -243,7 +243,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -262,7 +262,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -281,7 +281,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -300,7 +300,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -319,7 +319,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -338,7 +338,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -357,7 +357,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -382,7 +382,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -407,7 +407,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -430,7 +430,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -453,7 +453,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -476,7 +476,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -499,7 +499,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -522,7 +522,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -545,7 +545,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -568,7 +568,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -591,7 +591,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -614,7 +614,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -637,7 +637,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -660,7 +660,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -683,7 +683,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -706,7 +706,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -730,7 +730,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -754,7 +754,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -776,7 +776,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -798,7 +798,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -820,7 +820,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -844,7 +844,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -865,7 +865,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -886,7 +886,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -907,7 +907,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -932,7 +932,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -956,7 +956,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -980,7 +980,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1006,7 +1006,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1029,7 +1029,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1052,7 +1052,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1075,7 +1075,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1098,7 +1098,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1121,7 +1121,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1144,7 +1144,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1167,7 +1167,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1190,7 +1190,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1213,7 +1213,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1236,7 +1236,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1259,7 +1259,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1282,7 +1282,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1304,7 +1304,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1326,7 +1326,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1350,7 +1350,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1374,7 +1374,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1409,7 +1409,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1441,7 +1441,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1472,7 +1472,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1503,7 +1503,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1520,7 +1520,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -1550,7 +1550,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -1577,7 +1577,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						GroupBy: []Expr{
@@ -1604,7 +1604,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						GroupBy: []Expr{
@@ -1639,7 +1639,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						OrderBy: OrderBy{
@@ -1665,7 +1665,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						OrderBy: OrderBy{
@@ -1691,7 +1691,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						OrderBy: OrderBy{
@@ -1717,7 +1717,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						OrderBy: OrderBy{
@@ -1747,7 +1747,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						OrderBy: OrderBy{
@@ -1770,7 +1770,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Limit: &Limit{
@@ -1791,7 +1791,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Limit: &Limit{
@@ -1813,7 +1813,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Limit: &Limit{
@@ -1836,7 +1836,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1854,7 +1854,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -1871,7 +1871,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 							As:   "t",
 						},
 					},
@@ -1889,7 +1889,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 							As:   "t",
 						},
 					},
@@ -1907,7 +1907,7 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 							As:   "t",
 						},
 					},
@@ -1930,11 +1930,11 @@ func TestSelectStatement(t *testing.T) {
 						},
 						From: &JoinTableExpr{
 							LeftExpr: &AliasedTableExpr{
-								Expr: &Table{Name: "t"},
+								Expr: &Table{Name: "t", IsTarget: true},
 							},
 							JoinOperator: &JoinOperator{Op: JoinStr},
 							RightExpr: &AliasedTableExpr{
-								Expr: &Table{Name: "t2"},
+								Expr: &Table{Name: "t2", IsTarget: true},
 							},
 						},
 					},
@@ -1958,7 +1958,7 @@ func TestSelectStatement(t *testing.T) {
 										&StarSelectColumn{},
 									},
 									From: &AliasedTableExpr{
-										Expr: &Table{Name: "t"},
+										Expr: &Table{Name: "t", IsTarget: true},
 									},
 								},
 							},
@@ -1984,7 +1984,7 @@ func TestSelectStatement(t *testing.T) {
 										&StarSelectColumn{},
 									},
 									From: &AliasedTableExpr{
-										Expr: &Table{Name: "t"},
+										Expr: &Table{Name: "t", IsTarget: true},
 									},
 								},
 							},
@@ -2011,7 +2011,7 @@ func TestSelectStatement(t *testing.T) {
 										&StarSelectColumn{},
 									},
 									From: &AliasedTableExpr{
-										Expr: &Table{Name: "t"},
+										Expr: &Table{Name: "t", IsTarget: true},
 									},
 								},
 							},
@@ -2034,15 +2034,15 @@ func TestSelectStatement(t *testing.T) {
 						From: &JoinTableExpr{
 							LeftExpr: &JoinTableExpr{
 								LeftExpr: &JoinTableExpr{
-									LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+									LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 									JoinOperator: &JoinOperator{Op: JoinStr},
-									RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+									RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 								},
 								JoinOperator: &JoinOperator{Op: JoinStr},
-								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t3"}},
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t3", IsTarget: true}},
 							},
 							JoinOperator: &JoinOperator{Op: JoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t4"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t4", IsTarget: true}},
 						},
 					},
 				},
@@ -2059,9 +2059,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: JoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2078,9 +2078,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: LeftJoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2097,9 +2097,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: RightJoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2116,9 +2116,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: FullJoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2135,9 +2135,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: InnerJoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2154,9 +2154,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: LeftJoinStr, Natural: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2173,9 +2173,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: RightJoinStr, Natural: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2192,9 +2192,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: FullJoinStr, Natural: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2211,9 +2211,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: InnerJoinStr, Natural: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2230,9 +2230,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: LeftJoinStr, Outer: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2249,9 +2249,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: RightJoinStr, Outer: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2268,9 +2268,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: FullJoinStr, Outer: true},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2288,9 +2288,9 @@ func TestSelectStatement(t *testing.T) {
 						},
 						From: &JoinTableExpr{
 							LeftExpr: &JoinTableExpr{
-								LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+								LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 								JoinOperator: &JoinOperator{Op: JoinStr},
-								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+								RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 								On: &CmpExpr{
 									Operator: EqualStr,
 									Left:     &Column{Name: "a", TableRef: &Table{Name: "t"}},
@@ -2298,7 +2298,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							JoinOperator: &JoinOperator{Op: JoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t3"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t3", IsTarget: true}},
 							On: &CmpExpr{
 								Operator: EqualStr,
 								Left:     &Column{Name: "c1", TableRef: &Table{Name: "t2"}},
@@ -2320,9 +2320,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: JoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 							Using: ColumnList{
 								&Column{Name: "c1"},
 								&Column{Name: "c2"},
@@ -2344,9 +2344,9 @@ func TestSelectStatement(t *testing.T) {
 							&StarSelectColumn{},
 						},
 						From: &JoinTableExpr{
-							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t"}},
+							LeftExpr:     &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 							JoinOperator: &JoinOperator{Op: JoinStr},
-							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+							RightExpr:    &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 						},
 					},
 				},
@@ -2364,7 +2364,7 @@ func TestSelectStatement(t *testing.T) {
 						},
 						From: &ParenTableExpr{
 							TableExpr: &AliasedTableExpr{
-								Expr: &Table{Name: "t"},
+								Expr: &Table{Name: "t", IsTarget: true},
 							},
 						},
 					},
@@ -2381,7 +2381,7 @@ func TestSelectStatement(t *testing.T) {
 						SelectColumnList: SelectColumnList{
 							&StarSelectColumn{},
 						},
-						From: &AliasedTableExpr{Expr: &Table{Name: "t"}},
+						From: &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 						Where: &Where{
 							Type: WhereStr,
 							Expr: &Subquery{
@@ -2391,7 +2391,7 @@ func TestSelectStatement(t *testing.T) {
 											Expr: &Value{Type: IntValue, Value: []byte("1")},
 										},
 									},
-									From: &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+									From: &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 								},
 							},
 						},
@@ -2409,7 +2409,7 @@ func TestSelectStatement(t *testing.T) {
 						SelectColumnList: SelectColumnList{
 							&StarSelectColumn{},
 						},
-						From: &AliasedTableExpr{Expr: &Table{Name: "t"}},
+						From: &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 						Where: &Where{
 							Type: WhereStr,
 							Expr: &ExistsExpr{
@@ -2420,7 +2420,7 @@ func TestSelectStatement(t *testing.T) {
 												Expr: &Value{Type: IntValue, Value: []byte("1")},
 											},
 										},
-										From: &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+										From: &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 									},
 								},
 							},
@@ -2439,7 +2439,7 @@ func TestSelectStatement(t *testing.T) {
 						SelectColumnList: SelectColumnList{
 							&StarSelectColumn{},
 						},
-						From: &AliasedTableExpr{Expr: &Table{Name: "t"}},
+						From: &AliasedTableExpr{Expr: &Table{Name: "t", IsTarget: true}},
 						Where: &Where{
 							Type: WhereStr,
 							Expr: &NotExpr{
@@ -2451,7 +2451,7 @@ func TestSelectStatement(t *testing.T) {
 													Expr: &Value{Type: IntValue, Value: []byte("1")},
 												},
 											},
-											From: &AliasedTableExpr{Expr: &Table{Name: "t2"}},
+											From: &AliasedTableExpr{Expr: &Table{Name: "t2", IsTarget: true}},
 										},
 									},
 								},
@@ -2474,7 +2474,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -2502,7 +2502,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -2533,7 +2533,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -2549,7 +2549,7 @@ func TestSelectStatement(t *testing.T) {
 											},
 										},
 										From: &AliasedTableExpr{
-											Expr: &Table{Name: "t2"},
+											Expr: &Table{Name: "t2", IsTarget: true},
 										},
 									},
 								},
@@ -2572,7 +2572,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -2600,7 +2600,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -2631,7 +2631,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 
 						Where: &Where{
@@ -2647,7 +2647,7 @@ func TestSelectStatement(t *testing.T) {
 											},
 										},
 										From: &AliasedTableExpr{
-											Expr: &Table{Name: "t2"},
+											Expr: &Table{Name: "t2", IsTarget: true},
 										},
 									},
 								},
@@ -2675,7 +2675,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2707,7 +2707,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2731,7 +2731,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2755,7 +2755,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2777,7 +2777,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2799,7 +2799,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2831,7 +2831,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2864,7 +2864,7 @@ func TestSelectStatement(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -2918,18 +2918,18 @@ func TestSelectStatement(t *testing.T) {
 								LeftExpr: &JoinTableExpr{
 									JoinOperator: &JoinOperator{Op: JoinStr},
 									LeftExpr: &AliasedTableExpr{
-										Expr: &Table{Name: Identifier("t")},
+										Expr: &Table{Name: Identifier("t"), IsTarget: true},
 									},
 									RightExpr: &AliasedTableExpr{
-										Expr: &Table{Name: Identifier("t2")},
+										Expr: &Table{Name: Identifier("t2"), IsTarget: true},
 									},
 								},
 								RightExpr: &AliasedTableExpr{
-									Expr: &Table{Name: Identifier("t3")},
+									Expr: &Table{Name: Identifier("t3"), IsTarget: true},
 								},
 							},
 							RightExpr: &AliasedTableExpr{
-								Expr: &Table{Name: Identifier("t4")},
+								Expr: &Table{Name: Identifier("t4"), IsTarget: true},
 							},
 						},
 					},
@@ -2950,7 +2950,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t"},
+								Expr: &Table{Name: "t", IsTarget: true},
 							},
 						},
 						Type: CompoundUnionStr,
@@ -2961,7 +2961,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t2"},
+								Expr: &Table{Name: "t2", IsTarget: true},
 							},
 						},
 					},
@@ -2982,7 +2982,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t"},
+								Expr: &Table{Name: "t", IsTarget: true},
 							},
 						},
 						Type: CompoundUnionAllStr,
@@ -2993,7 +2993,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t2"},
+								Expr: &Table{Name: "t2", IsTarget: true},
 							},
 						},
 					},
@@ -3014,7 +3014,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t"},
+								Expr: &Table{Name: "t", IsTarget: true},
 							},
 						},
 						Type: CompoundExceptStr,
@@ -3025,7 +3025,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t2"},
+								Expr: &Table{Name: "t2", IsTarget: true},
 							},
 						},
 					},
@@ -3046,7 +3046,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t"},
+								Expr: &Table{Name: "t", IsTarget: true},
 							},
 						},
 						Type: CompoundIntersectStr,
@@ -3057,7 +3057,7 @@ func TestSelectStatement(t *testing.T) {
 								},
 							},
 							From: &AliasedTableExpr{
-								Expr: &Table{Name: "t2"},
+								Expr: &Table{Name: "t2", IsTarget: true},
 							},
 						},
 						OrderBy: []*OrderingTerm{
@@ -3152,7 +3152,7 @@ func TestAllowedFunctions(t *testing.T) {
 							},
 						},
 						From: &AliasedTableExpr{
-							Expr: &Table{Name: "t"},
+							Expr: &Table{Name: "t", IsTarget: true},
 						},
 					},
 				},
@@ -3194,7 +3194,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3211,7 +3211,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3228,7 +3228,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3245,7 +3245,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3262,7 +3262,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3283,7 +3283,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3307,7 +3307,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3331,7 +3331,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3355,7 +3355,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3388,7 +3388,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3420,7 +3420,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3463,7 +3463,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3535,7 +3535,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t"},
+						Table:       &Table{Name: "t", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{
@@ -3635,7 +3635,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						ColumnsDef: []*ColumnDef{
 							{
 								Column: &Column{Name: "id"},
@@ -3689,7 +3689,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						ColumnsDef: []*ColumnDef{
 							{
 								Column: &Column{Name: "x"},
@@ -3715,7 +3715,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						ColumnsDef: []*ColumnDef{
 							{
 								Column: &Column{Name: "x"},
@@ -3741,7 +3741,7 @@ func TestCreateTable(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						ColumnsDef: []*ColumnDef{
 							{
 								Column: &Column{Name: "x"},
@@ -3911,7 +3911,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "a"},
 							&Column{Name: "b"},
@@ -3937,7 +3937,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table:   &Table{Name: "t"},
+						Table:   &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{},
 						Rows: []Exprs{
 							{
@@ -3960,7 +3960,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table:         &Table{Name: "t"},
+						Table:         &Table{Name: "t", IsTarget: true},
 						Columns:       ColumnList{},
 						Rows:          []Exprs{},
 						DefaultValues: true,
@@ -3975,7 +3975,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "id"},
 						},
@@ -3999,7 +3999,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "id"},
 						},
@@ -4029,7 +4029,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "id"},
 							&Column{Name: "count"},
@@ -4073,7 +4073,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "phonebook"},
+						Table: &Table{Name: "phonebook", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "name"},
 							&Column{Name: "phonenumber"},
@@ -4116,7 +4116,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "phonebook"},
+						Table: &Table{Name: "phonebook", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "name"},
 							&Column{Name: "phonenumber"},
@@ -4170,7 +4170,7 @@ func TestInsert(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "id"},
 						},
@@ -4241,7 +4241,7 @@ func TestDelete(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Delete{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 					},
 				},
 			},
@@ -4253,7 +4253,7 @@ func TestDelete(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Delete{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Where: &Where{
 							Type: WhereStr,
 							Expr: &CmpExpr{
@@ -4301,7 +4301,7 @@ func TestUpdate(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Update{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Exprs: []*UpdateExpr{
 							{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
 							{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
@@ -4317,7 +4317,7 @@ func TestUpdate(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Update{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Exprs: []*UpdateExpr{
 							{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
 							{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
@@ -4340,7 +4340,7 @@ func TestUpdate(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Update{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Exprs: []*UpdateExpr{
 							{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
 							{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
@@ -4396,7 +4396,7 @@ func TestGrant(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Grant{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Privileges: Privileges{
 							"insert": struct{}{},
 							"update": struct{}{},
@@ -4421,7 +4421,7 @@ func TestGrant(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Revoke{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Privileges: Privileges{
 							"insert": struct{}{},
 							"update": struct{}{},
@@ -4498,7 +4498,7 @@ func TestMultipleStatements(t *testing.T) {
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Columns: ColumnList{
 							&Column{Name: "a"},
 							&Column{Name: "b"},
@@ -4515,17 +4515,17 @@ func TestMultipleStatements(t *testing.T) {
 						},
 					},
 					&Delete{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 					},
 					&Update{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Exprs: []*UpdateExpr{
 							{Column: &Column{Name: "a"}, Expr: &Value{Type: IntValue, Value: []byte("1")}},
 							{Column: &Column{Name: "b"}, Expr: &Value{Type: IntValue, Value: []byte("2")}},
 						},
 					},
 					&Grant{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Privileges: Privileges{
 							"insert": struct{}{},
 							"update": struct{}{},
@@ -4534,7 +4534,7 @@ func TestMultipleStatements(t *testing.T) {
 						Roles: []string{"a", "b"},
 					},
 					&Revoke{
-						Table: &Table{Name: "t"},
+						Table: &Table{Name: "t", IsTarget: true},
 						Privileges: Privileges{
 							"insert": struct{}{},
 							"update": struct{}{},
@@ -5197,22 +5197,156 @@ func TestRowIDReferences(t *testing.T) {
 	}
 }
 
-func TestGetUniqueTableReferences(t *testing.T) {
+func TestInsertWithSelect(t *testing.T) {
 	t.Parallel()
 
-	t.Run("nil", func(t *testing.T) {
-		t.Parallel()
-		require.ElementsMatch(t, []string{}, GetUniqueTableReferences(nil))
-	})
+	type testCase struct {
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+		expectedErr interface{}
+	}
 
-	t.Run("select", func(t *testing.T) {
-		t.Parallel()
+	tests := []testCase{
+		{
+			name:     "insert with select without order by",
+			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2",
+			deparsed: "insert into t_1_1 select * from t_1_2 order by rowid asc",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table:   &Table{Name: "t_1_1", IsTarget: true},
+						Columns: ColumnList{},
+						Rows:    []Exprs{},
+						Select: &Select{
+							SelectColumnList: SelectColumnList{
+								&StarSelectColumn{},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t_1_2", IsTarget: true},
+							},
+							OrderBy: OrderBy{
+								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "insert with select with order by",
+			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2 order by column desc",
+			deparsed: "insert into t_1_1 select * from t_1_2 order by column desc, rowid asc",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table:   &Table{Name: "t_1_1", IsTarget: true},
+						Columns: ColumnList{},
+						Rows:    []Exprs{},
+						Select: &Select{
+							SelectColumnList: SelectColumnList{
+								&StarSelectColumn{},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t_1_2", IsTarget: true},
+							},
+							OrderBy: OrderBy{
+								&OrderingTerm{Expr: &Column{Name: "column"}, Direction: DescStr, Nulls: NullsNil},
+								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "insert with select upsert do nothing",
+			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2 order by column desc ON CONFLICT DO NOTHING;",
+			deparsed: "insert into t_1_1 select * from t_1_2 order by column desc, rowid asc on conflict do nothing",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table:   &Table{Name: "t_1_1", IsTarget: true},
+						Columns: ColumnList{},
+						Rows:    []Exprs{},
+						Select: &Select{
+							SelectColumnList: SelectColumnList{
+								&StarSelectColumn{},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t_1_2", IsTarget: true},
+							},
+							OrderBy: OrderBy{
+								&OrderingTerm{Expr: &Column{Name: "column"}, Direction: DescStr, Nulls: NullsNil},
+								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
+							},
+						},
+						Upsert: Upsert{
+							&OnConflictClause{},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "insert with compound select",
+			stmt: "INSERT INTO t_1_1 SELECT * FROM t_1_2 UNION SELECT * FROM t_1_3",
+			expectedErr: func() **ErrCompoudSelectNotAllowed {
+				err := &ErrCompoudSelectNotAllowed{}
+				return &err
+			}(),
+		},
+		{
+			name: "insert with select with join",
+			stmt: "INSERT INTO t_1_1 SELECT * FROM t_1_2, t_1_3",
+			expectedErr: func() **ErrContainsJoinTableExpr {
+				err := &ErrContainsJoinTableExpr{}
+				return &err
+			}(),
+		},
+		{
+			name: "insert with select with subselect",
+			stmt: "INSERT INTO t_1_1 SELECT * FROM (select * from t_1_2)",
+			expectedErr: func() **ErrStatementContainsSubquery {
+				err := &ErrStatementContainsSubquery{StatementKind: "insert+select"}
+				return &err
+			}(),
+		},
+		{
+			name: "insert with select group by",
+			stmt: "INSERT INTO t_1_1 SELECT a FROM t_1_2 GROUP BY 1",
+			expectedErr: func() **ErrHavingOrGroupByIsNotAllowed {
+				err := &ErrHavingOrGroupByIsNotAllowed{}
+				return &err
+			}(),
+		},
+		{
+			name: "insert with select having",
+			stmt: "INSERT INTO t_1_1 SELECT a FROM t_1_2 having a > 0",
+			expectedErr: func() **ErrHavingOrGroupByIsNotAllowed {
+				err := &ErrHavingOrGroupByIsNotAllowed{}
+				return &err
+			}(),
+		},
+	}
 
-		sql := "SELECT t.id, t3.* FROM t, t2 JOIN t3 JOIN (SELECT * FROM t4);"
-		ast, err := Parse(sql)
-		require.NoError(t, err)
-		require.ElementsMatch(t, []string{"t", "t3", "t2", "t4"}, GetUniqueTableReferences(ast))
-	})
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+				if tc.expectedErr == nil {
+					require.NoError(t, err)
+					require.Len(t, ast.Errors, 0)
+					require.Equal(t, tc.expectedAST, ast)
+					require.Equal(t, tc.deparsed, ast.String())
+				} else {
+					require.ErrorAs(t, ast.Errors[0], tc.expectedErr)
+				}
+			}
+		}(tc))
+	}
 }
 
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.

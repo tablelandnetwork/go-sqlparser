@@ -1014,6 +1014,9 @@ func (node *CaseExpr) walkSubtree(visit Visit) error {
 // Table represents a table.
 type Table struct {
 	Name Identifier
+
+	// IsTarget indicates if the table is a target of a statement or simply a reference.
+	IsTarget bool
 }
 
 // String returns the string representation of the node.
@@ -1660,6 +1663,7 @@ type Insert struct {
 	Rows          []Exprs
 	DefaultValues bool
 	Upsert        Upsert
+	Select        *Select
 
 	// RETURNING clause is not accepted in the parser.
 	ReturningClause Exprs
@@ -1676,6 +1680,11 @@ func (node *Insert) String() string {
 	if node.ReturningClause != nil {
 		returning = fmt.Sprintf(" returning %s", node.ReturningClause.String())
 	}
+
+	if node.Select != nil {
+		return fmt.Sprintf("insert into %s %s%s%s", node.Table.Name.String(), node.Select.String(), node.Upsert.String(), returning)
+	}
+
 	if node.DefaultValues {
 		return fmt.Sprintf("insert into %s default values%s", node.Table.Name.String(), returning)
 	}
