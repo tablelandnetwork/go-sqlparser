@@ -82,43 +82,30 @@ func TestValidateTargetTable(t *testing.T) {
 		require.Equal(t, "_1_2", validTable.Name())
 	})
 
-	t.Run("valid table name without token", func(t *testing.T) {
+	t.Run("valid create table name", func(t *testing.T) {
 		table := &Table{Name: Identifier("t_1"), IsTarget: true}
-		validTable, err := ValidateTargetTable(table)
+		validTable, err := ValidateCreateTargetTable(table)
 		require.NoError(t, err)
 		require.Equal(t, "t", validTable.Prefix())
 		require.Equal(t, int64(1), validTable.ChainID())
-		require.Equal(t, int64(-1), validTable.TokenID())
 		require.Equal(t, "t_1", validTable.Name())
 	})
 
-	t.Run("valid table name without prefix without token", func(t *testing.T) {
+	t.Run("valid create table name without prefix", func(t *testing.T) {
 		table := &Table{Name: Identifier("_1"), IsTarget: true}
-		validTable, err := ValidateTargetTable(table)
+		validTable, err := ValidateCreateTargetTable(table)
 		require.NoError(t, err)
 		require.Equal(t, "", validTable.Prefix())
 		require.Equal(t, int64(1), validTable.ChainID())
-		require.Equal(t, int64(-1), validTable.TokenID())
 		require.Equal(t, "_1", validTable.Name())
 	})
 
-	t.Run("valid table name with consecutive underscore without token", func(t *testing.T) {
+	t.Run("valid create table name with consecutive underscore", func(t *testing.T) {
 		table := &Table{Name: Identifier("t_2_1__1"), IsTarget: true}
-		validTable, err := ValidateTargetTable(table)
+		validTable, err := ValidateCreateTargetTable(table)
 		require.NoError(t, err)
 		require.Equal(t, "t_2_1_", validTable.Prefix())
 		require.Equal(t, int64(1), validTable.ChainID())
-		require.Equal(t, int64(-1), validTable.TokenID())
 		require.Equal(t, "t_2_1__1", validTable.Name())
-	})
-
-	t.Run("valid table name with consecutive underscore", func(t *testing.T) {
-		table := &Table{Name: Identifier("t_2_1__1_2"), IsTarget: true}
-		validTable, err := ValidateTargetTable(table)
-		require.NoError(t, err)
-		require.Equal(t, "t_2_1_", validTable.Prefix())
-		require.Equal(t, int64(1), validTable.ChainID())
-		require.Equal(t, int64(2), validTable.TokenID())
-		require.Equal(t, "t_2_1__1_2", validTable.Name())
 	})
 }

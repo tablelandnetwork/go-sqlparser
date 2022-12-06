@@ -83,34 +83,23 @@ func ValidateTargetTables(node Node) ([]*ValidatedTable, error) {
 	return validTables, nil
 }
 
+var (
+	tableNameRegEx       = regexp.MustCompile("^([A-Za-z]+[A-Za-z0-9_]*)*_[0-9]+_[0-9]+$")
+	createTableNameRegEx = regexp.MustCompile("^([A-Za-z]+[A-Za-z0-9_]*)*_[0-9]+$")
+)
+
 func ValidateTargetTable(table *Table) (*ValidatedTable, error) {
 	if !table.IsTarget {
 		return nil, fmt.Errorf("table is not target")
 	}
-	tableNameRegEx, err := regexp.Compile("^([A-Za-z]+[A-Za-z0-9_]*)*(_[0-9]+){1,2}$")
-	if err != nil {
-		return nil, fmt.Errorf("regexp compile: %s", err)
-	}
+
 	if !tableNameRegEx.MatchString(table.String()) {
 		return nil, &ErrTableNameWrongFormat{Name: table.String()}
 	}
 
 	parts := strings.Split(table.String(), "_")
-	if len(parts) < 2 {
-		return nil, fmt.Errorf("chain id not present in table name")
-	}
-
-	// The below IF is just a trick to make extraction of prefix, chainID and tokenID easier
-
-	// Case 1: len(parts) == 2
-	// That means we don't have a tokenID in the name, so we add an empty one to make extraction easier
-
-	// Case 2: parts[len(parts)-2] == ""
-	// When we have consecutive underscore, e.g. t_1__1.
-	// In this case, because of the split, parts[len(parts)-2] will be empty string.
-	// In the above example, the prefix should be t_1_ and the chain id 1.
-	if len(parts) == 2 || parts[len(parts)-2] == "" {
-		parts = append(parts, "") // adds an empty tokenID in the end
+	if len(parts) < 3 {
+		return nil, fmt.Errorf("not enough parts in the name")
 	}
 
 	prefix := strings.Join(parts[:len(parts)-2], "_")
@@ -122,16 +111,37 @@ func ValidateTargetTable(table *Table) (*ValidatedTable, error) {
 		return nil, fmt.Errorf("parsing chain id in table name: %s", err)
 	}
 
-	if tokenIDstr == "" {
-		return &ValidatedTable{name: table.String(), prefix: prefix, chainID: chainID, tokenID: -1}, nil
-	}
-
 	tokenID, err := strconv.ParseInt(tokenIDstr, 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("parsing token id in table name: %s", err)
 	}
 
 	return &ValidatedTable{name: table.String(), prefix: prefix, chainID: chainID, tokenID: tokenID}, nil
+}
+
+func ValidateCreateTargetTable(table *Table) (*ValidatedCreateTable, error) {
+	if !table.IsTarget {
+		return nil, fmt.Errorf("table is not target")
+	}
+
+	if !createTableNameRegEx.MatchString(table.String()) {
+		return nil, &ErrTableNameWrongFormat{Name: table.String()}
+	}
+
+	parts := strings.Split(table.String(), "_")
+	if len(parts) < 2 {
+		return nil, fmt.Errorf("not enough parts in the name")
+	}
+
+	prefix := strings.Join(parts[:len(parts)-1], "_")
+	chainIDstr := parts[len(parts)-1]
+
+	chainID, err := strconv.ParseInt(chainIDstr, 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("parsing chain id in table name: %s", err)
+	}
+
+	return &ValidatedCreateTable{name: table.String(), prefix: prefix, chainID: chainID}, nil
 }
 
 // containsSubquery checks recursively if the node contains a subquery.
@@ -153,7 +163,7 @@ func containsSubquery(node Node) bool {
 	return containsSubquery
 }
 
-// ValidatedTable is a Table that was validated by ValidateTables.
+// ValidatedTable is a Table that was validated by ValidateTargetTable.
 type ValidatedTable struct {
 	name    string
 	prefix  string
@@ -172,12 +182,33 @@ func (node *ValidatedTable) ChainID() int64 {
 }
 
 // TokenID returns the table's token id.
-// If token id is -1, it means the table name does not have a token ID.
 func (node *ValidatedTable) TokenID() int64 {
 	return node.tokenID
 }
 
 // Prefix returns table's prefix.
 func (node *ValidatedTable) Prefix() string {
+	return node.prefix
+}
+
+// ValidatedCreateTable is a Table that was validated by ValidateCreateTargetTable.
+type ValidatedCreateTable struct {
+	name    string
+	prefix  string
+	chainID int64
+}
+
+// Name returns the table's name.
+func (node *ValidatedCreateTable) Name() string {
+	return node.name
+}
+
+// ChainID returns the table's chain id.
+func (node *ValidatedCreateTable) ChainID() int64 {
+	return node.chainID
+}
+
+// Prefix returns table's prefix.
+func (node *ValidatedCreateTable) Prefix() string {
 	return node.prefix
 }
