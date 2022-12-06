@@ -24,8 +24,8 @@ func TestLexer(t *testing.T) {
 		CREATE TABLE INT BLOB ANY PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 		INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 		GRANT TO REVOKE 
-		"doublequoteidentifier" [squarebracketsidentifier]
-	` + "`backtickidentifier`"
+		"double.quote.identifier" [square.brackets.identifier]
+	` + "`back.tick.identifier`"
 
 	expTokens := []int{
 		IDENTIFIER, INTEGRAL, FLOAT, FLOAT, STRING,
