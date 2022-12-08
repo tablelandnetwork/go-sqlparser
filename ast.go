@@ -1383,7 +1383,6 @@ const (
 	TypeIntegerStr = "integer"
 	TypeTextStr    = "text"
 	TypeBlobStr    = "blob"
-	TypeAnyStr     = "any"
 )
 
 // ColumnConstraint is used for parsing column constraint info from SQL.

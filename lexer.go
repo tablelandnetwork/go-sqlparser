@@ -57,7 +57,6 @@ var keywords = map[string]int{
 	"FILTER":     FILTER,
 	"BLOB":       BLOB,
 	"INT":        INT,
-	"ANY":        ANY,
 	"CREATE":     CREATE,
 	"TABLE":      TABLE,
 	"PRIMARY":    PRIMARY,
