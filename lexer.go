@@ -295,7 +295,7 @@ func (l *Lexer) Lex(lval *yySymType) (token int) {
 			'[': ']',
 		}
 		l.readByte() // consume opening char
-		literal := l.readIdentifier()
+		literal := l.readEnclosedIdentifier()
 		if l.ch != closingChar[ch] {
 			l.literal = literal
 			return ERROR
@@ -321,6 +321,14 @@ func (l *Lexer) Lex(lval *yySymType) (token int) {
 func (l *Lexer) readIdentifier() []byte {
 	position := l.position
 	for isLetter(l.ch) || isDigit(l.ch) {
+		l.readByte()
+	}
+	return l.input[position:l.position]
+}
+
+func (l *Lexer) readEnclosedIdentifier() []byte {
+	position := l.position
+	for isLetter(l.ch) || isDigit(l.ch) || l.ch == '.' {
 		l.readByte()
 	}
 	return l.input[position:l.position]
