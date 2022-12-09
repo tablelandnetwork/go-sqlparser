@@ -356,9 +356,9 @@ state 38
 
 
 state 39
-	identifier:  IDENTIFIER.    (257)
+	identifier:  IDENTIFIER.    (256)
 
-	.  reduce 257 (src line 1631)
+	.  reduce 256 (src line 1630)
 
 
 state 40
@@ -371,27 +371,27 @@ state 40
 
 
 state 41
-	privileges:  privilege.    (252)
+	privileges:  privilege.    (251)
 
-	.  reduce 252 (src line 1598)
+	.  reduce 251 (src line 1597)
 
 
 state 42
-	privilege:  INSERT.    (254)
+	privilege:  INSERT.    (253)
 
-	.  reduce 254 (src line 1616)
+	.  reduce 253 (src line 1615)
 
 
 state 43
-	privilege:  UPDATE.    (255)
+	privilege:  UPDATE.    (254)
 
-	.  reduce 255 (src line 1621)
+	.  reduce 254 (src line 1620)
 
 
 state 44
-	privilege:  DELETE.    (256)
+	privilege:  DELETE.    (255)
 
-	.  reduce 256 (src line 1625)
+	.  reduce 255 (src line 1624)
 
 
 state 45
@@ -918,32 +918,32 @@ state 80
 
 
 state 81
-	numeric_literal:  INTEGRAL.    (207)
+	numeric_literal:  INTEGRAL.    (206)
 
-	.  reduce 207 (src line 1238)
+	.  reduce 206 (src line 1237)
 
 
 state 82
-	numeric_literal:  FLOAT.    (208)
+	numeric_literal:  FLOAT.    (207)
 
-	.  reduce 208 (src line 1243)
+	.  reduce 207 (src line 1242)
 
 
 state 83
-	numeric_literal:  HEXNUM.    (209)
+	numeric_literal:  HEXNUM.    (208)
 
-	.  reduce 209 (src line 1248)
+	.  reduce 208 (src line 1247)
 
 
 state 84
 	insert_stmt:  INSERT INTO table_name.column_name_list_opt VALUES insert_rows upsert_clause_opt 
 	insert_stmt:  INSERT INTO table_name.DEFAULT VALUES 
 	insert_stmt:  INSERT INTO table_name.column_name_list_opt select_stmt upsert_clause_opt 
-	column_name_list_opt: .    (228)
+	column_name_list_opt: .    (227)
 
 	'('  shift 157
 	DEFAULT  shift 156
-	.  reduce 228 (src line 1404)
+	.  reduce 227 (src line 1403)
 
 	column_name_list_opt  goto 155
 
@@ -2502,9 +2502,9 @@ state 157
 	column_name_list  goto 236
 
 state 158
-	delete_stmt:  DELETE FROM table_name where_opt.    (240)
+	delete_stmt:  DELETE FROM table_name where_opt.    (239)
 
-	.  reduce 240 (src line 1494)
+	.  reduce 239 (src line 1493)
 
 
 state 159
@@ -2552,23 +2552,23 @@ state 160
 	where_opt  goto 239
 
 state 161
-	update_list:  common_update_list.    (242)
+	update_list:  common_update_list.    (241)
 	common_update_list:  common_update_list.',' update_expression 
 
 	','  shift 240
-	.  reduce 242 (src line 1516)
+	.  reduce 241 (src line 1515)
 
 
 state 162
-	update_list:  paren_update_list.    (243)
+	update_list:  paren_update_list.    (242)
 
-	.  reduce 243 (src line 1521)
+	.  reduce 242 (src line 1520)
 
 
 state 163
-	common_update_list:  update_expression.    (244)
+	common_update_list:  update_expression.    (243)
 
-	.  reduce 244 (src line 1527)
+	.  reduce 243 (src line 1526)
 
 
 state 164
@@ -2602,9 +2602,9 @@ state 167
 
 
 state 168
-	privileges:  privileges ',' privilege.    (253)
+	privileges:  privileges ',' privilege.    (252)
 
-	.  reduce 253 (src line 1605)
+	.  reduce 252 (src line 1604)
 
 
 state 169
@@ -2759,10 +2759,10 @@ state 177
 state 178
 	create_table_stmt:  CREATE TABLE table_name '(' column_def_list.table_constraint_list_opt ')' 
 	column_def_list:  column_def_list.',' column_def 
-	table_constraint_list_opt: .    (213)
+	table_constraint_list_opt: .    (212)
 
 	','  shift 251
-	.  reduce 213 (src line 1268)
+	.  reduce 212 (src line 1267)
 
 	table_constraint_list  goto 252
 	table_constraint_list_opt  goto 250
@@ -2780,7 +2780,6 @@ state 180
 	TEXT  shift 256
 	INT  shift 254
 	BLOB  shift 257
-	ANY  shift 258
 	.  error
 
 	type_name  goto 253
@@ -2789,10 +2788,10 @@ state 181
 	base_select:  SELECT distinct_opt select_column_list from_clause where_opt.group_by_opt having_opt 
 	group_by_opt: .    (64)
 
-	GROUP  shift 260
+	GROUP  shift 259
 	.  reduce 64 (src line 524)
 
-	group_by_opt  goto 259
+	group_by_opt  goto 258
 
 state 182
 	select_column_list:  select_column_list ',' select_column.    (26)
@@ -2805,49 +2804,49 @@ state 183
 	join_clause:  table_expr.join_op table_expr join_constraint 
 	natural_opt: .    (55)
 
-	','  shift 263
+	','  shift 262
 	RIGHT  reduce 55 (src line 479)
 	FULL  reduce 55 (src line 479)
 	INNER  reduce 55 (src line 479)
 	LEFT  reduce 55 (src line 479)
-	NATURAL  shift 266
-	CROSS  shift 264
-	JOIN  shift 262
+	NATURAL  shift 265
+	CROSS  shift 263
+	JOIN  shift 261
 	.  reduce 35 (src line 360)
 
-	natural_opt  goto 265
-	join_op  goto 261
+	natural_opt  goto 264
+	join_op  goto 260
 
 state 184
 	from_clause:  FROM join_clause.    (36)
 	join_clause:  join_clause.join_op table_expr join_constraint 
 	natural_opt: .    (55)
 
-	','  shift 263
+	','  shift 262
 	RIGHT  reduce 55 (src line 479)
 	FULL  reduce 55 (src line 479)
 	INNER  reduce 55 (src line 479)
 	LEFT  reduce 55 (src line 479)
-	NATURAL  shift 266
-	CROSS  shift 264
-	JOIN  shift 262
+	NATURAL  shift 265
+	CROSS  shift 263
+	JOIN  shift 261
 	.  reduce 36 (src line 365)
 
-	natural_opt  goto 265
-	join_op  goto 267
+	natural_opt  goto 264
+	join_op  goto 266
 
 state 185
 	table_expr:  table_name.as_table_opt 
 	as_table_opt: .    (41)
 
 	IDENTIFIER  shift 39
-	STRING  shift 272
-	AS  shift 270
+	STRING  shift 271
+	AS  shift 269
 	.  reduce 41 (src line 391)
 
-	as_table_opt  goto 268
-	table_alias  goto 269
-	identifier  goto 271
+	as_table_opt  goto 267
+	table_alias  goto 268
+	identifier  goto 270
 
 state 186
 	table_expr:  '('.select_stmt ')' as_table_opt 
@@ -2859,12 +2858,12 @@ state 186
 	SELECT  shift 15
 	.  error
 
-	select_stmt  goto 273
+	select_stmt  goto 272
 	base_select  goto 8
 	identifier  goto 38
 	table_name  goto 185
-	table_expr  goto 274
-	join_clause  goto 275
+	table_expr  goto 273
+	join_clause  goto 274
 
 state 187
 	expr:  expr.'+' expr 
@@ -3514,7 +3513,7 @@ state 201
 	'>'  shift 133
 	LE  shift 134
 	GE  shift 135
-	ESCAPE  shift 276
+	ESCAPE  shift 275
 	'&'  shift 106
 	'|'  shift 107
 	LSHIFT  shift 108
@@ -3746,7 +3745,7 @@ state 205
 	'~'  shift 62
 	.  error
 
-	expr  goto 277
+	expr  goto 276
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -3770,7 +3769,7 @@ state 207
 	.  error
 
 	subquery  goto 217
-	col_tuple  goto 278
+	col_tuple  goto 277
 
 state 208
 	cmp_op:  NOT REGEXP.    (136)
@@ -3832,7 +3831,7 @@ state 213
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 
-	AND  shift 279
+	AND  shift 278
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -3898,7 +3897,7 @@ state 216
 	FALSE  shift 75
 	NULL  shift 76
 	'('  shift 64
-	')'  shift 280
+	')'  shift 279
 	CAST  shift 67
 	CASE  shift 63
 	SELECT  shift 15
@@ -3913,12 +3912,12 @@ state 216
 
 	select_stmt  goto 147
 	base_select  goto 8
-	expr  goto 282
+	expr  goto 281
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
 	exists_subquery  goto 66
-	expr_list  goto 281
+	expr_list  goto 280
 	column_name  goto 59
 	identifier  goto 70
 	table_name  goto 91
@@ -3955,11 +3954,11 @@ state 221
 	else_expr_opt: .    (176)
 
 	WHEN  shift 223
-	ELSE  shift 285
+	ELSE  shift 284
 	.  reduce 176 (src line 1050)
 
-	else_expr_opt  goto 283
-	when  goto 284
+	else_expr_opt  goto 282
+	when  goto 283
 
 state 222
 	when_expr_list:  when.    (174)
@@ -3991,7 +3990,7 @@ state 223
 	'~'  shift 62
 	.  error
 
-	expr  goto 286
+	expr  goto 285
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -4044,7 +4043,7 @@ state 226
 	expr:  expr.NOT IN col_tuple 
 	expr:  CAST '(' expr.AS convert_type ')' 
 
-	AS  shift 287
+	AS  shift 286
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -4108,13 +4107,13 @@ state 227
 	'~'  shift 62
 	.  reduce 167 (src line 1003)
 
-	expr  goto 282
+	expr  goto 281
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
 	exists_subquery  goto 66
-	expr_list  goto 289
-	expr_list_opt  goto 288
+	expr_list  goto 288
+	expr_list_opt  goto 287
 	column_name  goto 59
 	identifier  goto 70
 	table_name  goto 91
@@ -4124,7 +4123,7 @@ state 227
 state 228
 	function_call_generic:  identifier '(' '*'.')' filter_opt 
 
-	')'  shift 290
+	')'  shift 289
 	.  error
 
 
@@ -4170,7 +4169,7 @@ state 231
 	expr:  expr.NOT IN col_tuple 
 	function_call_keyword:  GLOB '(' expr.',' expr ')' 
 
-	','  shift 291
+	','  shift 290
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -4240,7 +4239,7 @@ state 232
 	function_call_keyword:  LIKE '(' expr.',' expr ')' 
 	function_call_keyword:  LIKE '(' expr.',' expr ',' expr ')' 
 
-	','  shift 292
+	','  shift 291
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -4282,34 +4281,34 @@ state 232
 state 233
 	insert_stmt:  INSERT INTO table_name column_name_list_opt VALUES.insert_rows upsert_clause_opt 
 
-	'('  shift 294
+	'('  shift 293
 	.  error
 
-	insert_rows  goto 293
+	insert_rows  goto 292
 
 state 234
 	insert_stmt:  INSERT INTO table_name column_name_list_opt select_stmt.upsert_clause_opt 
-	upsert_clause_opt: .    (232)
+	upsert_clause_opt: .    (231)
 
-	ON  shift 298
-	.  reduce 232 (src line 1425)
+	ON  shift 297
+	.  reduce 231 (src line 1424)
 
-	upsert_clause_opt  goto 295
-	on_conflict_clause_list  goto 296
-	on_conflict_clause  goto 297
+	upsert_clause_opt  goto 294
+	on_conflict_clause_list  goto 295
+	on_conflict_clause  goto 296
 
 state 235
-	insert_stmt:  INSERT INTO table_name DEFAULT VALUES.    (226)
+	insert_stmt:  INSERT INTO table_name DEFAULT VALUES.    (225)
 
-	.  reduce 226 (src line 1361)
+	.  reduce 225 (src line 1360)
 
 
 state 236
 	column_name_list:  column_name_list.',' column_name 
 	column_name_list_opt:  '(' column_name_list.')' 
 
-	','  shift 299
-	')'  shift 300
+	','  shift 298
+	')'  shift 299
 	.  error
 
 
@@ -4388,9 +4387,9 @@ state 238
 	between_op  goto 122
 
 state 239
-	update_stmt:  UPDATE table_name SET update_list where_opt.    (241)
+	update_stmt:  UPDATE table_name SET update_list where_opt.    (240)
 
-	.  reduce 241 (src line 1505)
+	.  reduce 240 (src line 1504)
 
 
 state 240
@@ -4401,14 +4400,14 @@ state 240
 
 	column_name  goto 165
 	identifier  goto 166
-	update_expression  goto 301
+	update_expression  goto 300
 
 state 241
 	column_name_list:  column_name_list.',' column_name 
 	paren_update_list:  '(' column_name_list.')' '=' '(' expr_list ')' 
 
-	','  shift 299
-	')'  shift 302
+	','  shift 298
+	')'  shift 301
 	.  error
 
 
@@ -4436,7 +4435,7 @@ state 242
 	'~'  shift 62
 	.  error
 
-	expr  goto 303
+	expr  goto 302
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -4450,18 +4449,18 @@ state 242
 state 243
 	grant_stmt:  GRANT privileges ON table_name TO.roles 
 
-	STRING  shift 305
+	STRING  shift 304
 	.  error
 
-	roles  goto 304
+	roles  goto 303
 
 state 244
 	revoke_stmt:  REVOKE privileges ON table_name FROM.roles 
 
-	STRING  shift 305
+	STRING  shift 304
 	.  error
 
-	roles  goto 306
+	roles  goto 305
 
 state 245
 	limit_opt:  LIMIT expr ',' expr.    (81)
@@ -4615,55 +4614,55 @@ state 249
 	nulls:  NULLS.FIRST 
 	nulls:  NULLS.LAST 
 
-	FIRST  shift 307
-	LAST  shift 308
+	FIRST  shift 306
+	LAST  shift 307
 	.  error
 
 
 state 250
 	create_table_stmt:  CREATE TABLE table_name '(' column_def_list table_constraint_list_opt.')' 
 
-	')'  shift 309
+	')'  shift 308
 	.  error
 
 
 state 251
 	column_def_list:  column_def_list ','.column_def 
 	table_constraint_list:  ','.table_constraint 
-	constraint_name: .    (200)
+	constraint_name: .    (199)
 
 	IDENTIFIER  shift 39
-	CONSTRAINT  shift 313
-	.  reduce 200 (src line 1202)
+	CONSTRAINT  shift 312
+	.  reduce 199 (src line 1201)
 
 	column_name  goto 180
-	constraint_name  goto 312
+	constraint_name  goto 311
 	identifier  goto 166
-	column_def  goto 310
-	table_constraint  goto 311
+	column_def  goto 309
+	table_constraint  goto 310
 
 state 252
-	table_constraint_list_opt:  table_constraint_list.    (214)
+	table_constraint_list_opt:  table_constraint_list.    (213)
 	table_constraint_list:  table_constraint_list.',' table_constraint 
 
-	','  shift 314
-	.  reduce 214 (src line 1272)
+	','  shift 313
+	.  reduce 213 (src line 1271)
 
 
 state 253
 	column_def:  column_name type_name.column_constraints_opt 
-	column_constraints_opt: .    (187)
-	constraint_name: .    (200)
+	column_constraints_opt: .    (186)
+	constraint_name: .    (199)
 
-	','  reduce 187 (src line 1132)
-	')'  reduce 187 (src line 1132)
-	CONSTRAINT  shift 313
-	.  reduce 200 (src line 1202)
+	','  reduce 186 (src line 1131)
+	')'  reduce 186 (src line 1131)
+	CONSTRAINT  shift 312
+	.  reduce 199 (src line 1201)
 
-	constraint_name  goto 318
-	column_constraint  goto 317
-	column_constraints  goto 316
-	column_constraints_opt  goto 315
+	constraint_name  goto 317
+	column_constraint  goto 316
+	column_constraints  goto 315
+	column_constraints_opt  goto 314
 
 state 254
 	type_name:  INT.    (182)
@@ -4690,28 +4689,22 @@ state 257
 
 
 state 258
-	type_name:  ANY.    (186)
-
-	.  reduce 186 (src line 1129)
-
-
-state 259
 	base_select:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt.having_opt 
 	having_opt: .    (66)
 
-	HAVING  shift 320
+	HAVING  shift 319
 	.  reduce 66 (src line 534)
 
-	having_opt  goto 319
+	having_opt  goto 318
 
-state 260
+state 259
 	group_by_opt:  GROUP.BY expr_list 
 
-	BY  shift 321
+	BY  shift 320
 	.  error
 
 
-state 261
+state 260
 	join_clause:  table_expr join_op.table_expr join_constraint 
 
 	IDENTIFIER  shift 39
@@ -4720,47 +4713,47 @@ state 261
 
 	identifier  goto 38
 	table_name  goto 185
-	table_expr  goto 322
+	table_expr  goto 321
 
-state 262
+state 261
 	join_op:  JOIN.    (48)
 
 	.  reduce 48 (src line 448)
 
 
-state 263
+state 262
 	join_op:  ','.    (49)
 
 	.  reduce 49 (src line 453)
 
 
-state 264
+state 263
 	join_op:  CROSS.JOIN 
 
-	JOIN  shift 323
+	JOIN  shift 322
 	.  error
 
 
-state 265
+state 264
 	join_op:  natural_opt.LEFT outer_opt JOIN 
 	join_op:  natural_opt.RIGHT outer_opt JOIN 
 	join_op:  natural_opt.FULL outer_opt JOIN 
 	join_op:  natural_opt.INNER JOIN 
 
-	RIGHT  shift 325
-	FULL  shift 326
-	INNER  shift 327
-	LEFT  shift 324
+	RIGHT  shift 324
+	FULL  shift 325
+	INNER  shift 326
+	LEFT  shift 323
 	.  error
 
 
-state 266
+state 265
 	natural_opt:  NATURAL.    (56)
 
 	.  reduce 56 (src line 483)
 
 
-state 267
+state 266
 	join_clause:  join_clause join_op.table_expr join_constraint 
 
 	IDENTIFIER  shift 39
@@ -4769,80 +4762,80 @@ state 267
 
 	identifier  goto 38
 	table_name  goto 185
-	table_expr  goto 328
+	table_expr  goto 327
 
-state 268
+state 267
 	table_expr:  table_name as_table_opt.    (37)
 
 	.  reduce 37 (src line 371)
 
 
-state 269
+state 268
 	as_table_opt:  table_alias.    (42)
 
 	.  reduce 42 (src line 395)
 
 
-state 270
+state 269
 	as_table_opt:  AS.table_alias 
 
 	IDENTIFIER  shift 39
-	STRING  shift 272
+	STRING  shift 271
 	.  error
 
-	table_alias  goto 329
-	identifier  goto 271
+	table_alias  goto 328
+	identifier  goto 270
 
-state 271
+state 270
 	table_alias:  identifier.    (44)
 
 	.  reduce 44 (src line 404)
 
 
-state 272
+state 271
 	table_alias:  STRING.    (45)
 
 	.  reduce 45 (src line 409)
 
 
-state 273
+state 272
 	table_expr:  '(' select_stmt.')' as_table_opt 
 
-	')'  shift 330
+	')'  shift 329
 	.  error
 
 
-state 274
+state 273
 	table_expr:  '(' table_expr.')' 
 	join_clause:  table_expr.join_op table_expr join_constraint 
 	natural_opt: .    (55)
 
-	','  shift 263
-	')'  shift 331
-	NATURAL  shift 266
-	CROSS  shift 264
-	JOIN  shift 262
+	','  shift 262
+	')'  shift 330
+	NATURAL  shift 265
+	CROSS  shift 263
+	JOIN  shift 261
 	.  reduce 55 (src line 479)
 
-	natural_opt  goto 265
-	join_op  goto 261
+	natural_opt  goto 264
+	join_op  goto 260
 
-state 275
+state 274
 	table_expr:  '(' join_clause.')' 
 	join_clause:  join_clause.join_op table_expr join_constraint 
 	natural_opt: .    (55)
 
-	','  shift 263
-	')'  shift 332
-	NATURAL  shift 266
-	CROSS  shift 264
-	JOIN  shift 262
+	','  shift 262
+	')'  shift 331
+	NATURAL  shift 265
+	CROSS  shift 263
+	JOIN  shift 261
 	.  reduce 55 (src line 479)
 
-	natural_opt  goto 265
-	join_op  goto 267
+	natural_opt  goto 264
+	join_op  goto 266
 
-state 276
+state 275
 	expr:  expr like_op expr ESCAPE.expr 
 
 	IDENTIFIER  shift 39
@@ -4866,7 +4859,7 @@ state 276
 	'~'  shift 62
 	.  error
 
-	expr  goto 333
+	expr  goto 332
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -4877,7 +4870,7 @@ state 276
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 277
+state 276
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -4931,13 +4924,13 @@ state 277
 	like_op  goto 115
 	between_op  goto 122
 
-state 278
+state 277
 	expr:  expr NOT IN col_tuple.    (118)
 
 	.  reduce 118 (src line 761)
 
 
-state 279
+state 278
 	expr:  expr between_op expr AND.expr 
 
 	IDENTIFIER  shift 39
@@ -4961,7 +4954,7 @@ state 279
 	'~'  shift 62
 	.  error
 
-	expr  goto 334
+	expr  goto 333
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -4972,22 +4965,22 @@ state 279
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 280
+state 279
 	col_tuple:  '(' ')'.    (152)
 
 	.  reduce 152 (src line 915)
 
 
-state 281
+state 280
 	col_tuple:  '(' expr_list.')' 
 	expr_list:  expr_list.',' expr 
 
-	','  shift 336
-	')'  shift 335
+	','  shift 335
+	')'  shift 334
 	.  error
 
 
-state 282
+state 281
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5055,20 +5048,20 @@ state 282
 	like_op  goto 115
 	between_op  goto 122
 
-state 283
+state 282
 	expr:  CASE expr_opt when_expr_list else_expr_opt.END 
 
-	END  shift 337
+	END  shift 336
 	.  error
 
 
-state 284
+state 283
 	when_expr_list:  when_expr_list when.    (175)
 
 	.  reduce 175 (src line 1045)
 
 
-state 285
+state 284
 	else_expr_opt:  ELSE.expr 
 
 	IDENTIFIER  shift 39
@@ -5092,7 +5085,7 @@ state 285
 	'~'  shift 62
 	.  error
 
-	expr  goto 338
+	expr  goto 337
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -5103,7 +5096,7 @@ state 285
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 286
+state 285
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5133,7 +5126,7 @@ state 286
 	expr:  expr.NOT IN col_tuple 
 	when:  WHEN expr.THEN expr 
 
-	THEN  shift 339
+	THEN  shift 338
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -5172,42 +5165,78 @@ state 286
 	like_op  goto 115
 	between_op  goto 122
 
-state 287
+state 286
 	expr:  CAST '(' expr AS.convert_type ')' 
 
-	NONE  shift 341
-	INTEGER  shift 343
-	TEXT  shift 342
+	NONE  shift 340
+	INTEGER  shift 342
+	TEXT  shift 341
 	.  error
 
-	convert_type  goto 340
+	convert_type  goto 339
 
-state 288
+state 287
 	function_call_generic:  identifier '(' distinct_function_opt expr_list_opt.')' filter_opt 
 
-	')'  shift 344
+	')'  shift 343
 	.  error
 
 
-state 289
+state 288
 	expr_list:  expr_list.',' expr 
 	expr_list_opt:  expr_list.    (168)
 
-	','  shift 336
+	','  shift 335
 	.  reduce 168 (src line 1007)
 
 
-state 290
+state 289
 	function_call_generic:  identifier '(' '*' ')'.filter_opt 
 	filter_opt: .    (169)
 
-	FILTER  shift 346
+	FILTER  shift 345
 	.  reduce 169 (src line 1013)
 
-	filter_opt  goto 345
+	filter_opt  goto 344
+
+state 290
+	function_call_keyword:  GLOB '(' expr ','.expr ')' 
+
+	IDENTIFIER  shift 39
+	STRING  shift 72
+	INTEGRAL  shift 81
+	HEXNUM  shift 83
+	FLOAT  shift 82
+	BLOBVAL  shift 73
+	TRUE  shift 74
+	FALSE  shift 75
+	NULL  shift 76
+	'('  shift 64
+	CAST  shift 67
+	CASE  shift 63
+	EXISTS  shift 77
+	NOT  shift 78
+	GLOB  shift 79
+	LIKE  shift 80
+	'+'  shift 61
+	'-'  shift 60
+	'~'  shift 62
+	.  error
+
+	expr  goto 346
+	literal_value  goto 58
+	function_call_keyword  goto 68
+	function_call_generic  goto 69
+	exists_subquery  goto 66
+	column_name  goto 59
+	identifier  goto 70
+	table_name  goto 91
+	subquery  goto 65
+	numeric_literal  goto 71
 
 state 291
-	function_call_keyword:  GLOB '(' expr ','.expr ')' 
+	function_call_keyword:  LIKE '(' expr ','.expr ')' 
+	function_call_keyword:  LIKE '(' expr ','.expr ',' expr ')' 
 
 	IDENTIFIER  shift 39
 	STRING  shift 72
@@ -5242,55 +5271,19 @@ state 291
 	numeric_literal  goto 71
 
 state 292
-	function_call_keyword:  LIKE '(' expr ','.expr ')' 
-	function_call_keyword:  LIKE '(' expr ','.expr ',' expr ')' 
-
-	IDENTIFIER  shift 39
-	STRING  shift 72
-	INTEGRAL  shift 81
-	HEXNUM  shift 83
-	FLOAT  shift 82
-	BLOBVAL  shift 73
-	TRUE  shift 74
-	FALSE  shift 75
-	NULL  shift 76
-	'('  shift 64
-	CAST  shift 67
-	CASE  shift 63
-	EXISTS  shift 77
-	NOT  shift 78
-	GLOB  shift 79
-	LIKE  shift 80
-	'+'  shift 61
-	'-'  shift 60
-	'~'  shift 62
-	.  error
-
-	expr  goto 348
-	literal_value  goto 58
-	function_call_keyword  goto 68
-	function_call_generic  goto 69
-	exists_subquery  goto 66
-	column_name  goto 59
-	identifier  goto 70
-	table_name  goto 91
-	subquery  goto 65
-	numeric_literal  goto 71
-
-state 293
 	insert_stmt:  INSERT INTO table_name column_name_list_opt VALUES insert_rows.upsert_clause_opt 
 	insert_rows:  insert_rows.',' '(' expr_list ')' 
-	upsert_clause_opt: .    (232)
+	upsert_clause_opt: .    (231)
 
-	','  shift 350
-	ON  shift 298
-	.  reduce 232 (src line 1425)
+	','  shift 349
+	ON  shift 297
+	.  reduce 231 (src line 1424)
 
-	upsert_clause_opt  goto 349
-	on_conflict_clause_list  goto 296
-	on_conflict_clause  goto 297
+	upsert_clause_opt  goto 348
+	on_conflict_clause_list  goto 295
+	on_conflict_clause  goto 296
 
-state 294
+state 293
 	insert_rows:  '('.expr_list ')' 
 
 	IDENTIFIER  shift 39
@@ -5314,76 +5307,76 @@ state 294
 	'~'  shift 62
 	.  error
 
-	expr  goto 282
+	expr  goto 281
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
 	exists_subquery  goto 66
-	expr_list  goto 351
+	expr_list  goto 350
 	column_name  goto 59
 	identifier  goto 70
 	table_name  goto 91
 	subquery  goto 65
 	numeric_literal  goto 71
 
+state 294
+	insert_stmt:  INSERT INTO table_name column_name_list_opt select_stmt upsert_clause_opt.    (226)
+
+	.  reduce 226 (src line 1365)
+
+
 state 295
-	insert_stmt:  INSERT INTO table_name column_name_list_opt select_stmt upsert_clause_opt.    (227)
-
-	.  reduce 227 (src line 1366)
-
-
-state 296
-	upsert_clause_opt:  on_conflict_clause_list.    (233)
+	upsert_clause_opt:  on_conflict_clause_list.    (232)
 	on_conflict_clause_list:  on_conflict_clause_list.on_conflict_clause 
 
-	ON  shift 298
-	.  reduce 233 (src line 1429)
+	ON  shift 297
+	.  reduce 232 (src line 1428)
 
-	on_conflict_clause  goto 352
+	on_conflict_clause  goto 351
+
+state 296
+	on_conflict_clause_list:  on_conflict_clause.    (233)
+
+	.  reduce 233 (src line 1440)
+
 
 state 297
-	on_conflict_clause_list:  on_conflict_clause.    (234)
-
-	.  reduce 234 (src line 1441)
-
-
-state 298
 	on_conflict_clause:  ON.CONFLICT conflict_target_opt DO NOTHING 
 	on_conflict_clause:  ON.CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt 
 
-	CONFLICT  shift 353
+	CONFLICT  shift 352
 	.  error
 
 
-state 299
+state 298
 	column_name_list:  column_name_list ','.column_name 
 
 	IDENTIFIER  shift 39
 	.  error
 
-	column_name  goto 354
+	column_name  goto 353
 	identifier  goto 166
 
-state 300
-	column_name_list_opt:  '(' column_name_list ')'.    (229)
+state 299
+	column_name_list_opt:  '(' column_name_list ')'.    (228)
 
-	.  reduce 229 (src line 1408)
+	.  reduce 228 (src line 1407)
+
+
+state 300
+	common_update_list:  common_update_list ',' update_expression.    (244)
+
+	.  reduce 244 (src line 1534)
 
 
 state 301
-	common_update_list:  common_update_list ',' update_expression.    (245)
-
-	.  reduce 245 (src line 1535)
-
-
-state 302
 	paren_update_list:  '(' column_name_list ')'.'=' '(' expr_list ')' 
 
-	'='  shift 355
+	'='  shift 354
 	.  error
 
 
-state 303
+state 302
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5411,7 +5404,7 @@ state 303
 	expr:  expr.COLLATE identifier 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	update_expression:  column_name '=' expr.    (247)
+	update_expression:  column_name '=' expr.    (246)
 
 	OR  shift 117
 	ANDOP  shift 116
@@ -5444,120 +5437,120 @@ state 303
 	JSON_EXTRACT_OP  shift 111
 	JSON_UNQUOTE_EXTRACT_OP  shift 112
 	COLLATE  shift 123
-	.  reduce 247 (src line 1560)
+	.  reduce 246 (src line 1559)
 
 	cmp_op  goto 113
 	cmp_inequality_op  goto 114
 	like_op  goto 115
 	between_op  goto 122
 
-state 304
-	grant_stmt:  GRANT privileges ON table_name TO roles.    (248)
+state 303
+	grant_stmt:  GRANT privileges ON table_name TO roles.    (247)
 	roles:  roles.',' STRING 
 
-	','  shift 356
-	.  reduce 248 (src line 1570)
+	','  shift 355
+	.  reduce 247 (src line 1569)
+
+
+state 304
+	roles:  STRING.    (249)
+
+	.  reduce 249 (src line 1586)
 
 
 state 305
-	roles:  STRING.    (250)
+	revoke_stmt:  REVOKE privileges ON table_name FROM roles.    (248)
+	roles:  roles.',' STRING 
 
-	.  reduce 250 (src line 1587)
+	','  shift 355
+	.  reduce 248 (src line 1577)
 
 
 state 306
-	revoke_stmt:  REVOKE privileges ON table_name FROM roles.    (249)
-	roles:  roles.',' STRING 
-
-	','  shift 356
-	.  reduce 249 (src line 1578)
-
-
-state 307
 	nulls:  NULLS FIRST.    (77)
 
 	.  reduce 77 (src line 590)
 
 
-state 308
+state 307
 	nulls:  NULLS LAST.    (78)
 
 	.  reduce 78 (src line 594)
 
 
-state 309
+state 308
 	create_table_stmt:  CREATE TABLE table_name '(' column_def_list table_constraint_list_opt ')'.    (178)
 
 	.  reduce 178 (src line 1060)
 
 
-state 310
+state 309
 	column_def_list:  column_def_list ',' column_def.    (180)
 
 	.  reduce 180 (src line 1098)
 
 
+state 310
+	table_constraint_list:  ',' table_constraint.    (214)
+
+	.  reduce 214 (src line 1277)
+
+
 state 311
-	table_constraint_list:  ',' table_constraint.    (215)
-
-	.  reduce 215 (src line 1278)
-
-
-state 312
 	table_constraint:  constraint_name.PRIMARY KEY '(' indexed_column_list ')' 
 	table_constraint:  constraint_name.UNIQUE '(' column_name_list ')' 
 	table_constraint:  constraint_name.CHECK '(' expr ')' 
 
-	PRIMARY  shift 357
-	UNIQUE  shift 358
-	CHECK  shift 359
+	PRIMARY  shift 356
+	UNIQUE  shift 357
+	CHECK  shift 358
 	.  error
 
 
-state 313
+state 312
 	constraint_name:  CONSTRAINT.identifier 
 
 	IDENTIFIER  shift 39
 	.  error
 
-	identifier  goto 360
+	identifier  goto 359
+
+state 313
+	table_constraint_list:  table_constraint_list ','.table_constraint 
+	constraint_name: .    (199)
+
+	CONSTRAINT  shift 312
+	.  reduce 199 (src line 1201)
+
+	constraint_name  goto 311
+	table_constraint  goto 360
 
 state 314
-	table_constraint_list:  table_constraint_list ','.table_constraint 
-	constraint_name: .    (200)
-
-	CONSTRAINT  shift 313
-	.  reduce 200 (src line 1202)
-
-	constraint_name  goto 312
-	table_constraint  goto 361
-
-state 315
 	column_def:  column_name type_name column_constraints_opt.    (181)
 
 	.  reduce 181 (src line 1104)
 
 
-state 316
-	column_constraints_opt:  column_constraints.    (188)
+state 315
+	column_constraints_opt:  column_constraints.    (187)
 	column_constraints:  column_constraints.column_constraint 
-	constraint_name: .    (200)
+	constraint_name: .    (199)
 
-	','  reduce 188 (src line 1136)
-	')'  reduce 188 (src line 1136)
-	CONSTRAINT  shift 313
-	.  reduce 200 (src line 1202)
+	','  reduce 187 (src line 1135)
+	')'  reduce 187 (src line 1135)
+	CONSTRAINT  shift 312
+	.  reduce 199 (src line 1201)
 
-	constraint_name  goto 318
-	column_constraint  goto 362
+	constraint_name  goto 317
+	column_constraint  goto 361
+
+state 316
+	column_constraints:  column_constraint.    (188)
+
+	.  reduce 188 (src line 1141)
+
 
 state 317
-	column_constraints:  column_constraint.    (189)
-
-	.  reduce 189 (src line 1142)
-
-
-state 318
 	column_constraint:  constraint_name.PRIMARY KEY primary_key_order 
 	column_constraint:  constraint_name.NOT NULL 
 	column_constraint:  constraint_name.UNIQUE 
@@ -5568,23 +5561,23 @@ state 318
 	column_constraint:  constraint_name.GENERATED ALWAYS AS '(' expr ')' is_stored 
 	column_constraint:  constraint_name.AS '(' expr ')' is_stored 
 
-	AS  shift 369
-	PRIMARY  shift 363
-	UNIQUE  shift 365
-	CHECK  shift 366
-	DEFAULT  shift 367
-	GENERATED  shift 368
-	NOT  shift 364
+	AS  shift 368
+	PRIMARY  shift 362
+	UNIQUE  shift 364
+	CHECK  shift 365
+	DEFAULT  shift 366
+	GENERATED  shift 367
+	NOT  shift 363
 	.  error
 
 
-state 319
+state 318
 	base_select:  SELECT distinct_opt select_column_list from_clause where_opt group_by_opt having_opt.    (21)
 
 	.  reduce 21 (src line 284)
 
 
-state 320
+state 319
 	having_opt:  HAVING.expr 
 
 	IDENTIFIER  shift 39
@@ -5608,7 +5601,7 @@ state 320
 	'~'  shift 62
 	.  error
 
-	expr  goto 370
+	expr  goto 369
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -5619,7 +5612,7 @@ state 320
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 321
+state 320
 	group_by_opt:  GROUP BY.expr_list 
 
 	IDENTIFIER  shift 39
@@ -5643,110 +5636,110 @@ state 321
 	'~'  shift 62
 	.  error
 
-	expr  goto 282
+	expr  goto 281
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
 	exists_subquery  goto 66
-	expr_list  goto 371
+	expr_list  goto 370
 	column_name  goto 59
 	identifier  goto 70
 	table_name  goto 91
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 322
+state 321
 	join_clause:  table_expr join_op table_expr.join_constraint 
 	join_constraint: .    (59)
 
-	ON  shift 373
-	USING  shift 374
+	ON  shift 372
+	USING  shift 373
 	.  reduce 59 (src line 499)
 
-	join_constraint  goto 372
+	join_constraint  goto 371
 
-state 323
+state 322
 	join_op:  CROSS JOIN.    (50)
 
 	.  reduce 50 (src line 457)
 
 
-state 324
+state 323
 	join_op:  natural_opt LEFT.outer_opt JOIN 
 	outer_opt: .    (57)
 
-	OUTER  shift 376
+	OUTER  shift 375
 	.  reduce 57 (src line 489)
 
-	outer_opt  goto 375
+	outer_opt  goto 374
 
-state 325
+state 324
 	join_op:  natural_opt RIGHT.outer_opt JOIN 
 	outer_opt: .    (57)
 
-	OUTER  shift 376
+	OUTER  shift 375
+	.  reduce 57 (src line 489)
+
+	outer_opt  goto 376
+
+state 325
+	join_op:  natural_opt FULL.outer_opt JOIN 
+	outer_opt: .    (57)
+
+	OUTER  shift 375
 	.  reduce 57 (src line 489)
 
 	outer_opt  goto 377
 
 state 326
-	join_op:  natural_opt FULL.outer_opt JOIN 
-	outer_opt: .    (57)
-
-	OUTER  shift 376
-	.  reduce 57 (src line 489)
-
-	outer_opt  goto 378
-
-state 327
 	join_op:  natural_opt INNER.JOIN 
 
-	JOIN  shift 379
+	JOIN  shift 378
 	.  error
 
 
-state 328
+state 327
 	join_clause:  join_clause join_op table_expr.join_constraint 
 	join_constraint: .    (59)
 
-	ON  shift 373
-	USING  shift 374
+	ON  shift 372
+	USING  shift 373
 	.  reduce 59 (src line 499)
 
-	join_constraint  goto 380
+	join_constraint  goto 379
 
-state 329
+state 328
 	as_table_opt:  AS table_alias.    (43)
 
 	.  reduce 43 (src line 399)
 
 
-state 330
+state 329
 	table_expr:  '(' select_stmt ')'.as_table_opt 
 	as_table_opt: .    (41)
 
 	IDENTIFIER  shift 39
-	STRING  shift 272
-	AS  shift 270
+	STRING  shift 271
+	AS  shift 269
 	.  reduce 41 (src line 391)
 
-	as_table_opt  goto 381
-	table_alias  goto 269
-	identifier  goto 271
+	as_table_opt  goto 380
+	table_alias  goto 268
+	identifier  goto 270
 
-state 331
+state 330
 	table_expr:  '(' table_expr ')'.    (39)
 
 	.  reduce 39 (src line 381)
 
 
-state 332
+state 331
 	table_expr:  '(' join_clause ')'.    (40)
 
 	.  reduce 40 (src line 385)
 
 
-state 333
+state 332
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5800,7 +5793,7 @@ state 333
 	like_op  goto 115
 	between_op  goto 122
 
-state 334
+state 333
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5854,13 +5847,13 @@ state 334
 	like_op  goto 115
 	between_op  goto 122
 
-state 335
+state 334
 	col_tuple:  '(' expr_list ')'.    (154)
 
 	.  reduce 154 (src line 924)
 
 
-state 336
+state 335
 	expr_list:  expr_list ','.expr 
 
 	IDENTIFIER  shift 39
@@ -5884,7 +5877,7 @@ state 336
 	'~'  shift 62
 	.  error
 
-	expr  goto 382
+	expr  goto 381
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -5895,13 +5888,13 @@ state 336
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 337
+state 336
 	expr:  CASE expr_opt when_expr_list else_expr_opt END.    (114)
 
 	.  reduce 114 (src line 745)
 
 
-state 338
+state 337
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -5969,7 +5962,7 @@ state 338
 	like_op  goto 115
 	between_op  goto 122
 
-state 339
+state 338
 	when:  WHEN expr THEN.expr 
 
 	IDENTIFIER  shift 39
@@ -5993,7 +5986,7 @@ state 339
 	'~'  shift 62
 	.  error
 
-	expr  goto 383
+	expr  goto 382
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -6004,54 +5997,54 @@ state 339
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 340
+state 339
 	expr:  CAST '(' expr AS convert_type.')' 
 
-	')'  shift 384
+	')'  shift 383
 	.  error
 
 
-state 341
+state 340
 	convert_type:  NONE.    (149)
 
 	.  reduce 149 (src line 909)
 
 
-state 342
+state 341
 	convert_type:  TEXT.    (150)
 
 	.  reduce 150 (src line 911)
 
 
-state 343
+state 342
 	convert_type:  INTEGER.    (151)
 
 	.  reduce 151 (src line 912)
 
 
-state 344
+state 343
 	function_call_generic:  identifier '(' distinct_function_opt expr_list_opt ')'.filter_opt 
 	filter_opt: .    (169)
 
-	FILTER  shift 346
+	FILTER  shift 345
 	.  reduce 169 (src line 1013)
 
-	filter_opt  goto 385
+	filter_opt  goto 384
 
-state 345
+state 344
 	function_call_generic:  identifier '(' '*' ')' filter_opt.    (162)
 
 	.  reduce 162 (src line 972)
 
 
-state 346
+state 345
 	filter_opt:  FILTER.'(' WHERE expr ')' 
 
-	'('  shift 386
+	'('  shift 385
 	.  error
 
 
-state 347
+state 346
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -6081,6 +6074,77 @@ state 347
 	expr:  expr.NOT IN col_tuple 
 	function_call_keyword:  GLOB '(' expr ',' expr.')' 
 
+	')'  shift 386
+	OR  shift 117
+	ANDOP  shift 116
+	NOT  shift 121
+	IS  shift 118
+	MATCH  shift 131
+	GLOB  shift 130
+	REGEXP  shift 129
+	LIKE  shift 136
+	BETWEEN  shift 137
+	IN  shift 124
+	ISNULL  shift 119
+	NOTNULL  shift 120
+	NE  shift 128
+	'='  shift 127
+	'<'  shift 132
+	'>'  shift 133
+	LE  shift 134
+	GE  shift 135
+	'&'  shift 106
+	'|'  shift 107
+	LSHIFT  shift 108
+	RSHIFT  shift 109
+	'+'  shift 101
+	'-'  shift 102
+	'*'  shift 103
+	'/'  shift 104
+	'%'  shift 105
+	CONCAT  shift 110
+	JSON_EXTRACT_OP  shift 111
+	JSON_UNQUOTE_EXTRACT_OP  shift 112
+	COLLATE  shift 123
+	.  error
+
+	cmp_op  goto 113
+	cmp_inequality_op  goto 114
+	like_op  goto 115
+	between_op  goto 122
+
+state 347
+	expr:  expr.'+' expr 
+	expr:  expr.'-' expr 
+	expr:  expr.'*' expr 
+	expr:  expr.'/' expr 
+	expr:  expr.'%' expr 
+	expr:  expr.'&' expr 
+	expr:  expr.'|' expr 
+	expr:  expr.LSHIFT expr 
+	expr:  expr.RSHIFT expr 
+	expr:  expr.CONCAT expr 
+	expr:  expr.JSON_EXTRACT_OP expr 
+	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
+	expr:  expr.cmp_op expr 
+	expr:  expr.cmp_inequality_op expr 
+	expr:  expr.like_op expr 
+	expr:  expr.like_op expr ESCAPE expr 
+	expr:  expr.ANDOP expr 
+	expr:  expr.OR expr 
+	expr:  expr.IS expr 
+	expr:  expr.IS ISNOT expr 
+	expr:  expr.ISNULL 
+	expr:  expr.NOTNULL 
+	expr:  expr.NOT NULL 
+	expr:  expr.between_op expr AND expr 
+	expr:  expr.COLLATE identifier 
+	expr:  expr.IN col_tuple 
+	expr:  expr.NOT IN col_tuple 
+	function_call_keyword:  LIKE '(' expr ',' expr.')' 
+	function_call_keyword:  LIKE '(' expr ',' expr.',' expr ')' 
+
+	','  shift 388
 	')'  shift 387
 	OR  shift 117
 	ANDOP  shift 116
@@ -6121,201 +6185,130 @@ state 347
 	between_op  goto 122
 
 state 348
-	expr:  expr.'+' expr 
-	expr:  expr.'-' expr 
-	expr:  expr.'*' expr 
-	expr:  expr.'/' expr 
-	expr:  expr.'%' expr 
-	expr:  expr.'&' expr 
-	expr:  expr.'|' expr 
-	expr:  expr.LSHIFT expr 
-	expr:  expr.RSHIFT expr 
-	expr:  expr.CONCAT expr 
-	expr:  expr.JSON_EXTRACT_OP expr 
-	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
-	expr:  expr.cmp_op expr 
-	expr:  expr.cmp_inequality_op expr 
-	expr:  expr.like_op expr 
-	expr:  expr.like_op expr ESCAPE expr 
-	expr:  expr.ANDOP expr 
-	expr:  expr.OR expr 
-	expr:  expr.IS expr 
-	expr:  expr.IS ISNOT expr 
-	expr:  expr.ISNULL 
-	expr:  expr.NOTNULL 
-	expr:  expr.NOT NULL 
-	expr:  expr.between_op expr AND expr 
-	expr:  expr.COLLATE identifier 
-	expr:  expr.IN col_tuple 
-	expr:  expr.NOT IN col_tuple 
-	function_call_keyword:  LIKE '(' expr ',' expr.')' 
-	function_call_keyword:  LIKE '(' expr ',' expr.',' expr ')' 
+	insert_stmt:  INSERT INTO table_name column_name_list_opt VALUES insert_rows upsert_clause_opt.    (224)
 
-	','  shift 389
-	')'  shift 388
-	OR  shift 117
-	ANDOP  shift 116
-	NOT  shift 121
-	IS  shift 118
-	MATCH  shift 131
-	GLOB  shift 130
-	REGEXP  shift 129
-	LIKE  shift 136
-	BETWEEN  shift 137
-	IN  shift 124
-	ISNULL  shift 119
-	NOTNULL  shift 120
-	NE  shift 128
-	'='  shift 127
-	'<'  shift 132
-	'>'  shift 133
-	LE  shift 134
-	GE  shift 135
-	'&'  shift 106
-	'|'  shift 107
-	LSHIFT  shift 108
-	RSHIFT  shift 109
-	'+'  shift 101
-	'-'  shift 102
-	'*'  shift 103
-	'/'  shift 104
-	'%'  shift 105
-	CONCAT  shift 110
-	JSON_EXTRACT_OP  shift 111
-	JSON_UNQUOTE_EXTRACT_OP  shift 112
-	COLLATE  shift 123
-	.  error
+	.  reduce 224 (src line 1341)
 
-	cmp_op  goto 113
-	cmp_inequality_op  goto 114
-	like_op  goto 115
-	between_op  goto 122
 
 state 349
-	insert_stmt:  INSERT INTO table_name column_name_list_opt VALUES insert_rows upsert_clause_opt.    (225)
+	insert_rows:  insert_rows ','.'(' expr_list ')' 
 
-	.  reduce 225 (src line 1342)
+	'('  shift 389
+	.  error
 
 
 state 350
-	insert_rows:  insert_rows ','.'(' expr_list ')' 
+	expr_list:  expr_list.',' expr 
+	insert_rows:  '(' expr_list.')' 
 
-	'('  shift 390
+	','  shift 335
+	')'  shift 390
 	.  error
 
 
 state 351
-	expr_list:  expr_list.',' expr 
-	insert_rows:  '(' expr_list.')' 
+	on_conflict_clause_list:  on_conflict_clause_list on_conflict_clause.    (234)
 
-	','  shift 336
-	')'  shift 391
-	.  error
+	.  reduce 234 (src line 1445)
 
 
 state 352
-	on_conflict_clause_list:  on_conflict_clause_list on_conflict_clause.    (235)
-
-	.  reduce 235 (src line 1446)
-
-
-state 353
 	on_conflict_clause:  ON CONFLICT.conflict_target_opt DO NOTHING 
 	on_conflict_clause:  ON CONFLICT.conflict_target_opt DO UPDATE SET update_list where_opt 
-	conflict_target_opt: .    (238)
+	conflict_target_opt: .    (237)
 
-	'('  shift 393
-	.  reduce 238 (src line 1475)
+	'('  shift 392
+	.  reduce 237 (src line 1474)
 
-	conflict_target_opt  goto 392
+	conflict_target_opt  goto 391
 
-state 354
+state 353
 	column_name_list:  column_name_list ',' column_name.    (132)
 
 	.  reduce 132 (src line 827)
 
 
-state 355
+state 354
 	paren_update_list:  '(' column_name_list ')' '='.'(' expr_list ')' 
 
-	'('  shift 394
+	'('  shift 393
+	.  error
+
+
+state 355
+	roles:  roles ','.STRING 
+
+	STRING  shift 394
 	.  error
 
 
 state 356
-	roles:  roles ','.STRING 
+	table_constraint:  constraint_name PRIMARY.KEY '(' indexed_column_list ')' 
 
-	STRING  shift 395
+	KEY  shift 395
 	.  error
 
 
 state 357
-	table_constraint:  constraint_name PRIMARY.KEY '(' indexed_column_list ')' 
+	table_constraint:  constraint_name UNIQUE.'(' column_name_list ')' 
 
-	KEY  shift 396
+	'('  shift 396
 	.  error
 
 
 state 358
-	table_constraint:  constraint_name UNIQUE.'(' column_name_list ')' 
+	table_constraint:  constraint_name CHECK.'(' expr ')' 
 
 	'('  shift 397
 	.  error
 
 
 state 359
-	table_constraint:  constraint_name CHECK.'(' expr ')' 
+	constraint_name:  CONSTRAINT identifier.    (200)
 
-	'('  shift 398
-	.  error
+	.  reduce 200 (src line 1205)
 
 
 state 360
-	constraint_name:  CONSTRAINT identifier.    (201)
+	table_constraint_list:  table_constraint_list ',' table_constraint.    (215)
 
-	.  reduce 201 (src line 1206)
+	.  reduce 215 (src line 1289)
 
 
 state 361
-	table_constraint_list:  table_constraint_list ',' table_constraint.    (216)
+	column_constraints:  column_constraints column_constraint.    (189)
 
-	.  reduce 216 (src line 1290)
+	.  reduce 189 (src line 1153)
 
 
 state 362
-	column_constraints:  column_constraints column_constraint.    (190)
+	column_constraint:  constraint_name PRIMARY.KEY primary_key_order 
 
-	.  reduce 190 (src line 1154)
+	KEY  shift 398
+	.  error
 
 
 state 363
-	column_constraint:  constraint_name PRIMARY.KEY primary_key_order 
+	column_constraint:  constraint_name NOT.NULL 
 
-	KEY  shift 399
+	NULL  shift 399
 	.  error
 
 
 state 364
-	column_constraint:  constraint_name NOT.NULL 
+	column_constraint:  constraint_name UNIQUE.    (192)
 
-	NULL  shift 400
-	.  error
+	.  reduce 192 (src line 1171)
 
 
 state 365
-	column_constraint:  constraint_name UNIQUE.    (193)
-
-	.  reduce 193 (src line 1172)
-
-
-state 366
 	column_constraint:  constraint_name CHECK.'(' expr ')' 
 
-	'('  shift 401
+	'('  shift 400
 	.  error
 
 
-state 367
+state 366
 	column_constraint:  constraint_name DEFAULT.'(' expr ')' 
 	column_constraint:  constraint_name DEFAULT.literal_value 
 	column_constraint:  constraint_name DEFAULT.signed_number 
@@ -6328,30 +6321,30 @@ state 367
 	TRUE  shift 74
 	FALSE  shift 75
 	NULL  shift 76
-	'('  shift 402
-	'+'  shift 405
-	'-'  shift 406
+	'('  shift 401
+	'+'  shift 404
+	'-'  shift 405
 	.  error
 
-	literal_value  goto 403
-	signed_number  goto 404
+	literal_value  goto 402
+	signed_number  goto 403
 	numeric_literal  goto 71
 
-state 368
+state 367
 	column_constraint:  constraint_name GENERATED.ALWAYS AS '(' expr ')' is_stored 
 
-	ALWAYS  shift 407
+	ALWAYS  shift 406
+	.  error
+
+
+state 368
+	column_constraint:  constraint_name AS.'(' expr ')' is_stored 
+
+	'('  shift 407
 	.  error
 
 
 state 369
-	column_constraint:  constraint_name AS.'(' expr ')' is_stored 
-
-	'('  shift 408
-	.  error
-
-
-state 370
 	having_opt:  HAVING expr.    (67)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -6419,21 +6412,21 @@ state 370
 	like_op  goto 115
 	between_op  goto 122
 
-state 371
+state 370
 	group_by_opt:  GROUP BY expr_list.    (65)
 	expr_list:  expr_list.',' expr 
 
-	','  shift 336
+	','  shift 335
 	.  reduce 65 (src line 528)
 
 
-state 372
+state 371
 	join_clause:  table_expr join_op table_expr join_constraint.    (46)
 
 	.  reduce 46 (src line 415)
 
 
-state 373
+state 372
 	join_constraint:  ON.expr 
 
 	IDENTIFIER  shift 39
@@ -6457,7 +6450,7 @@ state 373
 	'~'  shift 62
 	.  error
 
-	expr  goto 409
+	expr  goto 408
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -6468,59 +6461,59 @@ state 373
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 374
+state 373
 	join_constraint:  USING.'(' column_name_list ')' 
 
-	'('  shift 410
+	'('  shift 409
+	.  error
+
+
+state 374
+	join_op:  natural_opt LEFT outer_opt.JOIN 
+
+	JOIN  shift 410
 	.  error
 
 
 state 375
-	join_op:  natural_opt LEFT outer_opt.JOIN 
-
-	JOIN  shift 411
-	.  error
-
-
-state 376
 	outer_opt:  OUTER.    (58)
 
 	.  reduce 58 (src line 493)
 
 
-state 377
+state 376
 	join_op:  natural_opt RIGHT outer_opt.JOIN 
+
+	JOIN  shift 411
+	.  error
+
+
+state 377
+	join_op:  natural_opt FULL outer_opt.JOIN 
 
 	JOIN  shift 412
 	.  error
 
 
 state 378
-	join_op:  natural_opt FULL outer_opt.JOIN 
-
-	JOIN  shift 413
-	.  error
-
-
-state 379
 	join_op:  natural_opt INNER JOIN.    (54)
 
 	.  reduce 54 (src line 473)
 
 
-state 380
+state 379
 	join_clause:  join_clause join_op table_expr join_constraint.    (47)
 
 	.  reduce 47 (src line 431)
 
 
-state 381
+state 380
 	table_expr:  '(' select_stmt ')' as_table_opt.    (38)
 
 	.  reduce 38 (src line 377)
 
 
-state 382
+state 381
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -6588,7 +6581,7 @@ state 382
 	like_op  goto 115
 	between_op  goto 122
 
-state 383
+state 382
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -6656,38 +6649,38 @@ state 383
 	like_op  goto 115
 	between_op  goto 122
 
-state 384
+state 383
 	expr:  CAST '(' expr AS convert_type ')'.    (121)
 
 	.  reduce 121 (src line 773)
 
 
-state 385
+state 384
 	function_call_generic:  identifier '(' distinct_function_opt expr_list_opt ')' filter_opt.    (161)
 
 	.  reduce 161 (src line 963)
 
 
-state 386
+state 385
 	filter_opt:  FILTER '('.WHERE expr ')' 
 
-	WHERE  shift 414
+	WHERE  shift 413
 	.  error
 
 
-state 387
+state 386
 	function_call_keyword:  GLOB '(' expr ',' expr ')'.    (158)
 
 	.  reduce 158 (src line 948)
 
 
-state 388
+state 387
 	function_call_keyword:  LIKE '(' expr ',' expr ')'.    (159)
 
 	.  reduce 159 (src line 953)
 
 
-state 389
+state 388
 	function_call_keyword:  LIKE '(' expr ',' expr ','.expr ')' 
 
 	IDENTIFIER  shift 39
@@ -6711,7 +6704,7 @@ state 389
 	'~'  shift 62
 	.  error
 
-	expr  goto 415
+	expr  goto 414
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -6722,7 +6715,7 @@ state 389
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 390
+state 389
 	insert_rows:  insert_rows ',' '('.expr_list ')' 
 
 	IDENTIFIER  shift 39
@@ -6746,33 +6739,33 @@ state 390
 	'~'  shift 62
 	.  error
 
-	expr  goto 282
+	expr  goto 281
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
 	exists_subquery  goto 66
-	expr_list  goto 416
+	expr_list  goto 415
 	column_name  goto 59
 	identifier  goto 70
 	table_name  goto 91
 	subquery  goto 65
 	numeric_literal  goto 71
 
+state 390
+	insert_rows:  '(' expr_list ')'.    (229)
+
+	.  reduce 229 (src line 1413)
+
+
 state 391
-	insert_rows:  '(' expr_list ')'.    (230)
-
-	.  reduce 230 (src line 1414)
-
-
-state 392
 	on_conflict_clause:  ON CONFLICT conflict_target_opt.DO NOTHING 
 	on_conflict_clause:  ON CONFLICT conflict_target_opt.DO UPDATE SET update_list where_opt 
 
-	DO  shift 417
+	DO  shift 416
 	.  error
 
 
-state 393
+state 392
 	conflict_target_opt:  '('.column_name_list ')' where_opt 
 
 	IDENTIFIER  shift 39
@@ -6780,9 +6773,9 @@ state 393
 
 	column_name  goto 237
 	identifier  goto 166
-	column_name_list  goto 418
+	column_name_list  goto 417
 
-state 394
+state 393
 	paren_update_list:  '(' column_name_list ')' '=' '('.expr_list ')' 
 
 	IDENTIFIER  shift 39
@@ -6806,32 +6799,32 @@ state 394
 	'~'  shift 62
 	.  error
 
-	expr  goto 282
+	expr  goto 281
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
 	exists_subquery  goto 66
-	expr_list  goto 419
+	expr_list  goto 418
 	column_name  goto 59
 	identifier  goto 70
 	table_name  goto 91
 	subquery  goto 65
 	numeric_literal  goto 71
 
+state 394
+	roles:  roles ',' STRING.    (250)
+
+	.  reduce 250 (src line 1591)
+
+
 state 395
-	roles:  roles ',' STRING.    (251)
-
-	.  reduce 251 (src line 1592)
-
-
-state 396
 	table_constraint:  constraint_name PRIMARY KEY.'(' indexed_column_list ')' 
 
-	'('  shift 420
+	'('  shift 419
 	.  error
 
 
-state 397
+state 396
 	table_constraint:  constraint_name UNIQUE '('.column_name_list ')' 
 
 	IDENTIFIER  shift 39
@@ -6839,9 +6832,9 @@ state 397
 
 	column_name  goto 237
 	identifier  goto 166
-	column_name_list  goto 421
+	column_name_list  goto 420
 
-state 398
+state 397
 	table_constraint:  constraint_name CHECK '('.expr ')' 
 
 	IDENTIFIER  shift 39
@@ -6865,7 +6858,7 @@ state 398
 	'~'  shift 62
 	.  error
 
-	expr  goto 422
+	expr  goto 421
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -6876,24 +6869,59 @@ state 398
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 399
+state 398
 	column_constraint:  constraint_name PRIMARY KEY.primary_key_order 
-	primary_key_order: .    (202)
+	primary_key_order: .    (201)
 
-	ASC  shift 424
-	DESC  shift 425
-	.  reduce 202 (src line 1212)
+	ASC  shift 423
+	DESC  shift 424
+	.  reduce 201 (src line 1211)
 
-	primary_key_order  goto 423
+	primary_key_order  goto 422
+
+state 399
+	column_constraint:  constraint_name NOT NULL.    (191)
+
+	.  reduce 191 (src line 1167)
+
 
 state 400
-	column_constraint:  constraint_name NOT NULL.    (192)
+	column_constraint:  constraint_name CHECK '('.expr ')' 
 
-	.  reduce 192 (src line 1168)
+	IDENTIFIER  shift 39
+	STRING  shift 72
+	INTEGRAL  shift 81
+	HEXNUM  shift 83
+	FLOAT  shift 82
+	BLOBVAL  shift 73
+	TRUE  shift 74
+	FALSE  shift 75
+	NULL  shift 76
+	'('  shift 64
+	CAST  shift 67
+	CASE  shift 63
+	EXISTS  shift 77
+	NOT  shift 78
+	GLOB  shift 79
+	LIKE  shift 80
+	'+'  shift 61
+	'-'  shift 60
+	'~'  shift 62
+	.  error
 
+	expr  goto 425
+	literal_value  goto 58
+	function_call_keyword  goto 68
+	function_call_generic  goto 69
+	exists_subquery  goto 66
+	column_name  goto 59
+	identifier  goto 70
+	table_name  goto 91
+	subquery  goto 65
+	numeric_literal  goto 71
 
 state 401
-	column_constraint:  constraint_name CHECK '('.expr ')' 
+	column_constraint:  constraint_name DEFAULT '('.expr ')' 
 
 	IDENTIFIER  shift 39
 	STRING  shift 72
@@ -6928,54 +6956,29 @@ state 401
 	numeric_literal  goto 71
 
 state 402
-	column_constraint:  constraint_name DEFAULT '('.expr ')' 
+	column_constraint:  constraint_name DEFAULT literal_value.    (195)
 
-	IDENTIFIER  shift 39
-	STRING  shift 72
-	INTEGRAL  shift 81
-	HEXNUM  shift 83
-	FLOAT  shift 82
-	BLOBVAL  shift 73
-	TRUE  shift 74
-	FALSE  shift 75
-	NULL  shift 76
-	'('  shift 64
-	CAST  shift 67
-	CASE  shift 63
-	EXISTS  shift 77
-	NOT  shift 78
-	GLOB  shift 79
-	LIKE  shift 80
-	'+'  shift 61
-	'-'  shift 60
-	'~'  shift 62
-	.  error
+	.  reduce 195 (src line 1183)
 
-	expr  goto 427
-	literal_value  goto 58
-	function_call_keyword  goto 68
-	function_call_generic  goto 69
-	exists_subquery  goto 66
-	column_name  goto 59
-	identifier  goto 70
-	table_name  goto 91
-	subquery  goto 65
-	numeric_literal  goto 71
 
 state 403
-	column_constraint:  constraint_name DEFAULT literal_value.    (196)
+	column_constraint:  constraint_name DEFAULT signed_number.    (196)
 
-	.  reduce 196 (src line 1184)
+	.  reduce 196 (src line 1187)
 
 
 state 404
-	column_constraint:  constraint_name DEFAULT signed_number.    (197)
+	signed_number:  '+'.numeric_literal 
 
-	.  reduce 197 (src line 1188)
+	INTEGRAL  shift 81
+	HEXNUM  shift 83
+	FLOAT  shift 82
+	.  error
 
+	numeric_literal  goto 427
 
 state 405
-	signed_number:  '+'.numeric_literal 
+	signed_number:  '-'.numeric_literal 
 
 	INTEGRAL  shift 81
 	HEXNUM  shift 83
@@ -6985,23 +6988,13 @@ state 405
 	numeric_literal  goto 428
 
 state 406
-	signed_number:  '-'.numeric_literal 
-
-	INTEGRAL  shift 81
-	HEXNUM  shift 83
-	FLOAT  shift 82
-	.  error
-
-	numeric_literal  goto 429
-
-state 407
 	column_constraint:  constraint_name GENERATED ALWAYS.AS '(' expr ')' is_stored 
 
-	AS  shift 430
+	AS  shift 429
 	.  error
 
 
-state 408
+state 407
 	column_constraint:  constraint_name AS '('.expr ')' is_stored 
 
 	IDENTIFIER  shift 39
@@ -7025,7 +7018,7 @@ state 408
 	'~'  shift 62
 	.  error
 
-	expr  goto 431
+	expr  goto 430
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -7036,7 +7029,7 @@ state 408
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 409
+state 408
 	join_constraint:  ON expr.    (60)
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -7104,7 +7097,7 @@ state 409
 	like_op  goto 115
 	between_op  goto 122
 
-state 410
+state 409
 	join_constraint:  USING '('.column_name_list ')' 
 
 	IDENTIFIER  shift 39
@@ -7112,27 +7105,27 @@ state 410
 
 	column_name  goto 237
 	identifier  goto 166
-	column_name_list  goto 432
+	column_name_list  goto 431
 
-state 411
+state 410
 	join_op:  natural_opt LEFT outer_opt JOIN.    (51)
 
 	.  reduce 51 (src line 461)
 
 
-state 412
+state 411
 	join_op:  natural_opt RIGHT outer_opt JOIN.    (52)
 
 	.  reduce 52 (src line 465)
 
 
-state 413
+state 412
 	join_op:  natural_opt FULL outer_opt JOIN.    (53)
 
 	.  reduce 53 (src line 469)
 
 
-state 414
+state 413
 	filter_opt:  FILTER '(' WHERE.expr ')' 
 
 	IDENTIFIER  shift 39
@@ -7156,7 +7149,7 @@ state 414
 	'~'  shift 62
 	.  error
 
-	expr  goto 433
+	expr  goto 432
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -7167,7 +7160,7 @@ state 414
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 415
+state 414
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -7197,7 +7190,7 @@ state 415
 	expr:  expr.NOT IN col_tuple 
 	function_call_keyword:  LIKE '(' expr ',' expr ',' expr.')' 
 
-	')'  shift 434
+	')'  shift 433
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -7236,63 +7229,63 @@ state 415
 	like_op  goto 115
 	between_op  goto 122
 
-state 416
+state 415
 	expr_list:  expr_list.',' expr 
 	insert_rows:  insert_rows ',' '(' expr_list.')' 
 
-	','  shift 336
-	')'  shift 435
+	','  shift 335
+	')'  shift 434
+	.  error
+
+
+state 416
+	on_conflict_clause:  ON CONFLICT conflict_target_opt DO.NOTHING 
+	on_conflict_clause:  ON CONFLICT conflict_target_opt DO.UPDATE SET update_list where_opt 
+
+	UPDATE  shift 436
+	NOTHING  shift 435
 	.  error
 
 
 state 417
-	on_conflict_clause:  ON CONFLICT conflict_target_opt DO.NOTHING 
-	on_conflict_clause:  ON CONFLICT conflict_target_opt DO.UPDATE SET update_list where_opt 
+	column_name_list:  column_name_list.',' column_name 
+	conflict_target_opt:  '(' column_name_list.')' where_opt 
 
-	UPDATE  shift 437
-	NOTHING  shift 436
+	','  shift 298
+	')'  shift 437
 	.  error
 
 
 state 418
-	column_name_list:  column_name_list.',' column_name 
-	conflict_target_opt:  '(' column_name_list.')' where_opt 
+	expr_list:  expr_list.',' expr 
+	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list.')' 
 
-	','  shift 299
+	','  shift 335
 	')'  shift 438
 	.  error
 
 
 state 419
-	expr_list:  expr_list.',' expr 
-	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list.')' 
-
-	','  shift 336
-	')'  shift 439
-	.  error
-
-
-state 420
 	table_constraint:  constraint_name PRIMARY KEY '('.indexed_column_list ')' 
 
 	IDENTIFIER  shift 39
 	.  error
 
-	column_name  goto 442
+	column_name  goto 441
 	identifier  goto 166
-	indexed_column_list  goto 440
-	indexed_column  goto 441
+	indexed_column_list  goto 439
+	indexed_column  goto 440
 
-state 421
+state 420
 	column_name_list:  column_name_list.',' column_name 
 	table_constraint:  constraint_name UNIQUE '(' column_name_list.')' 
 
-	','  shift 299
-	')'  shift 443
+	','  shift 298
+	')'  shift 442
 	.  error
 
 
-state 422
+state 421
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -7321,6 +7314,93 @@ state 422
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
 	table_constraint:  constraint_name CHECK '(' expr.')' 
+
+	')'  shift 443
+	OR  shift 117
+	ANDOP  shift 116
+	NOT  shift 121
+	IS  shift 118
+	MATCH  shift 131
+	GLOB  shift 130
+	REGEXP  shift 129
+	LIKE  shift 136
+	BETWEEN  shift 137
+	IN  shift 124
+	ISNULL  shift 119
+	NOTNULL  shift 120
+	NE  shift 128
+	'='  shift 127
+	'<'  shift 132
+	'>'  shift 133
+	LE  shift 134
+	GE  shift 135
+	'&'  shift 106
+	'|'  shift 107
+	LSHIFT  shift 108
+	RSHIFT  shift 109
+	'+'  shift 101
+	'-'  shift 102
+	'*'  shift 103
+	'/'  shift 104
+	'%'  shift 105
+	CONCAT  shift 110
+	JSON_EXTRACT_OP  shift 111
+	JSON_UNQUOTE_EXTRACT_OP  shift 112
+	COLLATE  shift 123
+	.  error
+
+	cmp_op  goto 113
+	cmp_inequality_op  goto 114
+	like_op  goto 115
+	between_op  goto 122
+
+state 422
+	column_constraint:  constraint_name PRIMARY KEY primary_key_order.    (190)
+
+	.  reduce 190 (src line 1162)
+
+
+state 423
+	primary_key_order:  ASC.    (202)
+
+	.  reduce 202 (src line 1215)
+
+
+state 424
+	primary_key_order:  DESC.    (203)
+
+	.  reduce 203 (src line 1219)
+
+
+state 425
+	expr:  expr.'+' expr 
+	expr:  expr.'-' expr 
+	expr:  expr.'*' expr 
+	expr:  expr.'/' expr 
+	expr:  expr.'%' expr 
+	expr:  expr.'&' expr 
+	expr:  expr.'|' expr 
+	expr:  expr.LSHIFT expr 
+	expr:  expr.RSHIFT expr 
+	expr:  expr.CONCAT expr 
+	expr:  expr.JSON_EXTRACT_OP expr 
+	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
+	expr:  expr.cmp_op expr 
+	expr:  expr.cmp_inequality_op expr 
+	expr:  expr.like_op expr 
+	expr:  expr.like_op expr ESCAPE expr 
+	expr:  expr.ANDOP expr 
+	expr:  expr.OR expr 
+	expr:  expr.IS expr 
+	expr:  expr.IS ISNOT expr 
+	expr:  expr.ISNULL 
+	expr:  expr.NOTNULL 
+	expr:  expr.NOT NULL 
+	expr:  expr.between_op expr AND expr 
+	expr:  expr.COLLATE identifier 
+	expr:  expr.IN col_tuple 
+	expr:  expr.NOT IN col_tuple 
+	column_constraint:  constraint_name CHECK '(' expr.')' 
 
 	')'  shift 444
 	OR  shift 117
@@ -7361,24 +7441,6 @@ state 422
 	like_op  goto 115
 	between_op  goto 122
 
-state 423
-	column_constraint:  constraint_name PRIMARY KEY primary_key_order.    (191)
-
-	.  reduce 191 (src line 1163)
-
-
-state 424
-	primary_key_order:  ASC.    (203)
-
-	.  reduce 203 (src line 1216)
-
-
-state 425
-	primary_key_order:  DESC.    (204)
-
-	.  reduce 204 (src line 1220)
-
-
 state 426
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
@@ -7407,7 +7469,7 @@ state 426
 	expr:  expr.COLLATE identifier 
 	expr:  expr.IN col_tuple 
 	expr:  expr.NOT IN col_tuple 
-	column_constraint:  constraint_name CHECK '(' expr.')' 
+	column_constraint:  constraint_name DEFAULT '(' expr.')' 
 
 	')'  shift 445
 	OR  shift 117
@@ -7449,94 +7511,25 @@ state 426
 	between_op  goto 122
 
 state 427
-	expr:  expr.'+' expr 
-	expr:  expr.'-' expr 
-	expr:  expr.'*' expr 
-	expr:  expr.'/' expr 
-	expr:  expr.'%' expr 
-	expr:  expr.'&' expr 
-	expr:  expr.'|' expr 
-	expr:  expr.LSHIFT expr 
-	expr:  expr.RSHIFT expr 
-	expr:  expr.CONCAT expr 
-	expr:  expr.JSON_EXTRACT_OP expr 
-	expr:  expr.JSON_UNQUOTE_EXTRACT_OP expr 
-	expr:  expr.cmp_op expr 
-	expr:  expr.cmp_inequality_op expr 
-	expr:  expr.like_op expr 
-	expr:  expr.like_op expr ESCAPE expr 
-	expr:  expr.ANDOP expr 
-	expr:  expr.OR expr 
-	expr:  expr.IS expr 
-	expr:  expr.IS ISNOT expr 
-	expr:  expr.ISNULL 
-	expr:  expr.NOTNULL 
-	expr:  expr.NOT NULL 
-	expr:  expr.between_op expr AND expr 
-	expr:  expr.COLLATE identifier 
-	expr:  expr.IN col_tuple 
-	expr:  expr.NOT IN col_tuple 
-	column_constraint:  constraint_name DEFAULT '(' expr.')' 
+	signed_number:  '+' numeric_literal.    (204)
 
-	')'  shift 446
-	OR  shift 117
-	ANDOP  shift 116
-	NOT  shift 121
-	IS  shift 118
-	MATCH  shift 131
-	GLOB  shift 130
-	REGEXP  shift 129
-	LIKE  shift 136
-	BETWEEN  shift 137
-	IN  shift 124
-	ISNULL  shift 119
-	NOTNULL  shift 120
-	NE  shift 128
-	'='  shift 127
-	'<'  shift 132
-	'>'  shift 133
-	LE  shift 134
-	GE  shift 135
-	'&'  shift 106
-	'|'  shift 107
-	LSHIFT  shift 108
-	RSHIFT  shift 109
-	'+'  shift 101
-	'-'  shift 102
-	'*'  shift 103
-	'/'  shift 104
-	'%'  shift 105
-	CONCAT  shift 110
-	JSON_EXTRACT_OP  shift 111
-	JSON_UNQUOTE_EXTRACT_OP  shift 112
-	COLLATE  shift 123
-	.  error
+	.  reduce 204 (src line 1225)
 
-	cmp_op  goto 113
-	cmp_inequality_op  goto 114
-	like_op  goto 115
-	between_op  goto 122
 
 state 428
-	signed_number:  '+' numeric_literal.    (205)
+	signed_number:  '-' numeric_literal.    (205)
 
-	.  reduce 205 (src line 1226)
+	.  reduce 205 (src line 1230)
 
 
 state 429
-	signed_number:  '-' numeric_literal.    (206)
-
-	.  reduce 206 (src line 1231)
-
-
-state 430
 	column_constraint:  constraint_name GENERATED ALWAYS AS.'(' expr ')' is_stored 
 
-	'('  shift 447
+	'('  shift 446
 	.  error
 
 
-state 431
+state 430
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -7566,7 +7559,7 @@ state 431
 	expr:  expr.NOT IN col_tuple 
 	column_constraint:  constraint_name AS '(' expr.')' is_stored 
 
-	')'  shift 448
+	')'  shift 447
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -7605,16 +7598,16 @@ state 431
 	like_op  goto 115
 	between_op  goto 122
 
-state 432
+state 431
 	join_constraint:  USING '(' column_name_list.')' 
 	column_name_list:  column_name_list.',' column_name 
 
-	','  shift 299
-	')'  shift 449
+	','  shift 298
+	')'  shift 448
 	.  error
 
 
-state 433
+state 432
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -7644,7 +7637,7 @@ state 433
 	expr:  expr.NOT IN col_tuple 
 	filter_opt:  FILTER '(' WHERE expr.')' 
 
-	')'  shift 450
+	')'  shift 449
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -7683,95 +7676,95 @@ state 433
 	like_op  goto 115
 	between_op  goto 122
 
-state 434
+state 433
 	function_call_keyword:  LIKE '(' expr ',' expr ',' expr ')'.    (160)
 
 	.  reduce 160 (src line 957)
 
 
-state 435
-	insert_rows:  insert_rows ',' '(' expr_list ')'.    (231)
+state 434
+	insert_rows:  insert_rows ',' '(' expr_list ')'.    (230)
 
-	.  reduce 231 (src line 1419)
+	.  reduce 230 (src line 1418)
+
+
+state 435
+	on_conflict_clause:  ON CONFLICT conflict_target_opt DO NOTHING.    (235)
+
+	.  reduce 235 (src line 1451)
 
 
 state 436
-	on_conflict_clause:  ON CONFLICT conflict_target_opt DO NOTHING.    (236)
-
-	.  reduce 236 (src line 1452)
-
-
-state 437
 	on_conflict_clause:  ON CONFLICT conflict_target_opt DO UPDATE.SET update_list where_opt 
 
-	SET  shift 451
+	SET  shift 450
 	.  error
 
 
-state 438
+state 437
 	conflict_target_opt:  '(' column_name_list ')'.where_opt 
 	where_opt: .    (62)
 
 	WHERE  shift 159
 	.  reduce 62 (src line 514)
 
-	where_opt  goto 452
+	where_opt  goto 451
+
+state 438
+	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list ')'.    (245)
+
+	.  reduce 245 (src line 1540)
+
 
 state 439
-	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list ')'.    (246)
-
-	.  reduce 246 (src line 1541)
-
-
-state 440
 	table_constraint:  constraint_name PRIMARY KEY '(' indexed_column_list.')' 
 	indexed_column_list:  indexed_column_list.',' indexed_column 
 
-	','  shift 454
-	')'  shift 453
+	','  shift 453
+	')'  shift 452
 	.  error
 
 
+state 440
+	indexed_column_list:  indexed_column.    (219)
+
+	.  reduce 219 (src line 1313)
+
+
 state 441
-	indexed_column_list:  indexed_column.    (220)
+	indexed_column:  column_name.collate_opt primary_key_order 
+	collate_opt: .    (222)
 
-	.  reduce 220 (src line 1314)
+	COLLATE  shift 455
+	.  reduce 222 (src line 1331)
 
+	collate_opt  goto 454
 
 state 442
-	indexed_column:  column_name.collate_opt primary_key_order 
-	collate_opt: .    (223)
+	table_constraint:  constraint_name UNIQUE '(' column_name_list ')'.    (217)
 
-	COLLATE  shift 456
-	.  reduce 223 (src line 1332)
+	.  reduce 217 (src line 1303)
 
-	collate_opt  goto 455
 
 state 443
-	table_constraint:  constraint_name UNIQUE '(' column_name_list ')'.    (218)
+	table_constraint:  constraint_name CHECK '(' expr ')'.    (218)
 
-	.  reduce 218 (src line 1304)
+	.  reduce 218 (src line 1307)
 
 
 state 444
-	table_constraint:  constraint_name CHECK '(' expr ')'.    (219)
+	column_constraint:  constraint_name CHECK '(' expr ')'.    (193)
 
-	.  reduce 219 (src line 1308)
+	.  reduce 193 (src line 1175)
 
 
 state 445
-	column_constraint:  constraint_name CHECK '(' expr ')'.    (194)
+	column_constraint:  constraint_name DEFAULT '(' expr ')'.    (194)
 
-	.  reduce 194 (src line 1176)
+	.  reduce 194 (src line 1179)
 
 
 state 446
-	column_constraint:  constraint_name DEFAULT '(' expr ')'.    (195)
-
-	.  reduce 195 (src line 1180)
-
-
-state 447
 	column_constraint:  constraint_name GENERATED ALWAYS AS '('.expr ')' is_stored 
 
 	IDENTIFIER  shift 39
@@ -7795,7 +7788,7 @@ state 447
 	'~'  shift 62
 	.  error
 
-	expr  goto 457
+	expr  goto 456
 	literal_value  goto 58
 	function_call_keyword  goto 68
 	function_call_generic  goto 69
@@ -7806,29 +7799,29 @@ state 447
 	subquery  goto 65
 	numeric_literal  goto 71
 
-state 448
+state 447
 	column_constraint:  constraint_name AS '(' expr ')'.is_stored 
-	is_stored: .    (210)
+	is_stored: .    (209)
 
-	STORED  shift 459
-	VIRTUAL  shift 460
-	.  reduce 210 (src line 1254)
+	STORED  shift 458
+	VIRTUAL  shift 459
+	.  reduce 209 (src line 1253)
 
-	is_stored  goto 458
+	is_stored  goto 457
 
-state 449
+state 448
 	join_constraint:  USING '(' column_name_list ')'.    (61)
 
 	.  reduce 61 (src line 508)
 
 
-state 450
+state 449
 	filter_opt:  FILTER '(' WHERE expr ')'.    (170)
 
 	.  reduce 170 (src line 1017)
 
 
-state 451
+state 450
 	on_conflict_clause:  ON CONFLICT conflict_target_opt DO UPDATE SET.update_list where_opt 
 
 	IDENTIFIER  shift 39
@@ -7838,51 +7831,51 @@ state 451
 	column_name  goto 165
 	identifier  goto 166
 	update_expression  goto 163
-	update_list  goto 461
+	update_list  goto 460
 	common_update_list  goto 161
 	paren_update_list  goto 162
 
-state 452
-	conflict_target_opt:  '(' column_name_list ')' where_opt.    (239)
+state 451
+	conflict_target_opt:  '(' column_name_list ')' where_opt.    (238)
 
-	.  reduce 239 (src line 1479)
+	.  reduce 238 (src line 1478)
+
+
+state 452
+	table_constraint:  constraint_name PRIMARY KEY '(' indexed_column_list ')'.    (216)
+
+	.  reduce 216 (src line 1298)
 
 
 state 453
-	table_constraint:  constraint_name PRIMARY KEY '(' indexed_column_list ')'.    (217)
-
-	.  reduce 217 (src line 1299)
-
-
-state 454
 	indexed_column_list:  indexed_column_list ','.indexed_column 
 
 	IDENTIFIER  shift 39
 	.  error
 
-	column_name  goto 442
+	column_name  goto 441
 	identifier  goto 166
-	indexed_column  goto 462
+	indexed_column  goto 461
+
+state 454
+	indexed_column:  column_name collate_opt.primary_key_order 
+	primary_key_order: .    (201)
+
+	ASC  shift 423
+	DESC  shift 424
+	.  reduce 201 (src line 1211)
+
+	primary_key_order  goto 462
 
 state 455
-	indexed_column:  column_name collate_opt.primary_key_order 
-	primary_key_order: .    (202)
-
-	ASC  shift 424
-	DESC  shift 425
-	.  reduce 202 (src line 1212)
-
-	primary_key_order  goto 463
-
-state 456
 	collate_opt:  COLLATE.identifier 
 
 	IDENTIFIER  shift 39
 	.  error
 
-	identifier  goto 464
+	identifier  goto 463
 
-state 457
+state 456
 	expr:  expr.'+' expr 
 	expr:  expr.'-' expr 
 	expr:  expr.'*' expr 
@@ -7912,7 +7905,7 @@ state 457
 	expr:  expr.NOT IN col_tuple 
 	column_constraint:  constraint_name GENERATED ALWAYS AS '(' expr.')' is_stored 
 
-	')'  shift 465
+	')'  shift 464
 	OR  shift 117
 	ANDOP  shift 116
 	NOT  shift 121
@@ -7951,82 +7944,82 @@ state 457
 	like_op  goto 115
 	between_op  goto 122
 
-state 458
-	column_constraint:  constraint_name AS '(' expr ')' is_stored.    (199)
+state 457
+	column_constraint:  constraint_name AS '(' expr ')' is_stored.    (198)
 
-	.  reduce 199 (src line 1196)
+	.  reduce 198 (src line 1195)
+
+
+state 458
+	is_stored:  STORED.    (210)
+
+	.  reduce 210 (src line 1257)
 
 
 state 459
-	is_stored:  STORED.    (211)
+	is_stored:  VIRTUAL.    (211)
 
-	.  reduce 211 (src line 1258)
+	.  reduce 211 (src line 1261)
 
 
 state 460
-	is_stored:  VIRTUAL.    (212)
-
-	.  reduce 212 (src line 1262)
-
-
-state 461
 	on_conflict_clause:  ON CONFLICT conflict_target_opt DO UPDATE SET update_list.where_opt 
 	where_opt: .    (62)
 
 	WHERE  shift 159
 	.  reduce 62 (src line 514)
 
-	where_opt  goto 466
+	where_opt  goto 465
+
+state 461
+	indexed_column_list:  indexed_column_list ',' indexed_column.    (220)
+
+	.  reduce 220 (src line 1318)
+
 
 state 462
-	indexed_column_list:  indexed_column_list ',' indexed_column.    (221)
+	indexed_column:  column_name collate_opt primary_key_order.    (221)
 
-	.  reduce 221 (src line 1319)
+	.  reduce 221 (src line 1324)
 
 
 state 463
-	indexed_column:  column_name collate_opt primary_key_order.    (222)
+	collate_opt:  COLLATE identifier.    (223)
 
-	.  reduce 222 (src line 1325)
+	.  reduce 223 (src line 1335)
 
 
 state 464
-	collate_opt:  COLLATE identifier.    (224)
+	column_constraint:  constraint_name GENERATED ALWAYS AS '(' expr ')'.is_stored 
+	is_stored: .    (209)
 
-	.  reduce 224 (src line 1336)
+	STORED  shift 458
+	VIRTUAL  shift 459
+	.  reduce 209 (src line 1253)
 
+	is_stored  goto 466
 
 state 465
-	column_constraint:  constraint_name GENERATED ALWAYS AS '(' expr ')'.is_stored 
-	is_stored: .    (210)
+	on_conflict_clause:  ON CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt.    (236)
 
-	STORED  shift 459
-	VIRTUAL  shift 460
-	.  reduce 210 (src line 1254)
+	.  reduce 236 (src line 1458)
 
-	is_stored  goto 467
 
 state 466
-	on_conflict_clause:  ON CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt.    (237)
+	column_constraint:  constraint_name GENERATED ALWAYS AS '(' expr ')' is_stored.    (197)
 
-	.  reduce 237 (src line 1459)
-
-
-state 467
-	column_constraint:  constraint_name GENERATED ALWAYS AS '(' expr ')' is_stored.    (198)
-
-	.  reduce 198 (src line 1192)
+	.  reduce 197 (src line 1191)
 
 
-123 terminals, 93 nonterminals
-258 grammar rules, 468/16000 states
+122 terminals, 93 nonterminals
+257 grammar rules, 467/16000 states
 0 shift/reduce, 0 reduce/reduce conflicts reported
 142 working sets used
 memory: parser 1237/240000
 366 extra closures
-2593 shift entries, 14 exceptions
+2592 shift entries, 14 exceptions
 266 goto entries
 767 entries saved by goto default
-Optimizer space used: output 1698/240000
-1698 table entries, 371 zero
-maximum spread: 122, maximum offset: 465
+Optimizer space used: output 1691/240000
+1691 table entries, 365 zero
+maximum spread: 121, maximum offset: 464

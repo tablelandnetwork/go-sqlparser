@@ -3256,9 +3256,9 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table types",
-			stmt:         "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB, e ANY);",
-			deparsed:     "create table t (a int, b integer, c text, d blob, e any)",
-			expectedHash: "f3f82e433af896787c5d7695c8e874f71392f2f4bd2590783120b7368e1dde22",
+			stmt:         "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB);",
+			deparsed:     "create table t (a int, b integer, c text, d blob)",
+			expectedHash: "4fe547ac5242c1f0f98a5918a570b498574f95389dc7bf59fd4eabe765938a03",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
@@ -3269,7 +3269,6 @@ func TestCreateTable(t *testing.T) {
 							{Column: &Column{Name: "b"}, Type: TypeIntegerStr, Constraints: []ColumnConstraint{}},
 							{Column: &Column{Name: "c"}, Type: TypeTextStr, Constraints: []ColumnConstraint{}},
 							{Column: &Column{Name: "d"}, Type: TypeBlobStr, Constraints: []ColumnConstraint{}},
-							{Column: &Column{Name: "e"}, Type: TypeAnyStr, Constraints: []ColumnConstraint{}},
 						},
 					},
 				},
@@ -5017,8 +5016,8 @@ func TestParallel(t *testing.T) {
 			deparsed: "create table t (a int)",
 		},
 		{
-			stmt:     "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB, e ANY);",
-			deparsed: "create table t (a int, b integer, c text, d blob, e any)",
+			stmt:     "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB);",
+			deparsed: "create table t (a int, b integer, c text, d blob)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
