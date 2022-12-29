@@ -108,6 +108,7 @@ func isRowID(column Identifier) bool {
 %token <empty> CREATE TABLE INT BLOB PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 %token <empty> INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 %token <empty> GRANT TO REVOKE
+%token <empty> BLOCK_NUM TXN_HASH
 
 %left <empty> RIGHT FULL INNER LEFT NATURAL OUTER CROSS JOIN
 %left <empty> ON USING
@@ -129,7 +130,7 @@ func isRowID(column Identifier) bool {
 %type <readStmt> select_stmt
 %type <baseSelect> base_select
 %type <createTableStmt> create_table_stmt
-%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number
+%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number function_call_custom
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege compound_op
 %type <column> column_name 
@@ -775,6 +776,7 @@ expr:
     $$ = &ConvertExpr{Expr: $3, Type: $5}
   }
 | function_call_keyword
+| function_call_custom
 | function_call_generic
 ;
 
@@ -978,6 +980,22 @@ function_call_generic:
     $$ = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: $5}
   }
 ;
+
+function_call_custom:
+  TXN_HASH '(' ')'
+  {
+    $$ = &CustomFuncExpr{Name: Identifier("txn_hash"), Args: Exprs{}}
+  }
+| BLOCK_NUM '(' ')'
+  {
+    $$ = &CustomFuncExpr{Name: Identifier("block_num"), Args: Exprs{}}
+  }
+| BLOCK_NUM '(' INTEGRAL ')'
+  {
+    $$ = &CustomFuncExpr{Name: Identifier("block_num"), Args: Exprs{&Value{Type: IntValue, Value: $3}}}
+  }
+;
+
 
 distinct_function_opt:
   {

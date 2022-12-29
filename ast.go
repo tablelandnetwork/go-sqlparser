@@ -3,8 +3,10 @@ package sqlparser
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/davecgh/go-spew/spew"
@@ -67,10 +69,30 @@ func (*Update) iStatement()         {}
 func (*Grant) iStatement()          {}
 func (*Revoke) iStatement()         {}
 
+// ReadStatementResolver resolves Tableland Custom Functions for a read statement.
+type ReadStatementResolver interface {
+	// GetBlockNumber returns the last known block number for the provided chainID. If the chainID isn't known,
+	// it returns (0, false).
+	GetBlockNumber(chainID int64) (int64, bool)
+}
+
+// WriteStatementResolver resolves Tableland Custom Functions for a write statement.
+type WriteStatementResolver interface {
+	// GetTxnHash returns the transaction hash of the transaction containing the query being processed.
+	GetTxnHash() string
+
+	// GetBlockNumber returns the block number of the block containing query being processed.
+	GetBlockNumber() int64
+}
+
 // ReadStatement is any SELECT statement or UNION statement.
 type ReadStatement interface {
 	iReadStatement()
 	iStatement()
+
+	// Resolve returns a string representation with custom function nodes resolved to the values
+	// passed by resolver.
+	Resolve(ReadStatementResolver) (string, error)
 	Node
 }
 
@@ -91,6 +113,10 @@ type WriteStatement interface {
 	iWriteStatement()
 	iStatement()
 	GetTable() *Table
+
+	// Resolve returns a string representation with custom function nodes resolved to the values
+	// passed by resolver.
+	Resolve(WriteStatementResolver) (string, error)
 	Node
 }
 
@@ -138,6 +164,12 @@ func (node *Select) String() string {
 	)
 }
 
+// Resolve returns a string representation with custom function nodes resolved to the values
+// passed by resolver.
+func (node *Select) Resolve(resolver ReadStatementResolver) (string, error) {
+	return resolveReadStatementWalk(node, resolver)
+}
+
 func (node *Select) walkSubtree(visit Visit) error {
 	if node == nil {
 		return nil
@@ -174,6 +206,12 @@ type CompoundSelect struct {
 
 func (node *CompoundSelect) String() string {
 	return fmt.Sprintf("%s %s %s%s%s", node.Left, node.Type, node.Right, node.Limit, node.OrderBy)
+}
+
+// Resolve returns a string representation with custom function nodes resolved to the values
+// passed by resolver.
+func (node *CompoundSelect) Resolve(resolver ReadStatementResolver) (string, error) {
+	return resolveReadStatementWalk(node, resolver)
 }
 
 func (node *CompoundSelect) walkSubtree(visit Visit) error {
@@ -574,28 +612,29 @@ type Expr interface {
 	Node
 }
 
-func (*NullValue) iExpr()   {}
-func (BoolValue) iExpr()    {}
-func (*Value) iExpr()       {}
-func (*UnaryExpr) iExpr()   {}
-func (*BinaryExpr) iExpr()  {}
-func (*CmpExpr) iExpr()     {}
-func (*AndExpr) iExpr()     {}
-func (*OrExpr) iExpr()      {}
-func (*NotExpr) iExpr()     {}
-func (*IsExpr) iExpr()      {}
-func (*IsNullExpr) iExpr()  {}
-func (*NotNullExpr) iExpr() {}
-func (*CollateExpr) iExpr() {}
-func (*ConvertExpr) iExpr() {}
-func (*BetweenExpr) iExpr() {}
-func (*CaseExpr) iExpr()    {}
-func (*Column) iExpr()      {}
-func (Exprs) iExpr()        {}
-func (*Subquery) iExpr()    {}
-func (*ExistsExpr) iExpr()  {}
-func (*FuncExpr) iExpr()    {}
-func (*ParenExpr) iExpr()   {}
+func (*NullValue) iExpr()      {}
+func (BoolValue) iExpr()       {}
+func (*Value) iExpr()          {}
+func (*UnaryExpr) iExpr()      {}
+func (*BinaryExpr) iExpr()     {}
+func (*CmpExpr) iExpr()        {}
+func (*AndExpr) iExpr()        {}
+func (*OrExpr) iExpr()         {}
+func (*NotExpr) iExpr()        {}
+func (*IsExpr) iExpr()         {}
+func (*IsNullExpr) iExpr()     {}
+func (*NotNullExpr) iExpr()    {}
+func (*CollateExpr) iExpr()    {}
+func (*ConvertExpr) iExpr()    {}
+func (*BetweenExpr) iExpr()    {}
+func (*CaseExpr) iExpr()       {}
+func (*Column) iExpr()         {}
+func (Exprs) iExpr()           {}
+func (*Subquery) iExpr()       {}
+func (*ExistsExpr) iExpr()     {}
+func (*FuncExpr) iExpr()       {}
+func (*CustomFuncExpr) iExpr() {}
+func (*ParenExpr) iExpr()      {}
 
 // NullValue represents null values.
 type NullValue struct{}
@@ -1223,6 +1262,37 @@ func (node *FuncExpr) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Args, node.Filter)
 }
 
+// CustomFuncExpr represents a function call.
+type CustomFuncExpr struct {
+	Name           Identifier
+	Args           Exprs
+	ResolvedString string
+}
+
+// String returns the string representation of the node.
+func (node *CustomFuncExpr) String() string {
+	if node.ResolvedString != "" {
+		return node.ResolvedString
+	}
+
+	var argsStr string
+	if node.Args != nil {
+		argsStr = node.Args.String()
+	} else {
+		argsStr = "(*)"
+	}
+
+	return fmt.Sprintf("%s%s", node.Name.String(), argsStr[:1]+argsStr[1:])
+}
+
+func (node *CustomFuncExpr) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Name, node.Args)
+}
+
 // ParenExpr represents a (expr) expression.
 type ParenExpr struct {
 	Expr Expr
@@ -1695,6 +1765,12 @@ func (node *Insert) String() string {
 	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), node.Upsert.String(), returning)
 }
 
+// Resolve returns a string representation with custom function nodes resolved to the values
+// passed by resolver.
+func (node *Insert) Resolve(resolver WriteStatementResolver) (string, error) {
+	return resolveWriteStatementWalk(node, resolver)
+}
+
 func (node *Insert) walkSubtree(visit Visit) error {
 	if node == nil {
 		return nil
@@ -1790,6 +1866,12 @@ func (node *Delete) GetTable() *Table {
 	return node.Table
 }
 
+// Resolve returns a string representation with custom function nodes resolved to the values
+// passed by resolver.
+func (node *Delete) Resolve(resolver WriteStatementResolver) (string, error) {
+	return resolveWriteStatementWalk(node, resolver)
+}
+
 // AddWhereClause add a WHERE clause to DELETE.
 func (node *Delete) AddWhereClause(where *Where) {
 	if node.Where == nil {
@@ -1836,6 +1918,12 @@ func (node *Update) String() string {
 // GetTable returns the table.
 func (node *Update) GetTable() *Table {
 	return node.Table
+}
+
+// Resolve returns a string representation with custom function nodes resolved to the values
+// passed by resolver.
+func (node *Update) Resolve(resolver WriteStatementResolver) (string, error) {
+	return resolveWriteStatementWalk(node, resolver)
 }
 
 func (node *Update) walkSubtree(visit Visit) error {
@@ -1976,4 +2064,94 @@ func (node *Revoke) walkSubtree(visit Visit) error {
 		return nil
 	}
 	return Walk(visit, node.Privileges, node.Table)
+}
+
+// resolvers
+
+func resolveReadStatementWalk(node Node, resolver ReadStatementResolver) (string, error) {
+	err := Walk(func(node Node) (bool, error) {
+		if funcExpr, ok := node.(*CustomFuncExpr); ok && funcExpr != nil {
+			resolvedString, err := resolveReadStatement(funcExpr, resolver)
+			if err != nil {
+				return true, fmt.Errorf("resolve read statement: %s", err)
+			}
+			funcExpr.ResolvedString = resolvedString
+		}
+		return false, nil
+	}, node)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve while walking: %s", err)
+	}
+	return node.String(), nil
+}
+
+func resolveReadStatement(node *CustomFuncExpr, resolver ReadStatementResolver) (string, error) {
+	if resolver == nil {
+		return "", errors.New("read resolver is needed")
+	}
+
+	switch node.Name {
+	case "block_num":
+		if len(node.Args) != 1 {
+			return "", errors.New("block_num function should have exactly one argument")
+		}
+		value, ok := node.Args[0].(*Value)
+		if !ok {
+			return "", errors.New("argument of block_num is not a literal value")
+		}
+
+		chainID, err := strconv.ParseInt(string(value.Value), 10, 64)
+		if err != nil {
+			return "", err
+		}
+		blockNumber, exists := resolver.GetBlockNumber(chainID)
+		if !exists {
+			return "", errors.New("chain id does not exist")
+		}
+
+		valueNode := &Value{Type: IntValue, Value: []byte(strconv.Itoa(int(blockNumber)))}
+		return valueNode.String(), nil
+	}
+
+	return "", fmt.Errorf("custom function %s is not resolvable", node.Name)
+}
+
+func resolveWriteStatementWalk(node Node, resolver WriteStatementResolver) (string, error) {
+	err := Walk(func(node Node) (bool, error) {
+		if funcExpr, ok := node.(*CustomFuncExpr); ok && funcExpr != nil {
+			resolvedString, err := resolveWriteStatement(funcExpr, resolver)
+			if err != nil {
+				return true, fmt.Errorf("resolve write statement: %s", err)
+			}
+			funcExpr.ResolvedString = resolvedString
+		}
+		return false, nil
+	}, node)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve while walking: %s", err)
+	}
+	return node.String(), nil
+}
+
+func resolveWriteStatement(node *CustomFuncExpr, resolver WriteStatementResolver) (string, error) {
+	if resolver == nil {
+		return "", errors.New("write resolver is needed")
+	}
+
+	switch node.Name {
+	case "block_num":
+		if len(node.Args) != 0 {
+			return "", errors.New("block_num function should have exactly zero arguments")
+		}
+
+		blockNumber := resolver.GetBlockNumber()
+		valueNode := &Value{Type: IntValue, Value: []byte(strconv.Itoa(int(blockNumber)))}
+		return valueNode.String(), nil
+	case "txn_hash":
+		txnHash := resolver.GetTxnHash()
+		valueNode := &Value{Type: StrValue, Value: []byte(txnHash)}
+		return valueNode.String(), nil
+	}
+
+	return "", fmt.Errorf("custom function %s is not resolvable", node.Name)
 }
