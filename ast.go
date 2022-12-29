@@ -2073,19 +2073,23 @@ func resolveReadStatementWalk(node Node, resolver ReadStatementResolver) (string
 		if funcExpr, ok := node.(*CustomFuncExpr); ok && funcExpr != nil {
 			resolvedString, err := resolveReadStatement(funcExpr, resolver)
 			if err != nil {
-				return true, err
+				return true, fmt.Errorf("resolve read statement: %s", err)
 			}
 			funcExpr.ResolvedString = resolvedString
 		}
 		return false, nil
 	}, node)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to resolve while walking: %s", err)
 	}
 	return node.String(), nil
 }
 
 func resolveReadStatement(node *CustomFuncExpr, resolver ReadStatementResolver) (string, error) {
+	if resolver == nil {
+		return "", errors.New("read resolver is needed")
+	}
+
 	switch node.Name {
 	case "block_num":
 		if len(node.Args) != 1 {
@@ -2117,19 +2121,23 @@ func resolveWriteStatementWalk(node Node, resolver WriteStatementResolver) (stri
 		if funcExpr, ok := node.(*CustomFuncExpr); ok && funcExpr != nil {
 			resolvedString, err := resolveWriteStatement(funcExpr, resolver)
 			if err != nil {
-				return true, err
+				return true, fmt.Errorf("resolve write statement: %s", err)
 			}
 			funcExpr.ResolvedString = resolvedString
 		}
 		return false, nil
 	}, node)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to resolve while walking: %s", err)
 	}
 	return node.String(), nil
 }
 
 func resolveWriteStatement(node *CustomFuncExpr, resolver WriteStatementResolver) (string, error) {
+	if resolver == nil {
+		return "", errors.New("write resolver is needed")
+	}
+
 	switch node.Name {
 	case "block_num":
 		if len(node.Args) != 0 {

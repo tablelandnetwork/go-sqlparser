@@ -5442,6 +5442,17 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 			}
 		}(it))
 	}
+
+	t.Run("nil resolver", func(t *testing.T) {
+		t.Parallel()
+
+		ast, err := Parse("SELECT block_num(1337) FROM t")
+		require.NoError(t, err)
+
+		_, err = ast.Statements[0].(ReadStatement).Resolve(nil)
+		require.Error(t, err)
+		require.ErrorContains(t, err, "read resolver is needed")
+	})
 }
 
 func TestCustomFunctionResolveWriteQuery(t *testing.T) {
@@ -5524,6 +5535,17 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 			}
 		}(it))
 	}
+
+	t.Run("nil resolver", func(t *testing.T) {
+		t.Parallel()
+
+		ast, err := Parse("insert into foo_1337_1 values (txn_hash())")
+		require.NoError(t, err)
+
+		_, err = ast.Statements[0].(WriteStatement).Resolve(nil)
+		require.Error(t, err)
+		require.ErrorContains(t, err, "write resolver is needed")
+	})
 }
 
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.
