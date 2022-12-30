@@ -3134,7 +3134,10 @@ func TestAllowedFunctions(t *testing.T) {
 	}
 
 	tests := []testCase{}
-	for allowedFunction := range AllowedFunctions {
+	for allowedFunction, isCustom := range AllowedFunctions {
+		if isCustom {
+			continue
+		}
 		functionCall, args := genFunctionCallAndArgs(allowedFunction)
 		tests = append(tests, testCase{
 			name:     allowedFunction,
@@ -5370,11 +5373,10 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name                string
-		query               string
-		mustFailAtParsing   bool
-		mustFailAtResolving bool
-		expQuery            string
+		name     string
+		query    string
+		mustFail bool
+		expQuery string
 	}
 
 	resolver := &readResolver{
@@ -5393,29 +5395,24 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 			expQuery: "select 100, 200 from foo_1337_1 where a = 300",
 		},
 		{
-			name:              "select with block_num() with string argument",
-			query:             "select block_num('1337') from foo_1337_1",
-			mustFailAtParsing: true,
+			name:     "select with block_num() with string argument",
+			query:    "select block_num('1337') from foo_1337_1",
+			mustFail: true,
 		},
 		{
-			name:              "select with block_num() with float argument",
-			query:             "select block_num(1.2) from foo_1337_1",
-			mustFailAtParsing: true,
+			name:     "select with block_num(*) for chainID that doesn't exist",
+			query:    "select block_num(1337) from foo_1337_1 where a = block_num(10)",
+			mustFail: true,
 		},
 		{
-			name:                "select with block_num(*) for chainID that doesn't exist",
-			query:               "select block_num(1337) from foo_1337_1 where a = block_num(10)",
-			mustFailAtResolving: true,
+			name:     "select with txn_hash()",
+			query:    "select txn_hash() from foo_1337_1",
+			mustFail: true,
 		},
 		{
-			name:                "select with txn_hash()",
-			query:               "select txn_hash() from foo_1337_1",
-			mustFailAtResolving: true,
-		},
-		{
-			name:                "select with empty block_num()",
-			query:               "select block_num() from foo_1337_1",
-			mustFailAtResolving: true,
+			name:     "select with empty block_num()",
+			query:    "select block_num() from foo_1337_1",
+			mustFail: true,
 		},
 	}
 
@@ -5425,15 +5422,11 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 				t.Parallel()
 
 				ast, err := Parse(tc.query)
-				if tc.mustFailAtParsing {
-					require.Error(t, err)
-					return
-				}
 				require.NoError(t, err)
 
 				for _, stmt := range ast.Statements {
 					resolved, err := stmt.(ReadStatement).Resolve(resolver)
-					if tc.mustFailAtResolving {
+					if tc.mustFail {
 						require.Error(t, err)
 						return
 					}
@@ -5453,17 +5446,37 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 		require.Error(t, err)
 		require.ErrorContains(t, err, "read resolver is needed")
 	})
+
+	t.Run("parser level error star", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := Parse("SELECT block_num(*) FROM t")
+		require.ErrorContains(t, err, "custom function cannot be used with *")
+	})
+
+	t.Run("parser level error distinct", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := Parse("SELECT block_num(DISTINCT a) FROM t")
+		require.ErrorContains(t, err, "custom function cannot have DISTINCT")
+	})
+
+	t.Run("parser level error filter", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := Parse("SELECT block_num(a) FILTER(WHERE a > 2) FROM t")
+		require.ErrorContains(t, err, "custom function cannot have FILTER")
+	})
 }
 
 func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name                string
-		query               string
-		mustFailAtParsing   bool
-		mustFailAtResolving bool
-		expQueries          []string
+		name       string
+		query      string
+		mustFail   bool
+		expQueries []string
 	}
 
 	tests := []testCase{
@@ -5491,24 +5504,24 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 			},
 		},
 		{
-			name:                "block_num() with integer argument",
-			query:               "delete from foo_1337_1 where a=block_num(1337)",
-			mustFailAtResolving: true,
+			name:     "block_num() with integer argument",
+			query:    "delete from foo_1337_1 where a=block_num(1337)",
+			mustFail: true,
 		},
 		{
-			name:              "block_num() with string argument",
-			query:             "delete from foo_1337_1 where a=block_num('foo')",
-			mustFailAtParsing: true,
+			name:     "block_num() with string argument",
+			query:    "delete from foo_1337_1 where a=block_num('foo')",
+			mustFail: true,
 		},
 		{
-			name:              "txn_hash() with an integer argument",
-			query:             "insert into foo_1337_1 values (txn_hash(1))",
-			mustFailAtParsing: true,
+			name:     "txn_hash() with an integer argument",
+			query:    "insert into foo_1337_1 values (txn_hash(1))",
+			mustFail: true,
 		},
 		{
-			name:              "txn_hash() with a string argument",
-			query:             "insert into foo_1337_1 values (txn_hash('foo'))",
-			mustFailAtParsing: true,
+			name:     "txn_hash() with a string argument",
+			query:    "insert into foo_1337_1 values (txn_hash('foo'))",
+			mustFail: true,
 		},
 	}
 
@@ -5518,15 +5531,11 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 				t.Parallel()
 
 				ast, err := Parse(tc.query)
-				if tc.mustFailAtParsing {
-					require.Error(t, err)
-					return
-				}
 				require.NoError(t, err)
 
 				for i, stmt := range ast.Statements {
 					resolved, err := stmt.(WriteStatement).Resolve(&writeResolver{})
-					if tc.mustFailAtResolving {
+					if tc.mustFail {
 						require.Error(t, err)
 						return
 					}

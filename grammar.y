@@ -4,6 +4,7 @@ package sqlparser
 import (
   "bytes"
   "strings"
+  "errors"
 )
 
 var keywordsNotAllowed = map[string]struct{}{
@@ -108,7 +109,6 @@ func isRowID(column Identifier) bool {
 %token <empty> CREATE TABLE INT BLOB PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 %token <empty> INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 %token <empty> GRANT TO REVOKE
-%token <empty> BLOCK_NUM TXN_HASH
 
 %left <empty> RIGHT FULL INNER LEFT NATURAL OUTER CROSS JOIN
 %left <empty> ON USING
@@ -130,7 +130,7 @@ func isRowID(column Identifier) bool {
 %type <readStmt> select_stmt
 %type <baseSelect> base_select
 %type <createTableStmt> create_table_stmt
-%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number function_call_custom
+%type <expr> expr literal_value function_call_keyword function_call_generic expr_opt else_expr_opt exists_subquery signed_number
 %type <exprs> expr_list expr_list_opt group_by_opt
 %type <string> cmp_op cmp_inequality_op like_op between_op asc_desc_opt distinct_opt type_name primary_key_order privilege compound_op
 %type <column> column_name 
@@ -776,7 +776,6 @@ expr:
     $$ = &ConvertExpr{Expr: $3, Type: $5}
   }
 | function_call_keyword
-| function_call_custom
 | function_call_generic
 ;
 
@@ -966,36 +965,39 @@ function_call_generic:
   identifier '(' distinct_function_opt expr_list_opt ')' filter_opt
   {
     lowered := strings.ToLower(string($1))
-    if _, ok := AllowedFunctions[lowered]; !ok {
+    isCustom, ok := AllowedFunctions[lowered];
+    if !ok {
       yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string($1)})
     }
-    $$ = &FuncExpr{Name: Identifier(lowered), Distinct: $3, Args: $4, Filter: $6}
+
+    if isCustom {
+      if $3 {
+        yylex.(*Lexer).AddError(errors.New("custom function cannot have DISTINCT"))
+      }
+
+      if $6 != nil {
+        yylex.(*Lexer).AddError(errors.New("custom function cannot have FILTER"))
+      }
+      $$ = &CustomFuncExpr{Name: Identifier(lowered), Args: $4}
+    } else {
+      $$ = &FuncExpr{Name: Identifier(lowered), Distinct: $3, Args: $4, Filter: $6}
+    }
   }
 | identifier '(' '*' ')' filter_opt
   {
     lowered := strings.ToLower(string($1))
-    if _, ok := AllowedFunctions[lowered]; !ok {
+    isCustom, ok := AllowedFunctions[lowered];
+    if !ok {
       yylex.(*Lexer).AddError(&ErrNoSuchFunction{FunctionName: string($1)})
     }
-    $$ = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: $5}
+
+    if isCustom {
+      yylex.(*Lexer).AddError(errors.New("custom function cannot be used with *"))
+    } else {
+      $$ = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: $5}
+    }
   }
 ;
-
-function_call_custom:
-  TXN_HASH '(' ')'
-  {
-    $$ = &CustomFuncExpr{Name: Identifier("txn_hash"), Args: Exprs{}}
-  }
-| BLOCK_NUM '(' ')'
-  {
-    $$ = &CustomFuncExpr{Name: Identifier("block_num"), Args: Exprs{}}
-  }
-| BLOCK_NUM '(' INTEGRAL ')'
-  {
-    $$ = &CustomFuncExpr{Name: Identifier("block_num"), Args: Exprs{&Value{Type: IntValue, Value: $3}}}
-  }
-;
-
 
 distinct_function_opt:
   {
@@ -1020,7 +1022,7 @@ expr_list:
 
 expr_list_opt:
   {
-    $$ = nil
+    $$ = Exprs{}
   }
 | expr_list
   {
@@ -1505,8 +1507,6 @@ conflict_target_opt:
     }
   }
 ;
-
-
 
 delete_stmt:
   DELETE FROM table_name where_opt

@@ -91,8 +91,6 @@ var keywords = map[string]int{
 	"UNION":      UNION,
 	"EXCEPT":     EXCEPT,
 	"INTERSECT":  INTERSECT,
-	"TXN_HASH":   TXN_HASH,
-	"BLOCK_NUM":  BLOCK_NUM,
 }
 
 const EOF = 0
