@@ -2095,14 +2095,19 @@ func resolveReadStatement(node *CustomFuncExpr, resolver ReadStatementResolver) 
 		if len(node.Args) != 1 {
 			return "", errors.New("block_num function should have exactly one argument")
 		}
+
 		value, ok := node.Args[0].(*Value)
 		if !ok {
 			return "", errors.New("argument of block_num is not a literal value")
 		}
 
+		if value.Type != IntValue {
+			return "", errors.New("argument of block_num is not an integer")
+		}
+
 		chainID, err := strconv.ParseInt(string(value.Value), 10, 64)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("parsing argument to int: %s", err)
 		}
 		blockNumber, exists := resolver.GetBlockNumber(chainID)
 		if !exists {
@@ -2140,6 +2145,10 @@ func resolveWriteStatement(node *CustomFuncExpr, resolver WriteStatementResolver
 
 	switch node.Name {
 	case "block_num":
+		if node.Args == nil {
+			return "", errors.New("block_num arguments cannot be nil")
+		}
+
 		if len(node.Args) != 0 {
 			return "", errors.New("block_num function should have exactly zero arguments")
 		}
@@ -2148,6 +2157,14 @@ func resolveWriteStatement(node *CustomFuncExpr, resolver WriteStatementResolver
 		valueNode := &Value{Type: IntValue, Value: []byte(strconv.Itoa(int(blockNumber)))}
 		return valueNode.String(), nil
 	case "txn_hash":
+		if node.Args == nil {
+			return "", errors.New("txn_hash arguments cannot be nil")
+		}
+
+		if len(node.Args) != 0 {
+			return "", errors.New("txn_hash function should have exactly zero arguments")
+		}
+
 		txnHash := resolver.GetTxnHash()
 		valueNode := &Value{Type: StrValue, Value: []byte(txnHash)}
 		return valueNode.String(), nil
