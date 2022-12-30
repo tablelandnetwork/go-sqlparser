@@ -5,6 +5,7 @@ import __yyfmt__ "fmt"
 
 import (
 	"bytes"
+	"errors"
 	"strings"
 )
 
@@ -1977,6 +1978,13 @@ yydefault:
 			}
 
 			if isCustom {
+				if yyDollar[3].bool {
+					yylex.(*Lexer).AddError(errors.New("custom function cannot have DISTINCT"))
+				}
+
+				if yyDollar[6].where != nil {
+					yylex.(*Lexer).AddError(errors.New("custom function cannot have FILTER"))
+				}
 				yyVAL.expr = &CustomFuncExpr{Name: Identifier(lowered), Args: yyDollar[4].exprs}
 			} else {
 				yyVAL.expr = &FuncExpr{Name: Identifier(lowered), Distinct: yyDollar[3].bool, Args: yyDollar[4].exprs, Filter: yyDollar[6].where}
@@ -1992,7 +2000,7 @@ yydefault:
 			}
 
 			if isCustom {
-				yyVAL.expr = &CustomFuncExpr{Name: Identifier(lowered), Args: nil}
+				yylex.(*Lexer).AddError(errors.New("custom function cannot be used with *"))
 			} else {
 				yyVAL.expr = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: yyDollar[5].where}
 			}

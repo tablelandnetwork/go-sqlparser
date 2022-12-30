@@ -4,6 +4,7 @@ package sqlparser
 import (
   "bytes"
   "strings"
+  "errors"
 )
 
 var keywordsNotAllowed = map[string]struct{}{
@@ -970,6 +971,13 @@ function_call_generic:
     }
 
     if isCustom {
+      if $3 {
+        yylex.(*Lexer).AddError(errors.New("custom function cannot have DISTINCT"))
+      }
+
+      if $6 != nil {
+        yylex.(*Lexer).AddError(errors.New("custom function cannot have FILTER"))
+      }
       $$ = &CustomFuncExpr{Name: Identifier(lowered), Args: $4}
     } else {
       $$ = &FuncExpr{Name: Identifier(lowered), Distinct: $3, Args: $4, Filter: $6}
@@ -984,7 +992,7 @@ function_call_generic:
     }
 
     if isCustom {
-      $$ = &CustomFuncExpr{Name: Identifier(lowered), Args: nil}
+      yylex.(*Lexer).AddError(errors.New("custom function cannot be used with *"))
     } else {
       $$ = &FuncExpr{Name: Identifier(lowered), Distinct: false, Args: nil, Filter: $5}
     }

@@ -5446,6 +5446,27 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 		require.Error(t, err)
 		require.ErrorContains(t, err, "read resolver is needed")
 	})
+
+	t.Run("parser level error star", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := Parse("SELECT block_num(*) FROM t")
+		require.ErrorContains(t, err, "custom function cannot be used with *")
+	})
+
+	t.Run("parser level error distinct", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := Parse("SELECT block_num(DISTINCT a) FROM t")
+		require.ErrorContains(t, err, "custom function cannot have DISTINCT")
+	})
+
+	t.Run("parser level error filter", func(t *testing.T) {
+		t.Parallel()
+
+		_, err := Parse("SELECT block_num(a) FILTER(WHERE a > 2) FROM t")
+		require.ErrorContains(t, err, "custom function cannot have FILTER")
+	})
 }
 
 func TestCustomFunctionResolveWriteQuery(t *testing.T) {
