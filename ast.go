@@ -237,7 +237,7 @@ func (node SelectColumnList) String() string {
 		colsStr = append(colsStr, col.String())
 	}
 
-	return strings.Join(colsStr, ", ")
+	return strings.Join(colsStr, ",")
 }
 
 func (node SelectColumnList) walkSubtree(visit Visit) error {
@@ -492,7 +492,7 @@ func (node GroupBy) String() string {
 		strs = append(strs, e.String())
 	}
 
-	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
+	return fmt.Sprintf(" group by %s", strings.Join(strs, ","))
 }
 
 func (node GroupBy) walkSubtree(visit Visit) error {
@@ -518,7 +518,7 @@ func (node OrderBy) String() string {
 		strs = append(strs, e.String())
 	}
 
-	return fmt.Sprintf(" order by %s", strings.Join(strs, ", "))
+	return fmt.Sprintf(" order by %s", strings.Join(strs, ","))
 }
 
 func (node OrderBy) walkSubtree(visit Visit) error {
@@ -1106,7 +1106,7 @@ func (node ColumnList) String() string {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
+	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ","), ")")
 }
 
 func (node ColumnList) walkSubtree(visit Visit) error {
@@ -1160,7 +1160,7 @@ func (node IndexedColumnList) String() string {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
+	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ","), ")")
 }
 
 func (node IndexedColumnList) walkSubtree(visit Visit) error {
@@ -1183,7 +1183,7 @@ func (node Exprs) String() string {
 		strs = append(strs, expr.String())
 	}
 
-	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
+	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ","), ")")
 }
 
 func (node Exprs) walkSubtree(visit Visit) error {
@@ -1345,13 +1345,13 @@ func (node *CreateTable) String() string {
 	for _, column := range node.ColumnsDef {
 		columns = append(columns, column.String())
 	}
-	column := strings.Join(columns, ", ")
+	column := strings.Join(columns, ",")
 	if len(node.Constraints) > 0 {
 		constraints := []string{}
 		for _, constraint := range node.Constraints {
 			constraints = append(constraints, constraint.String())
 		}
-		column += ", " + strings.Join(constraints, ", ")
+		column += "," + strings.Join(constraints, ",")
 	}
 
 	if node.StrictMode {
@@ -1762,7 +1762,7 @@ func (node *Insert) String() string {
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), node.Upsert.String(), returning)
+	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ","), node.Upsert.String(), returning)
 }
 
 // Resolve returns a string representation with custom function nodes resolved to the values
@@ -1957,7 +1957,7 @@ func (node UpdateExprs) String() string {
 		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
 	}
 
-	return strings.Join(exprs, ", ")
+	return strings.Join(exprs, ",")
 }
 
 func (node UpdateExprs) walkSubtree(visit Visit) error {
@@ -2021,7 +2021,7 @@ func (node Privileges) String() string {
 
 	// we cannot guarantee map order, so we sort it so the string is deterministic
 	sort.Strings(privileges)
-	return strings.Join(privileges, ", ")
+	return strings.Join(privileges, ",")
 }
 
 func (node Privileges) Len() int {
