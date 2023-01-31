@@ -2402,7 +2402,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "exists",
 			stmt:     "SELECT * FROM t WHERE EXISTS (SELECT 1 FROM t2)",
-			deparsed: "select * from t where exists (select 1 from t2)",
+			deparsed: "select * from t where exists(select 1 from t2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2432,7 +2432,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "not-exists",
 			stmt:     "SELECT * FROM t WHERE NOT EXISTS (SELECT 1 FROM t2)",
-			deparsed: "select * from t where not exists (select 1 from t2)",
+			deparsed: "select * from t where not exists(select 1 from t2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -3909,7 +3909,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "insert simple",
 			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t (a,b) values (1,2),(3,4)",
+			deparsed: "insert into t (a,b) values(1,2),(3,4)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3935,7 +3935,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "insert skip columns",
 			stmt:     "INSERT INTO t VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t values (1,2),(3,4)",
+			deparsed: "insert into t values(1,2),(3,4)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3973,7 +3973,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do nothing",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t (id) values (1) on conflict do nothing",
+			deparsed: "insert into t (id) values(1) on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3997,7 +3997,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do nothing with target",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING;",
-			deparsed: "insert into t (id) values (1) on conflict (id) do nothing",
+			deparsed: "insert into t (id) values(1) on conflict (id) do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4027,7 +4027,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target",
 			stmt:     "INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1;",
-			deparsed: "insert into t (id,count) values (1,1) on conflict (id) do update set count=count+1",
+			deparsed: "insert into t (id,count) values(1,1) on conflict (id) do update set count=count+1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4071,7 +4071,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;",
-			deparsed: "insert into phonebook (name,phonenumber) values ('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber",
+			deparsed: "insert into phonebook (name,phonenumber) values('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4114,7 +4114,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded with where",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';",
-			deparsed: "insert into phonebook (name,phonenumber) values ('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
+			deparsed: "insert into phonebook (name,phonenumber) values('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4168,7 +4168,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert multiple clauses",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t (id) values (1) on conflict (id) do nothing on conflict do nothing",
+			deparsed: "insert into t (id) values(1) on conflict (id) do nothing on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4201,7 +4201,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:        "upsert multiple clauses missing target",
 			stmt:        "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING ON CONFLICT DO NOTHING;",
-			deparsed:    "insert into t (id) values (1) on conflict do nothing on conflict do nothing",
+			deparsed:    "insert into t (id) values(1) on conflict do nothing on conflict do nothing",
 			expectedAST: nil,
 			expectedErr: &ErrUpsertMissingTarget{},
 		},
@@ -4983,11 +4983,11 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t (a,b) values (1,2),(3,4)",
+			deparsed: "insert into t (a,b) values(1,2),(3,4)",
 		},
 		{
 			stmt:     "INSERT INTO t VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t values (1,2),(3,4)",
+			deparsed: "insert into t values(1,2),(3,4)",
 		},
 		{
 			stmt:     "INSERT INTO t DEFAULT VALUES;",
@@ -5483,7 +5483,7 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 		{
 			name:       "insert with custom functions",
 			query:      "insert into foo_1337_1 values (txn_hash(), block_num())",
-			expQueries: []string{"insert into foo_1337_1 values ('0xabc',100)"},
+			expQueries: []string{"insert into foo_1337_1 values('0xabc',100)"},
 		},
 		{
 			name:       "update with custom functions",
@@ -5499,7 +5499,7 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 			name:  "multiple queries",
 			query: "insert into foo_1337_1 values (txn_hash()); delete from foo_1337_1 where a=block_num()",
 			expQueries: []string{
-				"insert into foo_1337_1 values ('0xabc')",
+				"insert into foo_1337_1 values('0xabc')",
 				"delete from foo_1337_1 where a=100",
 			},
 		},

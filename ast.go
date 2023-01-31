@@ -33,7 +33,7 @@ func (node *AST) String() string {
 	for _, stmt := range node.Statements {
 		stmts = append(stmts, stmt.String())
 	}
-	return strings.Join(stmts, "; ")
+	return strings.Join(stmts, ";")
 }
 
 func (node *AST) walkSubtree(visit Visit) error {
@@ -1204,7 +1204,8 @@ type ExistsExpr struct {
 
 // String returns the string representation of the node.
 func (node *ExistsExpr) String() string {
-	return fmt.Sprintf("exists %s", node.Subquery.String())
+	// SubQuery is always wrapped in parenthesis, hence no space after `exists`
+	return fmt.Sprintf("exists%s", node.Subquery.String())
 }
 
 func (node *ExistsExpr) walkSubtree(visit Visit) error {
@@ -1763,7 +1764,7 @@ func (node *Insert) String() string {
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ","), node.Upsert.String(), returning)
+	return fmt.Sprintf("insert into %s%s values%s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ","), node.Upsert.String(), returning)
 }
 
 // Resolve returns a string representation with custom function nodes resolved to the values
