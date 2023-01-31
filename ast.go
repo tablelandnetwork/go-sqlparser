@@ -959,7 +959,7 @@ const (
 
 // String returns the string representation of the node.
 func (node *ConvertExpr) String() string {
-	return fmt.Sprintf("cast (%s as %s)", node.Expr.String(), string(node.Type))
+	return fmt.Sprintf("cast(%s as %s)", node.Expr.String(), string(node.Type))
 }
 
 func (node *ConvertExpr) walkSubtree(visit Visit) error {
@@ -1106,7 +1106,7 @@ func (node ColumnList) String() string {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ","), ")")
+	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ","), ")")
 }
 
 func (node ColumnList) walkSubtree(visit Visit) error {
@@ -1160,7 +1160,7 @@ func (node IndexedColumnList) String() string {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ","), ")")
+	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ","), ")")
 }
 
 func (node IndexedColumnList) walkSubtree(visit Visit) error {
@@ -1356,9 +1356,9 @@ func (node *CreateTable) String() string {
 	}
 
 	if node.StrictMode {
-		return fmt.Sprintf("create table %s (%s) strict", node.Table.String(), column)
+		return fmt.Sprintf("create table %s(%s)strict", node.Table.String(), column)
 	} else {
-		return fmt.Sprintf("create table %s (%s)", node.Table.String(), column)
+		return fmt.Sprintf("create table %s(%s)", node.Table.String(), column)
 	}
 }
 

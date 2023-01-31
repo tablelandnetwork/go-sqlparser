@@ -916,7 +916,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "cast-to-text",
 			stmt:     "SELECT CAST (1 AS TEXT) FROM t",
-			deparsed: "select cast (1 as text) from t",
+			deparsed: "select cast(1 as text) from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -941,7 +941,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "cast-to-none",
 			stmt:     "SELECT CAST (a AS none) FROM t",
-			deparsed: "select cast (a as none) from t",
+			deparsed: "select cast(a as none) from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -965,7 +965,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "cast-to-integer",
 			stmt:     "SELECT CAST (a AS integer) FROM t",
-			deparsed: "select cast (a as integer) from t",
+			deparsed: "select cast(a as integer) from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2312,7 +2312,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "join-using",
 			stmt:     "SELECT * FROM t JOIN t2 USING(c1, c2)",
-			deparsed: "select * from t join t2 using (c1,c2)",
+			deparsed: "select * from t join t2 using(c1,c2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -3192,7 +3192,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table simple",
 			stmt:         "CREATE TABLE t (a INT);",
-			deparsed:     "create table t (a int)",
+			deparsed:     "create table t(a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3209,7 +3209,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table backtick",
 			stmt:         "CREATE TABLE `t` (a INT);",
-			deparsed:     "create table t (a int)",
+			deparsed:     "create table t(a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3226,7 +3226,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table double quotes",
 			stmt:         "CREATE TABLE \"t\" (a INT);",
-			deparsed:     "create table t (a int)",
+			deparsed:     "create table t(a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3243,7 +3243,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table square brackets",
 			stmt:         "CREATE TABLE [t] (a INT);",
-			deparsed:     "create table t (a int)",
+			deparsed:     "create table t(a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3260,7 +3260,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table types",
 			stmt:         "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB);",
-			deparsed:     "create table t (a int,b integer,c text,d blob)",
+			deparsed:     "create table t(a int,b integer,c text,d blob)",
 			expectedHash: "4fe547ac5242c1f0f98a5918a570b498574f95389dc7bf59fd4eabe765938a03",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3280,7 +3280,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table primary key",
 			stmt:         "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
-			deparsed:     "create table t (id int primary key,a int)",
+			deparsed:     "create table t(id int primary key,a int)",
 			expectedHash: "a360ddb202c0871558c0a3140a67e8a7a7a76e794a297214f7443e8739546408",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3304,7 +3304,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table primary key asc",
 			stmt:         "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
-			deparsed:     "create table t (id int primary key asc,a int)",
+			deparsed:     "create table t(id int primary key asc,a int)",
 			expectedHash: "a360ddb202c0871558c0a3140a67e8a7a7a76e794a297214f7443e8739546408",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3328,7 +3328,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table primary key desc",
 			stmt:         "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT);",
-			deparsed:     "create table t (id int primary key desc,a int)",
+			deparsed:     "create table t(id int primary key desc,a int)",
 			expectedHash: "a360ddb202c0871558c0a3140a67e8a7a7a76e794a297214f7443e8739546408",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3352,7 +3352,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table primary key not null",
 			stmt:         "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
-			deparsed:     "create table t (id int primary key constraint nn not null,id2 int not null)",
+			deparsed:     "create table t(id int primary key constraint nn not null,id2 int not null)",
 			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3385,7 +3385,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table unique",
 			stmt:         "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
-			deparsed:     "create table t (id int unique,id2 int constraint un unique)",
+			deparsed:     "create table t(id int unique,id2 int constraint un unique)",
 			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3417,7 +3417,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table check",
 			stmt:         "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
-			deparsed:     "create table t (a int check(a>2),id2 int constraint check_constraint check(a>2))",
+			deparsed:     "create table t(a int check(a>2),id2 int constraint check_constraint check(a>2))",
 			expectedHash: "0e93c25832cc90984a0157bdb71f7fa33172700a41c55cd9d896ff4c3d07d598",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3460,7 +3460,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table default",
 			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);",
-			deparsed:     "create table t (a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'),f int default 1)",
+			deparsed:     "create table t(a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'),f int default 1)",
 			expectedHash: "70a57145d62731d006bc23ede6126e3fe3f3f0a3954a87411edd2fb66ff59d7b",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3532,7 +3532,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table generated",
 			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed:     "create table t (a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as (a*abs(b)),e text generated always as (substr(c,b,b+1)) stored,f text as (substr(c,b,b+1)))",
+			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as (a*abs(b)),e text generated always as (substr(c,b,b+1)) stored,f text as (substr(c,b,b+1)))",
 			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3632,7 +3632,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table table constraints",
 			stmt:         "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
-			deparsed:     "create table t (id int constraint nm not null,id2 int,constraint pk primary key (id),constraint un unique (id,id2),constraint c check(id>0))",
+			deparsed:     "create table t(id int constraint nm not null,id2 int,constraint pk primary key(id),constraint un unique(id,id2),constraint c check(id>0))",
 			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3686,7 +3686,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table replace table constraint",
 			stmt:         "CREATE TABLE t(x INTEGER, PRIMARY KEY (x));",
-			deparsed:     "create table t (x integer primary key autoincrement)",
+			deparsed:     "create table t(x integer primary key autoincrement)",
 			expectedHash: "858688370cc6ddf501ebbfe878877e83edeaaf247d1e12faff8bb77ce904e935",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3712,7 +3712,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table replace table constraint with name",
 			stmt:         "CREATE TABLE t(x INTEGER, CONSTRAINT pk PRIMARY KEY (x));",
-			deparsed:     "create table t (x integer constraint pk primary key autoincrement)",
+			deparsed:     "create table t(x integer constraint pk primary key autoincrement)",
 			expectedHash: "858688370cc6ddf501ebbfe878877e83edeaaf247d1e12faff8bb77ce904e935",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3738,7 +3738,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table replace table constraint middle",
 			stmt:         "CREATE TABLE t(x INTEGER NOT NULL, b INT, check(b>0), PRIMARY KEY (x DESC), UNIQUE (b));",
-			deparsed:     "create table t (x integer not null primary key desc,b int,check(b>0),unique (b))",
+			deparsed:     "create table t(x integer not null primary key desc,b int,check(b>0),unique(b))",
 			expectedHash: "783f0ed7cc77247b44f69325d3c865b05ebdbc9c8087d367d685ea63af87fdbd",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3820,7 +3820,7 @@ func TestCreateTableStrict(t *testing.T) {
 
 	ast.Statements[0].(*CreateTable).StrictMode = true
 
-	require.Equal(t, "create table t (a int) strict", ast.String())
+	require.Equal(t, "create table t(a int)strict", ast.String())
 }
 
 func TestCreateTableAutoIncrementRules(t *testing.T) {
@@ -3842,27 +3842,27 @@ func TestCreateTableAutoIncrementRules(t *testing.T) {
 		{
 			"integer primary key forces autoincrement",
 			"CREATE TABLE t (a INTEGER PRIMARY KEY)",
-			"create table t (a integer primary key autoincrement)",
+			"create table t(a integer primary key autoincrement)",
 		},
 		{
 			"integer primary key desc",
 			"CREATE TABLE t (a INTEGER PRIMARY KEY DESC)",
-			"create table t (a integer primary key desc)",
+			"create table t(a integer primary key desc)",
 		},
 		{
 			"non integer primary key",
 			"CREATE TABLE t (a INT PRIMARY KEY)",
-			"create table t (a int primary key)",
+			"create table t(a int primary key)",
 		},
 		{
 			"integer table primary key forces autoincrement",
 			"CREATE TABLE t (a INTEGER, PRIMARY KEY(a ASC))",
-			"create table t (a integer primary key asc autoincrement)",
+			"create table t(a integer primary key asc autoincrement)",
 		},
 		{
 			"integer table primary key desc",
 			"CREATE TABLE t (a INTEGER, PRIMARY KEY(a DESC))",
-			"create table t (a integer primary key desc)",
+			"create table t(a integer primary key desc)",
 		},
 	}
 
@@ -3909,7 +3909,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "insert simple",
 			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t (a,b) values(1,2),(3,4)",
+			deparsed: "insert into t(a,b) values(1,2),(3,4)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3973,7 +3973,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do nothing",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t (id) values(1) on conflict do nothing",
+			deparsed: "insert into t(id) values(1) on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3997,7 +3997,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do nothing with target",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING;",
-			deparsed: "insert into t (id) values(1) on conflict (id) do nothing",
+			deparsed: "insert into t(id) values(1) on conflict(id) do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4027,7 +4027,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target",
 			stmt:     "INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1;",
-			deparsed: "insert into t (id,count) values(1,1) on conflict (id) do update set count=count+1",
+			deparsed: "insert into t(id,count) values(1,1) on conflict(id) do update set count=count+1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4071,7 +4071,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;",
-			deparsed: "insert into phonebook (name,phonenumber) values('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber",
+			deparsed: "insert into phonebook(name,phonenumber) values('Alice','704-555-1212') on conflict(name) do update set phonenumber=excluded.phonenumber",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4114,7 +4114,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded with where",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';",
-			deparsed: "insert into phonebook (name,phonenumber) values('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
+			deparsed: "insert into phonebook(name,phonenumber) values('Alice','704-555-1212') on conflict(name) do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4168,7 +4168,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert multiple clauses",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t (id) values(1) on conflict (id) do nothing on conflict do nothing",
+			deparsed: "insert into t(id) values(1) on conflict(id) do nothing on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4201,7 +4201,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:        "upsert multiple clauses missing target",
 			stmt:        "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING ON CONFLICT DO NOTHING;",
-			deparsed:    "insert into t (id) values(1) on conflict do nothing on conflict do nothing",
+			deparsed:    "insert into t(id) values(1) on conflict do nothing on conflict do nothing",
 			expectedAST: nil,
 			expectedErr: &ErrUpsertMissingTarget{},
 		},
@@ -4931,15 +4931,15 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "SELECT CAST (1 AS TEXT) FROM t",
-			deparsed: "select cast (1 as text) from t",
+			deparsed: "select cast(1 as text) from t",
 		},
 		{
 			stmt:     "SELECT CAST (a AS none) FROM t",
-			deparsed: "select cast (a as none) from t",
+			deparsed: "select cast(a as none) from t",
 		},
 		{
 			stmt:     "SELECT CAST (a AS integer) FROM t",
-			deparsed: "select cast (a as integer) from t",
+			deparsed: "select cast(a as integer) from t",
 		},
 		{
 			stmt:     "SELECT c1 = c2 COLLATE rtrim FROM t",
@@ -4983,7 +4983,7 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t (a,b) values(1,2),(3,4)",
+			deparsed: "insert into t(a,b) values(1,2),(3,4)",
 		},
 		{
 			stmt:     "INSERT INTO t VALUES (1, 2), (3, 4);",
@@ -5015,51 +5015,51 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT);",
-			deparsed: "create table t (a int)",
+			deparsed: "create table t(a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT, b INTEGER, c TEXT, d BLOB);",
-			deparsed: "create table t (a int,b integer,c text,d blob)",
+			deparsed: "create table t(a int,b integer,c text,d blob)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY, a INT);",
-			deparsed: "create table t (id int primary key,a int)",
+			deparsed: "create table t(id int primary key,a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INTEGER PRIMARY KEY, a INT);",
-			deparsed: "create table t (id integer primary key autoincrement,a int)",
+			deparsed: "create table t(id integer primary key autoincrement,a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INTEGER PRIMARY KEY ASC, a INT);",
-			deparsed: "create table t (id integer primary key asc autoincrement,a int)",
+			deparsed: "create table t(id integer primary key asc autoincrement,a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INTEGER PRIMARY KEY DESC, a INT);",
-			deparsed: "create table t (id integer primary key desc,a int)",
+			deparsed: "create table t(id integer primary key desc,a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY ASC, a INT);",
-			deparsed: "create table t (id int primary key asc,a int)",
+			deparsed: "create table t(id int primary key asc,a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY DESC, a INT);",
-			deparsed: "create table t (id int primary key desc,a int)",
+			deparsed: "create table t(id int primary key desc,a int)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT PRIMARY KEY CONSTRAINT nn NOT NULL, id2 INT NOT NULL);",
-			deparsed: "create table t (id int primary key constraint nn not null,id2 int not null)",
+			deparsed: "create table t(id int primary key constraint nn not null,id2 int not null)",
 		},
 		{
 			stmt:     "CREATE TABLE t (id INT UNIQUE, id2 INT CONSTRAINT un UNIQUE);",
-			deparsed: "create table t (id int unique,id2 int constraint un unique)",
+			deparsed: "create table t(id int unique,id2 int constraint un unique)",
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
-			deparsed: "create table t (a int check(a>2),id2 int constraint check_constraint check(a>2))",
+			deparsed: "create table t(a int check(a>2),id2 int constraint check_constraint check(a>2))",
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
-			deparsed: "create table t (a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'))",
+			deparsed: "create table t(a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'))",
 		},
 	}
 
