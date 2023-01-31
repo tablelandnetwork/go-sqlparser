@@ -735,7 +735,6 @@ type BinaryExpr struct {
 	Left, Right Expr
 }
 
-// TODO: I don't know what the spacing rules are for JSON operators
 // Operators for BinaryExpr.
 const (
 	BitAndStr            = "&"
@@ -748,8 +747,8 @@ const (
 	ShiftLeftStr         = "<<"
 	ShiftRightStr        = ">>"
 	ConcatStr            = "||"
-	JSONExtractOp        = " -> "
-	JSONUnquoteExtractOp = " ->> "
+	JSONExtractOp        = "->"
+	JSONUnquoteExtractOp = "->>"
 )
 
 // String returns the string representation of the node.
@@ -2169,7 +2168,6 @@ func resolveWriteStatement(node *CustomFuncExpr, resolver WriteStatementResolver
 
 		txnHash := resolver.GetTxnHash()
 		valueNode := &Value{Type: StrValue, Value: []byte(txnHash)}
-		fmt.Println("\nFooz: ", valueNode.String())
 		return valueNode.String(), nil
 	}
 

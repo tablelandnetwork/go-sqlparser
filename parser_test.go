@@ -1245,7 +1245,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "json-extract",
 			stmt:     "SELECT c1 -> c2 FROM t",
-			deparsed: "select c1 -> c2 from t",
+			deparsed: "select c1->c2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1268,7 +1268,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "json-unquote-extract",
 			stmt:     "SELECT c1 ->> c2 FROM t",
-			deparsed: "select c1 ->> c2 from t",
+			deparsed: "select c1->>c2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
