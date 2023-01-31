@@ -735,6 +735,7 @@ type BinaryExpr struct {
 	Left, Right Expr
 }
 
+// TODO: I don't know what the spacing rules are for JSON operators
 // Operators for BinaryExpr.
 const (
 	BitAndStr            = "&"
@@ -747,13 +748,13 @@ const (
 	ShiftLeftStr         = "<<"
 	ShiftRightStr        = ">>"
 	ConcatStr            = "||"
-	JSONExtractOp        = "->"
-	JSONUnquoteExtractOp = "->>"
+	JSONExtractOp        = " -> "
+	JSONUnquoteExtractOp = " ->> "
 )
 
 // String returns the string representation of the node.
 func (node *BinaryExpr) String() string {
-	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
+	return fmt.Sprintf("%s%s%s", node.Left.String(), node.Operator, node.Right.String())
 }
 
 func (node *BinaryExpr) walkSubtree(visit Visit) error {
@@ -778,25 +779,25 @@ const (
 	LessEqualStr    = "<="
 	GreaterEqualStr = ">="
 	NotEqualStr     = "!="
-	InStr           = "in"
-	NotInStr        = "not in"
-	LikeStr         = "like"
-	NotLikeStr      = "not like"
-	RegexpStr       = "regexp"
-	NotRegexpStr    = "not regexp"
-	MatchStr        = "match"
-	NotMatchStr     = "not match"
-	GlobStr         = "glob"
-	NotGlobStr      = "not glob"
+	InStr           = " in "
+	NotInStr        = " not in "
+	LikeStr         = " like "
+	NotLikeStr      = " not like "
+	RegexpStr       = " regexp "
+	NotRegexpStr    = " not regexp "
+	MatchStr        = " match "
+	NotMatchStr     = " not match "
+	GlobStr         = " glob "
+	NotGlobStr      = " not glob "
 )
 
 // String returns the string representation of the node.
 func (node *CmpExpr) String() string {
 	if node.Escape != nil {
-		return fmt.Sprintf("%s %s %s escape %s", node.Left.String(), node.Operator, node.Right.String(), node.Escape.String())
+		return fmt.Sprintf("%s%s%s escape %s", node.Left.String(), node.Operator, node.Right.String(), node.Escape.String())
 	}
 
-	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
+	return fmt.Sprintf("%s%s%s", node.Left.String(), node.Operator, node.Right.String())
 }
 
 func (node *CmpExpr) walkSubtree(visit Visit) error {
@@ -1954,7 +1955,7 @@ type UpdateExprs []*UpdateExpr
 func (node UpdateExprs) String() string {
 	var exprs []string
 	for _, expr := range node {
-		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
+		exprs = append(exprs, fmt.Sprintf("%s=%s", expr.Column.String(), expr.Expr.String()))
 	}
 
 	return strings.Join(exprs, ",")
@@ -2167,6 +2168,7 @@ func resolveWriteStatement(node *CustomFuncExpr, resolver WriteStatementResolver
 
 		txnHash := resolver.GetTxnHash()
 		valueNode := &Value{Type: StrValue, Value: []byte(txnHash)}
+		fmt.Println("\nFooz: ", valueNode.String())
 		return valueNode.String(), nil
 	}
 

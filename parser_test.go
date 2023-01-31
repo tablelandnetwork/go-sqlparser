@@ -416,7 +416,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-equals",
 			stmt:     "SELECT a = 2 FROM t",
-			deparsed: "select a = 2 from t",
+			deparsed: "select a=2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -439,7 +439,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-not-equals",
 			stmt:     "SELECT a != 2 FROM t",
-			deparsed: "select a != 2 from t",
+			deparsed: "select a!=2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -462,7 +462,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-not-equals-<>",
 			stmt:     "SELECT a <> 2 FROM t",
-			deparsed: "select a != 2 from t",
+			deparsed: "select a!=2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -485,7 +485,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-greater",
 			stmt:     "SELECT a > 2 FROM t",
-			deparsed: "select a > 2 from t",
+			deparsed: "select a>2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -508,7 +508,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-less",
 			stmt:     "SELECT a < 2 FROM t",
-			deparsed: "select a < 2 from t",
+			deparsed: "select a<2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -531,7 +531,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-greater-equal",
 			stmt:     "SELECT a >= 2 FROM t",
-			deparsed: "select a >= 2 from t",
+			deparsed: "select a>=2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -554,7 +554,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "comparison-less-equal",
 			stmt:     "SELECT a <= 2 FROM t",
-			deparsed: "select a <= 2 from t",
+			deparsed: "select a<=2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -989,7 +989,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "collate",
 			stmt:     "SELECT c1 = c2 COLLATE rtrim FROM t",
-			deparsed: "select c1 = c2 collate rtrim from t",
+			deparsed: "select c1=c2 collate rtrim from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1015,7 +1015,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "plus",
 			stmt:     "SELECT c1 + 10 FROM t",
-			deparsed: "select c1 + 10 from t",
+			deparsed: "select c1+10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1038,7 +1038,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "minus",
 			stmt:     "SELECT c1 - 10 FROM t",
-			deparsed: "select c1 - 10 from t",
+			deparsed: "select c1-10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1061,7 +1061,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "multiplication",
 			stmt:     "SELECT c1 * 10 FROM t",
-			deparsed: "select c1 * 10 from t",
+			deparsed: "select c1*10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1084,7 +1084,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "division",
 			stmt:     "SELECT c1 / 10 FROM t",
-			deparsed: "select c1 / 10 from t",
+			deparsed: "select c1/10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1107,7 +1107,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "mod",
 			stmt:     "SELECT c1 % 10 FROM t",
-			deparsed: "select c1 % 10 from t",
+			deparsed: "select c1%10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1130,7 +1130,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "bitand",
 			stmt:     "SELECT c1 & 10 FROM t",
-			deparsed: "select c1 & 10 from t",
+			deparsed: "select c1&10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1153,7 +1153,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "bitor",
 			stmt:     "SELECT c1 | 10 FROM t",
-			deparsed: "select c1 | 10 from t",
+			deparsed: "select c1|10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1176,7 +1176,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "leftshift",
 			stmt:     "SELECT c1 << 10 FROM t",
-			deparsed: "select c1 << 10 from t",
+			deparsed: "select c1<<10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1199,7 +1199,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "rightshift",
 			stmt:     "SELECT c1 >> 10 FROM t",
-			deparsed: "select c1 >> 10 from t",
+			deparsed: "select c1>>10 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1222,7 +1222,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "concat",
 			stmt:     "SELECT c1 || c2 FROM t",
-			deparsed: "select c1 || c2 from t",
+			deparsed: "select c1||c2 from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1512,7 +1512,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "simple-select",
 			stmt:     "SELECT * FROM t WHERE c1 > c2",
-			deparsed: "select * from t where c1 > c2",
+			deparsed: "select * from t where c1>c2",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1591,7 +1591,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "groupby-having",
 			stmt:     "SELECT a, b FROM t GROUP BY a, b HAVING a = 1",
-			deparsed: "select a,b from t group by a,b having a = 1",
+			deparsed: "select a,b from t group by a,b having a=1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2279,7 +2279,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "join-on",
 			stmt:     "SELECT * FROM t JOIN t2 ON t.a = t2.a JOIN t3 ON t2.c1 = t3.c1",
-			deparsed: "select * from t join t2 on t.a = t2.a join t3 on t2.c1 = t3.c1",
+			deparsed: "select * from t join t2 on t.a=t2.a join t3 on t2.c1=t3.c1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2684,7 +2684,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call filter",
 			stmt:     "SELECT max(a) FILTER(WHERE a > 2) FROM t",
-			deparsed: "select max(a) filter(where a > 2) from t",
+			deparsed: "select max(a) filter(where a>2) from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2840,7 +2840,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:        "function does not exist",
 			stmt:        "SELECT foo(ID) FILTER(WHERE ID > 2) FROM t",
-			deparsed:    "select foo(ID) filter(where ID > 2) from t",
+			deparsed:    "select foo(ID) filter(where ID>2) from t",
 			expectedAST: nil,
 			expectedErr: &ErrNoSuchFunction{FunctionName: "foo"},
 		},
@@ -3417,7 +3417,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table check",
 			stmt:         "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
-			deparsed:     "create table t (a int check(a > 2),id2 int constraint check_constraint check(a > 2))",
+			deparsed:     "create table t (a int check(a>2),id2 int constraint check_constraint check(a>2))",
 			expectedHash: "0e93c25832cc90984a0157bdb71f7fa33172700a41c55cd9d896ff4c3d07d598",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3532,7 +3532,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table generated",
 			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed:     "create table t (a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as (a * abs(b)),e text generated always as (substr(c,b,b + 1)) stored,f text as (substr(c,b,b + 1)))",
+			deparsed:     "create table t (a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as (a*abs(b)),e text generated always as (substr(c,b,b+1)) stored,f text as (substr(c,b,b+1)))",
 			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3632,7 +3632,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table table constraints",
 			stmt:         "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
-			deparsed:     "create table t (id int constraint nm not null,id2 int,constraint pk primary key (id),constraint un unique (id,id2),constraint c check(id > 0))",
+			deparsed:     "create table t (id int constraint nm not null,id2 int,constraint pk primary key (id),constraint un unique (id,id2),constraint c check(id>0))",
 			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3738,7 +3738,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table replace table constraint middle",
 			stmt:         "CREATE TABLE t(x INTEGER NOT NULL, b INT, check(b>0), PRIMARY KEY (x DESC), UNIQUE (b));",
-			deparsed:     "create table t (x integer not null primary key desc,b int,check(b > 0),unique (b))",
+			deparsed:     "create table t (x integer not null primary key desc,b int,check(b>0),unique (b))",
 			expectedHash: "783f0ed7cc77247b44f69325d3c865b05ebdbc9c8087d367d685ea63af87fdbd",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -4027,7 +4027,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target",
 			stmt:     "INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1;",
-			deparsed: "insert into t (id,count) values (1,1) on conflict (id) do update set count = count + 1",
+			deparsed: "insert into t (id,count) values (1,1) on conflict (id) do update set count=count+1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4071,7 +4071,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;",
-			deparsed: "insert into phonebook (name,phonenumber) values ('Alice','704-555-1212') on conflict (name) do update set phonenumber = excluded.phonenumber",
+			deparsed: "insert into phonebook (name,phonenumber) values ('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4114,7 +4114,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded with where",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';",
-			deparsed: "insert into phonebook (name,phonenumber) values ('Alice','704-555-1212') on conflict (name) do update set phonenumber = excluded.phonenumber where excluded.phonenumber != ''",
+			deparsed: "insert into phonebook (name,phonenumber) values ('Alice','704-555-1212') on conflict (name) do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4251,7 +4251,7 @@ func TestDelete(t *testing.T) {
 		{
 			name:     "delete with where",
 			stmt:     "DELETE FROM t WHERE a = 1;",
-			deparsed: "delete from t where a = 1",
+			deparsed: "delete from t where a=1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Delete{
@@ -4299,7 +4299,7 @@ func TestUpdate(t *testing.T) {
 		{
 			name:     "update simple",
 			stmt:     "update t set a = 1, b = 2;",
-			deparsed: "update t set a = 1,b = 2",
+			deparsed: "update t set a=1,b=2",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Update{
@@ -4315,7 +4315,7 @@ func TestUpdate(t *testing.T) {
 		{
 			name:     "update parenthesis",
 			stmt:     "update t set (a, b) = (1, 2);",
-			deparsed: "update t set a = 1,b = 2",
+			deparsed: "update t set a=1,b=2",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Update{
@@ -4338,7 +4338,7 @@ func TestUpdate(t *testing.T) {
 		{
 			name:     "update with where",
 			stmt:     "update t set a = 1, b = 2 where a = 3;",
-			deparsed: "update t set a = 1,b = 2 where a = 3",
+			deparsed: "update t set a=1,b=2 where a=3",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Update{
@@ -4586,7 +4586,7 @@ func TestAddWhere(t *testing.T) {
 
 		updateStmt := ast.Statements[0].(*Update)
 		updateStmt.AddWhereClause(where)
-		require.Equal(t, "update t set a = 1 where b = 2", ast.String())
+		require.Equal(t, "update t set a=1 where b=2", ast.String())
 	}
 
 	{
@@ -4595,7 +4595,7 @@ func TestAddWhere(t *testing.T) {
 
 		updateStmt := ast.Statements[0].(*Update)
 		updateStmt.AddWhereClause(where)
-		require.Equal(t, "update t set a = 1 where a = 2 and b = 2", ast.String())
+		require.Equal(t, "update t set a=1 where a=2 and b=2", ast.String())
 	}
 	{
 		ast, err := Parse("delete from t")
@@ -4604,7 +4604,7 @@ func TestAddWhere(t *testing.T) {
 		deleteStmt := ast.Statements[0].(*Delete)
 		deleteStmt.AddWhereClause(where)
 
-		require.Equal(t, "delete from t where b = 2", ast.String())
+		require.Equal(t, "delete from t where b=2", ast.String())
 	}
 
 	{
@@ -4613,7 +4613,7 @@ func TestAddWhere(t *testing.T) {
 
 		deleteStmt := ast.Statements[0].(*Delete)
 		deleteStmt.AddWhereClause(where)
-		require.Equal(t, "delete from t where a = 2 and b = 2", ast.String())
+		require.Equal(t, "delete from t where a=2 and b=2", ast.String())
 	}
 }
 
@@ -4871,23 +4871,23 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "SELECT a = 2 FROM t",
-			deparsed: "select a = 2 from t",
+			deparsed: "select a=2 from t",
 		},
 		{
 			stmt:     "SELECT a != 2 FROM t",
-			deparsed: "select a != 2 from t",
+			deparsed: "select a!=2 from t",
 		},
 		{
 			stmt:     "SELECT a < 2 FROM t",
-			deparsed: "select a < 2 from t",
+			deparsed: "select a<2 from t",
 		},
 		{
 			stmt:     "SELECT a >= 2 FROM t",
-			deparsed: "select a >= 2 from t",
+			deparsed: "select a>=2 from t",
 		},
 		{
 			stmt:     "SELECT a <= 2 FROM t",
-			deparsed: "select a <= 2 from t",
+			deparsed: "select a<=2 from t",
 		},
 		{
 			stmt:     "SELECT a glob 'a' FROM t",
@@ -4943,35 +4943,35 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "SELECT c1 = c2 COLLATE rtrim FROM t",
-			deparsed: "select c1 = c2 collate rtrim from t",
+			deparsed: "select c1=c2 collate rtrim from t",
 		},
 		{
 			stmt:     "SELECT c1 + 10 FROM t",
-			deparsed: "select c1 + 10 from t",
+			deparsed: "select c1+10 from t",
 		},
 		{
 			stmt:     "SELECT c1 - 10 FROM t",
-			deparsed: "select c1 - 10 from t",
+			deparsed: "select c1-10 from t",
 		},
 		{
 			stmt:     "SELECT c1 * 10 FROM t",
-			deparsed: "select c1 * 10 from t",
+			deparsed: "select c1*10 from t",
 		},
 		{
 			stmt:     "SELECT c1 / 10 FROM t",
-			deparsed: "select c1 / 10 from t",
+			deparsed: "select c1/10 from t",
 		},
 		{
 			stmt:     "SELECT c1 % 10 FROM t",
-			deparsed: "select c1 % 10 from t",
+			deparsed: "select c1%10 from t",
 		},
 		{
 			stmt:     "SELECT c1 & 10 FROM t",
-			deparsed: "select c1 & 10 from t",
+			deparsed: "select c1&10 from t",
 		},
 		{
 			stmt:     "SELECT c1 | 10 FROM t",
-			deparsed: "select c1 | 10 from t",
+			deparsed: "select c1|10 from t",
 		},
 		{
 			stmt:     "GRANT INSERT, UPDATE, DELETE on t TO 'a', 'b'",
@@ -4999,19 +4999,19 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "DELETE FROM t WHERE a = 1;",
-			deparsed: "delete from t where a = 1",
+			deparsed: "delete from t where a=1",
 		},
 		{
 			stmt:     "update t set a = 1, b = 2;",
-			deparsed: "update t set a = 1,b = 2",
+			deparsed: "update t set a=1,b=2",
 		},
 		{
 			stmt:     "update t set (a, b) = (1, 2);",
-			deparsed: "update t set a = 1,b = 2",
+			deparsed: "update t set a=1,b=2",
 		},
 		{
 			stmt:     "update t set a = 1, b = 2 where a = 3;",
-			deparsed: "update t set a = 1,b = 2 where a = 3",
+			deparsed: "update t set a=1,b=2 where a=3",
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT);",
@@ -5055,7 +5055,7 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT CHECK(a > 2), id2 INT CONSTRAINT check_constraint CHECK(a > 2));",
-			deparsed: "create table t (a int check(a > 2),id2 int constraint check_constraint check(a > 2))",
+			deparsed: "create table t (a int check(a>2),id2 int constraint check_constraint check(a>2))",
 		},
 		{
 			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
@@ -5387,12 +5387,12 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 		{
 			name:     "select with block_num(*)",
 			query:    "select block_num(1337), block_num(5) from foo_1337_1 where a = block_num(1)",
-			expQuery: "select 100,200 from foo_1337_1 where a = 300",
+			expQuery: "select 100,200 from foo_1337_1 where a=300",
 		},
 		{
 			name:     "select with block_num(*) capital letters",
 			query:    "select BlOcK_NuM(1337), block_num(5) from foo_1337_1 where a = BLOCK_NUM(1)",
-			expQuery: "select 100,200 from foo_1337_1 where a = 300",
+			expQuery: "select 100,200 from foo_1337_1 where a=300",
 		},
 		{
 			name:     "select with block_num() with string argument",
@@ -5488,19 +5488,19 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 		{
 			name:       "update with custom functions",
 			query:      "update foo_1337_1 SET a=txn_hash(), b=block_num() where c in (block_num(), block_num()+1)",
-			expQueries: []string{"update foo_1337_1 set a = '0xabc',b = 100 where c in (100,100 + 1)"},
+			expQueries: []string{"update foo_1337_1 set a='0xabc',b=100 where c in (100,100+1)"},
 		},
 		{
 			name:       "delete with custom functions",
 			query:      "delete from foo_1337_1 where a=block_num() and b=txn_hash()",
-			expQueries: []string{"delete from foo_1337_1 where a = 100 and b = '0xabc'"},
+			expQueries: []string{"delete from foo_1337_1 where a=100 and b='0xabc'"},
 		},
 		{
 			name:  "multiple queries",
 			query: "insert into foo_1337_1 values (txn_hash()); delete from foo_1337_1 where a=block_num()",
 			expQueries: []string{
 				"insert into foo_1337_1 values ('0xabc')",
-				"delete from foo_1337_1 where a = 100",
+				"delete from foo_1337_1 where a=100",
 			},
 		},
 		{
