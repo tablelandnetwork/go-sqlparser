@@ -916,7 +916,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "cast-to-text",
 			stmt:     "SELECT CAST (1 AS TEXT) FROM t",
-			deparsed: "select cast(1 as text) from t",
+			deparsed: "select cast(1 as text)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -941,7 +941,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "cast-to-none",
 			stmt:     "SELECT CAST (a AS none) FROM t",
-			deparsed: "select cast(a as none) from t",
+			deparsed: "select cast(a as none)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -965,7 +965,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "cast-to-integer",
 			stmt:     "SELECT CAST (a AS integer) FROM t",
-			deparsed: "select cast(a as integer) from t",
+			deparsed: "select cast(a as integer)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1383,7 +1383,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "parens-expr",
 			stmt:     "SELECT a and (a and a and (a or a)) FROM t",
-			deparsed: "select a and (a and a and (a or a)) from t",
+			deparsed: "select a and(a and a and(a or a))from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1944,7 +1944,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "select-from-subquery",
 			stmt:     "SELECT * FROM (SELECT * FROM t)",
-			deparsed: "select * from (select * from t)",
+			deparsed: "select * from(select * from t)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1970,7 +1970,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "select-from-subquery-aliased",
 			stmt:     "SELECT * FROM (SELECT * FROM t) as subquery",
-			deparsed: "select * from (select * from t) as subquery",
+			deparsed: "select * from(select * from t)as subquery",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1997,7 +1997,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "select-from-subquery-aliased-alt",
 			stmt:     "SELECT * FROM (SELECT * FROM t) subquery",
-			deparsed: "select * from (select * from t) as subquery",
+			deparsed: "select * from(select * from t)as subquery",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2355,7 +2355,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "table expr parenthesis",
 			stmt:     "SELECT * FROM (t)",
-			deparsed: "select * from (t)",
+			deparsed: "select * from(t)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2464,7 +2464,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "in empty",
 			stmt:     "SELECT a FROM t WHERE a IN ()",
-			deparsed: "select a from t where a in ()",
+			deparsed: "select a from t where a in()",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2492,7 +2492,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "in multiple values",
 			stmt:     "SELECT a FROM t WHERE a IN (1, 2)",
-			deparsed: "select a from t where a in (1,2)",
+			deparsed: "select a from t where a in(1,2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2522,8 +2522,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "in subselect",
-			stmt:     "SELECT a FROM t WHERE a IN (SELECT a FROM t2)",
-			deparsed: "select a from t where a in (select a from t2)",
+			stmt:     "SELECT a FROM t WHERE a IN(SELECT a FROM t2)",
+			deparsed: "select a from t where a in(select a from t2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2562,7 +2562,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "not in empty",
 			stmt:     "SELECT a FROM t WHERE a NOT IN ()",
-			deparsed: "select a from t where a not in ()",
+			deparsed: "select a from t where a not in()",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2590,7 +2590,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "not in multiple values",
 			stmt:     "SELECT a FROM t WHERE a NOT IN (1, 2)",
-			deparsed: "select a from t where a not in (1,2)",
+			deparsed: "select a from t where a not in(1,2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2621,7 +2621,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "not in subselect",
 			stmt:     "SELECT a FROM t WHERE a NOT IN (SELECT a FROM t2)",
-			deparsed: "select a from t where a not in (select a from t2)",
+			deparsed: "select a from t where a not in(select a from t2)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2660,7 +2660,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call",
 			stmt:     "SELECT count(c1) FROM t",
-			deparsed: "select count(c1) from t",
+			deparsed: "select count(c1)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2684,7 +2684,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call filter",
 			stmt:     "SELECT max(a) FILTER(WHERE a > 2) FROM t",
-			deparsed: "select max(a) filter(where a>2) from t",
+			deparsed: "select max(a) filter(where a>2)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2716,7 +2716,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call",
 			stmt:     "SELECT count(c1) FROM t",
-			deparsed: "select count(c1) from t",
+			deparsed: "select count(c1)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2740,7 +2740,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call upper",
 			stmt:     "SELECT COUNT(c1) FROM t",
-			deparsed: "select count(c1) from t",
+			deparsed: "select count(c1)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2764,7 +2764,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call star",
 			stmt:     "SELECT count(*) FROM t",
-			deparsed: "select count(*) from t",
+			deparsed: "select count(*)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2786,7 +2786,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call star upper",
 			stmt:     "SELECT COUNT(*) FROM t",
-			deparsed: "select count(*) from t",
+			deparsed: "select count(*)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2808,14 +2808,14 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:        "function does not exist star",
 			stmt:        "SELECT foo(*) FROM t",
-			deparsed:    "select foo(*) from t",
+			deparsed:    "select foo(*)from t",
 			expectedAST: nil,
 			expectedErr: &ErrNoSuchFunction{FunctionName: "foo"},
 		},
 		{
 			name:     "function call distinct",
 			stmt:     "SELECT count(distinct c1) FROM t",
-			deparsed: "select count(distinct c1) from t",
+			deparsed: "select count(distinct c1)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2840,14 +2840,14 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:        "function does not exist",
 			stmt:        "SELECT foo(ID) FILTER(WHERE ID > 2) FROM t",
-			deparsed:    "select foo(ID) filter(where ID>2) from t",
+			deparsed:    "select foo(ID)filter(where ID>2)from t",
 			expectedAST: nil,
 			expectedErr: &ErrNoSuchFunction{FunctionName: "foo"},
 		},
 		{
 			name:     "function call like with escape",
 			stmt:     "SELECT like(a, b, c) FROM t",
-			deparsed: "select like(a,b,c) from t",
+			deparsed: "select like(a,b,c)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -3142,7 +3142,7 @@ func TestAllowedFunctions(t *testing.T) {
 		tests = append(tests, testCase{
 			name:     allowedFunction,
 			stmt:     fmt.Sprintf("select %s from t", functionCall),
-			deparsed: fmt.Sprintf("select %s from t", functionCall),
+			deparsed: fmt.Sprintf("select %sfrom t", functionCall),
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -3532,7 +3532,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table generated",
 			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as (a*abs(b)),e text generated always as (substr(c,b,b+1)) stored,f text as (substr(c,b,b+1)))",
+			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as(a*abs(b)),e text generated always as(substr(c,b,b+1)) stored,f text as(substr(c,b,b+1)))",
 			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -4931,15 +4931,15 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "SELECT CAST (1 AS TEXT) FROM t",
-			deparsed: "select cast(1 as text) from t",
+			deparsed: "select cast(1 as text)from t",
 		},
 		{
 			stmt:     "SELECT CAST (a AS none) FROM t",
-			deparsed: "select cast(a as none) from t",
+			deparsed: "select cast(a as none)from t",
 		},
 		{
 			stmt:     "SELECT CAST (a AS integer) FROM t",
-			deparsed: "select cast(a as integer) from t",
+			deparsed: "select cast(a as integer)from t",
 		},
 		{
 			stmt:     "SELECT c1 = c2 COLLATE rtrim FROM t",
@@ -5488,7 +5488,7 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 		{
 			name:       "update with custom functions",
 			query:      "update foo_1337_1 SET a=txn_hash(), b=block_num() where c in (block_num(), block_num()+1)",
-			expQueries: []string{"update foo_1337_1 set a='0xabc',b=100 where c in (100,100+1)"},
+			expQueries: []string{"update foo_1337_1 set a='0xabc',b=100 where c in(100,100+1)"},
 		},
 		{
 			name:       "delete with custom functions",
