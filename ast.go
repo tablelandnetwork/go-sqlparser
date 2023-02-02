@@ -54,29 +54,26 @@ func (ast *AST) PrettyPrint() {
 	spew.Dump("%#v", ast)
 }
 
-func SubtreeString (left string, operator string, right string) string {
-	var compactOps = map[string]bool{
-		"=": true,
-		"<": true,
-		">": true,
-		"<=": true,
-		">=": true,
-		"!=": true,
+func subtreeString (left string, operator string, right string) string {
+	var compactOps = map[string]struct{}{
+		"=": {},
+		"<": {},
+		">": {},
+		"<=": {},
+		">=": {},
+		"!=": {},
 	}
 
 	// if the operator never needs space combine and return
-	if compactOps[operator] {
+	if _, ok := compactOps[operator]; ok {
 		return fmt.Sprintf("%s%s%s", left, operator, right)
 	}
 
-	leftRune := []rune(left)
-	rightRune := []rune(right)
-
-	if string(leftRune[len(leftRune) - 1]) != ")" {
+	if left[len(left) - 1] != ')' {
 		operator = fmt.Sprintf(" %s", operator)
 	}
 
-	if string(rightRune[0]) != "(" {
+	if right[0] != '(' {
 		operator = fmt.Sprintf("%s ", operator)
 	}
 
@@ -183,7 +180,7 @@ func (node *Select) String() string {
 	return fmt.Sprintf(
 		"select %s%s%s%s%s%s%s",
 		node.Distinct,
-		SubtreeString(
+		subtreeString(
 			node.SelectColumnList.String(),
 			"from",
 			node.From.String(),
@@ -320,7 +317,7 @@ type AliasedSelectColumn struct {
 // String returns the string representation of the node.
 func (node *AliasedSelectColumn) String() string {
 	if !node.As.IsEmpty() {
-		return SubtreeString(node.Expr.String(), "as", node.As.String())
+		return subtreeString(node.Expr.String(), "as", node.As.String())
 	}
 
 	return node.Expr.String()
@@ -357,7 +354,7 @@ func (node *AliasedTableExpr) String() string {
 		return node.Expr.String()
 	}
 
-	return SubtreeString(node.Expr.String(), "as", node.As.String())
+	return subtreeString(node.Expr.String(), "as", node.As.String())
 }
 
 func (node *AliasedTableExpr) walkSubtree(visit Visit) error {
@@ -457,14 +454,14 @@ const (
 // String returns the string representation of the node.
 func (node *JoinTableExpr) String() string {
 	if node.On != nil {
-		return SubtreeString(node.LeftExpr.String(), node.JoinOperator.String(), SubtreeString(node.RightExpr.String(), "on", node.On.String()))
+		return subtreeString(node.LeftExpr.String(), node.JoinOperator.String(), subtreeString(node.RightExpr.String(), "on", node.On.String()))
 	}
 
 	if node.Using != nil {
-		return fmt.Sprintf("%s using%s", SubtreeString(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String()), node.Using.String())
+		return fmt.Sprintf("%s using%s", subtreeString(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String()), node.Using.String())
 	}
 
-	return SubtreeString(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
+	return subtreeString(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
 }
 
 func (node *JoinTableExpr) walkSubtree(visit Visit) error {
@@ -825,10 +822,10 @@ const (
 // String returns the string representation of the node.
 func (node *CmpExpr) String() string {
 	if node.Escape != nil {
-		return fmt.Sprintf("%s escape %s", SubtreeString(node.Left.String(), node.Operator, node.Right.String()), node.Escape.String())
+		return fmt.Sprintf("%s escape %s", subtreeString(node.Left.String(), node.Operator, node.Right.String()), node.Escape.String())
 	}
 
-	return SubtreeString(node.Left.String(), node.Operator, node.Right.String())
+	return subtreeString(node.Left.String(), node.Operator, node.Right.String())
 }
 
 func (node *CmpExpr) walkSubtree(visit Visit) error {
@@ -848,7 +845,7 @@ func (node *AndExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return SubtreeString(node.Left.String(), "and", node.Right.String())
+	return subtreeString(node.Left.String(), "and", node.Right.String())
 }
 
 func (node *AndExpr) walkSubtree(visit Visit) error {
@@ -869,7 +866,7 @@ func (node *OrExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return SubtreeString(node.Left.String(), "or", node.Right.String())
+	return subtreeString(node.Left.String(), "or", node.Right.String())
 }
 
 func (node *OrExpr) walkSubtree(visit Visit) error {
@@ -908,7 +905,7 @@ type IsExpr struct {
 
 // String returns the string representation of the node.
 func (node *IsExpr) String() string {
-	return SubtreeString(node.Left.String(), "is", node.Right.String())
+	return subtreeString(node.Left.String(), "is", node.Right.String())
 }
 
 func (node *IsExpr) walkSubtree(visit Visit) error {
@@ -963,7 +960,7 @@ type CollateExpr struct {
 
 // String returns the string representation of the node.
 func (node *CollateExpr) String() string {
-	return SubtreeString(node.Expr.String(), "collate", node.CollationName.String())
+	return subtreeString(node.Expr.String(), "collate", node.CollationName.String())
 }
 
 func (node *CollateExpr) walkSubtree(visit Visit) error {
@@ -991,7 +988,7 @@ const (
 
 // String returns the string representation of the node.
 func (node *ConvertExpr) String() string {
-	return fmt.Sprintf("cast(%s)", SubtreeString(node.Expr.String(), "as", string(node.Type)))
+	return fmt.Sprintf("cast(%s)", subtreeString(node.Expr.String(), "as", string(node.Type)))
 }
 
 func (node *ConvertExpr) walkSubtree(visit Visit) error {
@@ -1017,7 +1014,7 @@ const (
 
 // String returns the string representation of the node.
 func (node *BetweenExpr) String() string {
-	return SubtreeString(SubtreeString(node.Left.String(), node.Operator, node.From.String()), "and", node.To.String())
+	return subtreeString(subtreeString(node.Left.String(), node.Operator, node.From.String()), "and", node.To.String())
 }
 
 func (node *BetweenExpr) walkSubtree(visit Visit) error {
@@ -1035,7 +1032,7 @@ type When struct {
 
 // String returns the string representation of the node.
 func (node *When) String() string {
-	return fmt.Sprintf("when %s", SubtreeString(node.Condition.String(), "then", node.Value.String()))
+	return fmt.Sprintf("when %s", subtreeString(node.Condition.String(), "then", node.Value.String()))
 }
 
 // CaseExpr represents a CASE expression.
