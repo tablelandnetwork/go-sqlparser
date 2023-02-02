@@ -5105,24 +5105,30 @@ func TestCreateTableMultiplePrimaryKey(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			ast, err := Parse(tc.stmt)
-			require.Error(t, err)
-			require.Len(t, ast.Errors, 1)
+		func(tc struct {
+			name string
+			stmt string
+		},
+		) {
+			t.Run(tc.name, func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+				require.Error(t, err)
+				require.Len(t, ast.Errors, 1)
 
-			var e *ErrMultiplePrimaryKey
-			require.ErrorAs(t, ast.Errors[0], &e)
-			require.ErrorAs(t, err, &e)
+				var e *ErrMultiplePrimaryKey
+				require.ErrorAs(t, ast.Errors[0], &e)
+				require.ErrorAs(t, err, &e)
 
-			// check the stmt in sqlite to make sure sqlite also throws an error
-			db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
-			require.NoError(t, err)
+				// check the stmt in sqlite to make sure sqlite also throws an error
+				db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+				require.NoError(t, err)
 
-			_, err = db.Exec(tc.stmt)
-			require.Error(t, err)
-			require.ErrorContains(t, err, "has more than one primary key")
-		})
+				_, err = db.Exec(tc.stmt)
+				require.Error(t, err)
+				require.ErrorContains(t, err, "has more than one primary key")
+			})
+		}(tc)
 	}
 }
 
@@ -5184,17 +5190,23 @@ func TestRowIDReferences(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			t.Parallel()
-			ast, err := Parse(tc.stmt)
-			require.Error(t, err)
-			require.Len(t, ast.Errors, 1)
+		func(tc struct {
+			name string
+			stmt string
+		},
+		) {
+			t.Run(tc.name, func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+				require.Error(t, err)
+				require.Len(t, ast.Errors, 1)
 
-			var e *ErrRowIDNotAllowed
-			require.ErrorAs(t, ast.Errors[0], &e)
-			require.ErrorAs(t, err, &e)
-			require.ErrorContains(t, err, "rowid is not allowed")
-		})
+				var e *ErrRowIDNotAllowed
+				require.ErrorAs(t, ast.Errors[0], &e)
+				require.ErrorAs(t, err, &e)
+				require.ErrorContains(t, err, "rowid is not allowed")
+			})
+		}(tc)
 	}
 }
 

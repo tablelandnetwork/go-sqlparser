@@ -40,16 +40,18 @@ func TestValidateTargetTable(t *testing.T) {
 	}
 
 	for _, name := range invalidWrongFormatTests {
-		t.Run(fmt.Sprintf("invalid wrong format:%s", name), func(t *testing.T) {
-			t.Parallel()
-			table := &Table{Name: Identifier(name), IsTarget: true}
-			validTable, err := ValidateTargetTable(table)
-			require.Error(t, err)
+		func(name string) {
+			t.Run(fmt.Sprintf("invalid wrong format:%s", name), func(t *testing.T) {
+				t.Parallel()
+				table := &Table{Name: Identifier(name), IsTarget: true}
+				validTable, err := ValidateTargetTable(table)
+				require.Error(t, err)
 
-			e := &ErrTableNameWrongFormat{Name: name}
-			require.ErrorAs(t, err, &e)
-			require.Nil(t, validTable)
-		})
+				e := &ErrTableNameWrongFormat{Name: name}
+				require.ErrorAs(t, err, &e)
+				require.Nil(t, validTable)
+			})
+		}(name)
 	}
 
 	t.Run("valid table name", func(t *testing.T) {
