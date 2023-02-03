@@ -2311,7 +2311,7 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "join-using",
-			stmt:     "SELECT * FROM t JOIN t2 USING(c1, c2)",
+			stmt:     "SELECT * FROM t JOIN t2 USING (c1, c2)",
 			deparsed: "select * from t join t2 using(c1,c2)",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -2684,7 +2684,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "function call filter",
 			stmt:     "SELECT max(a) FILTER(WHERE a > 2) FROM t",
-			deparsed: "select max(a) filter(where a>2)from t",
+			deparsed: "select max(a)filter(where a>2)from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -3532,7 +3532,7 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table generated",
 			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as(a*abs(b)),e text generated always as(substr(c,b,b+1)) stored,f text as(substr(c,b,b+1)))",
+			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as(a*abs(b)),e text generated always as(substr(c,b,b+1))stored,f text as(substr(c,b,b+1)))",
 			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3909,7 +3909,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "insert simple",
 			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t(a,b) values(1,2),(3,4)",
+			deparsed: "insert into t(a,b)values(1,2),(3,4)",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3973,7 +3973,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do nothing",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t(id) values(1) on conflict do nothing",
+			deparsed: "insert into t(id)values(1)on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -3997,7 +3997,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do nothing with target",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING;",
-			deparsed: "insert into t(id) values(1) on conflict(id) do nothing",
+			deparsed: "insert into t(id)values(1)on conflict(id)do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4027,7 +4027,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target",
 			stmt:     "INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1;",
-			deparsed: "insert into t(id,count) values(1,1) on conflict(id) do update set count=count+1",
+			deparsed: "insert into t(id,count)values(1,1)on conflict(id)do update set count=count+1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4071,7 +4071,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;",
-			deparsed: "insert into phonebook(name,phonenumber) values('Alice','704-555-1212') on conflict(name) do update set phonenumber=excluded.phonenumber",
+			deparsed: "insert into phonebook(name,phonenumber)values('Alice','704-555-1212')on conflict(name)do update set phonenumber=excluded.phonenumber",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4114,7 +4114,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert do update with target excluded with where",
 			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';",
-			deparsed: "insert into phonebook(name,phonenumber) values('Alice','704-555-1212') on conflict(name) do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
+			deparsed: "insert into phonebook(name,phonenumber)values('Alice','704-555-1212')on conflict(name)do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4168,7 +4168,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:     "upsert multiple clauses",
 			stmt:     "INSERT INTO t (id) VALUES (1) ON CONFLICT (id) DO NOTHING ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t(id) values(1) on conflict(id) do nothing on conflict do nothing",
+			deparsed: "insert into t(id)values(1)on conflict(id)do nothing on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4201,7 +4201,7 @@ func TestInsert(t *testing.T) {
 		{
 			name:        "upsert multiple clauses missing target",
 			stmt:        "INSERT INTO t (id) VALUES (1) ON CONFLICT DO NOTHING ON CONFLICT DO NOTHING;",
-			deparsed:    "insert into t(id) values(1) on conflict do nothing on conflict do nothing",
+			deparsed:    "insert into t(id)values(1)on conflict do nothing on conflict do nothing",
 			expectedAST: nil,
 			expectedErr: &ErrUpsertMissingTarget{},
 		},
@@ -4983,7 +4983,7 @@ func TestParallel(t *testing.T) {
 		},
 		{
 			stmt:     "INSERT INTO t (a, b) VALUES (1, 2), (3, 4);",
-			deparsed: "insert into t(a,b) values(1,2),(3,4)",
+			deparsed: "insert into t(a,b)values(1,2),(3,4)",
 		},
 		{
 			stmt:     "INSERT INTO t VALUES (1, 2), (3, 4);",
