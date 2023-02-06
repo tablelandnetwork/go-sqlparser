@@ -33,7 +33,7 @@ func (node *AST) String() string {
 	for _, stmt := range node.Statements {
 		stmts = append(stmts, stmt.String())
 	}
-	return strings.Join(stmts, "; ")
+	return strings.Join(stmts, ";")
 }
 
 func (node *AST) walkSubtree(visit Visit) error {
@@ -52,6 +52,49 @@ func (ast *AST) PrettyPrint() {
 	spew.Config.DisablePointerAddresses = true
 	spew.Config.DisableMethods = true
 	spew.Dump("%#v", ast)
+}
+
+// Combines an ordered set of two node strings with correct delimiting
+func nodeStringConcat (left string, right string) string {
+	// If a node string starts or ends with any of these bytes the string will never
+	// need to be space delimited when being concatinated with other node strings
+	var noDelim = map[byte]struct{}{
+		'=': {},
+		'<': {},
+		'>': {},
+		'!': {},
+		'(': {},
+		')': {},
+	}
+
+	left = strings.Trim(left, " ")
+	right = strings.Trim(right, " ")
+
+	// If one of the strings is empty we don't want to add an unnecessary space and
+	// we can't access index the `-1` below, so we can just return the other string
+	if left == "" {
+		return right
+	}
+	if right == "" {
+		return left
+	}
+
+	if _, ok := noDelim[left[len(left) - 1]]; ok {
+		return fmt.Sprintf("%s%s", left, right)
+	}
+	if _, ok := noDelim[right[0]]; ok {
+		return fmt.Sprintf("%s%s", left, right)
+	}
+
+	return fmt.Sprintf("%s %s", left, right)
+}
+
+func nodeStringsConcat (strs ...string) string {
+	var subtreeString string
+	for _, str := range strs {
+		subtreeString = nodeStringConcat(subtreeString, str)
+	}
+	return subtreeString
 }
 
 // Statement represents a SQL statement.
@@ -151,10 +194,11 @@ type Select struct {
 
 // String returns the string representation of the node.
 func (node *Select) String() string {
-	return fmt.Sprintf(
-		"select %s%s from %s%s%s%s%s%s",
+	return nodeStringsConcat(
+		"select",
 		node.Distinct,
 		node.SelectColumnList.String(),
+		"from",
 		node.From.String(),
 		node.Where.String(),
 		node.GroupBy.String(),
@@ -205,7 +249,7 @@ type CompoundSelect struct {
 }
 
 func (node *CompoundSelect) String() string {
-	return fmt.Sprintf("%s %s %s%s%s", node.Left, node.Type, node.Right, node.Limit, node.OrderBy)
+	return nodeStringsConcat(node.Left.String(), node.Type, node.Right.String(), node.Limit.String(), node.OrderBy.String())
 }
 
 // Resolve returns a string representation with custom function nodes resolved to the values
@@ -237,7 +281,7 @@ func (node SelectColumnList) String() string {
 		colsStr = append(colsStr, col.String())
 	}
 
-	return strings.Join(colsStr, ", ")
+	return strings.Join(colsStr, ",")
 }
 
 func (node SelectColumnList) walkSubtree(visit Visit) error {
@@ -288,7 +332,7 @@ type AliasedSelectColumn struct {
 // String returns the string representation of the node.
 func (node *AliasedSelectColumn) String() string {
 	if !node.As.IsEmpty() {
-		return fmt.Sprintf("%s as %s", node.Expr.String(), node.As.String())
+		return nodeStringsConcat(node.Expr.String(), "as", node.As.String())
 	}
 
 	return node.Expr.String()
@@ -325,7 +369,7 @@ func (node *AliasedTableExpr) String() string {
 		return node.Expr.String()
 	}
 
-	return fmt.Sprintf("%s as %s", node.Expr.String(), node.As.String())
+	return nodeStringsConcat(node.Expr.String(), "as", node.As.String())
 }
 
 func (node *AliasedTableExpr) walkSubtree(visit Visit) error {
@@ -352,7 +396,7 @@ type Subquery struct {
 
 // String returns the string representation of the node.
 func (node *Subquery) String() string {
-	return fmt.Sprintf("(%s)", node.Select.String())
+	return nodeStringsConcat("(", node.Select.String(), ")")
 }
 
 func (node *Subquery) walkSubtree(visit Visit) error {
@@ -369,7 +413,7 @@ type ParenTableExpr struct {
 
 // String returns the string representation of the node.
 func (node *ParenTableExpr) String() string {
-	return fmt.Sprintf("(%v)", node.TableExpr.String())
+	return nodeStringsConcat("(", node.TableExpr.String(), ")")
 }
 
 func (node *ParenTableExpr) walkSubtree(visit Visit) error {
@@ -396,7 +440,7 @@ func (node *JoinOperator) String() string {
 	if node.Outer {
 		node.Op = strings.Replace(node.Op, " ", " outer ", 1)
 	}
-	return fmt.Sprintf("%s%s", natural, node.Op)
+	return nodeStringsConcat(natural, node.Op)
 }
 
 func (node *JoinOperator) walkSubtree(visit Visit) error {
@@ -425,14 +469,14 @@ const (
 // String returns the string representation of the node.
 func (node *JoinTableExpr) String() string {
 	if node.On != nil {
-		return fmt.Sprintf("%s %s %s on %s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), node.On.String())
+		return nodeStringsConcat(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), "on", node.On.String())
 	}
 
 	if node.Using != nil {
-		return fmt.Sprintf("%s %s %s using%s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), node.Using.String())
+		return nodeStringsConcat(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), "using", node.Using.String())
 	}
 
-	return fmt.Sprintf("%s %s %s", node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
+	return nodeStringsConcat(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
 }
 
 func (node *JoinTableExpr) walkSubtree(visit Visit) error {
@@ -492,7 +536,7 @@ func (node GroupBy) String() string {
 		strs = append(strs, e.String())
 	}
 
-	return fmt.Sprintf(" group by %s", strings.Join(strs, ", "))
+	return nodeStringsConcat("group by", strings.Join(strs, ","))
 }
 
 func (node GroupBy) walkSubtree(visit Visit) error {
@@ -518,7 +562,7 @@ func (node OrderBy) String() string {
 		strs = append(strs, e.String())
 	}
 
-	return fmt.Sprintf(" order by %s", strings.Join(strs, ", "))
+	return nodeStringsConcat("order by", strings.Join(strs, ","))
 }
 
 func (node OrderBy) walkSubtree(visit Visit) error {
@@ -564,12 +608,12 @@ func (node *OrderingTerm) String() string {
 	case NullsNil:
 		nullsStr = ""
 	case NullsFirst:
-		nullsStr = " nulls first"
+		nullsStr = "nulls first"
 	case NullsLast:
-		nullsStr = " nulls last"
+		nullsStr = "nulls last"
 	}
 
-	return fmt.Sprintf("%s %s%s", node.Expr.String(), node.Direction, nullsStr)
+	return nodeStringsConcat(node.Expr.String(), node.Direction, nullsStr)
 }
 
 func (node *OrderingTerm) walkSubtree(visit Visit) error {
@@ -592,10 +636,10 @@ func (node *Limit) String() string {
 	}
 
 	if node.Offset == nil {
-		return fmt.Sprintf(" limit %s", node.Limit.String())
+		return nodeStringsConcat("limit", node.Limit.String())
 	}
 
-	return fmt.Sprintf(" limit %s offset %s", node.Limit.String(), node.Offset.String())
+	return nodeStringsConcat("limit", node.Limit.String(), "offset", node.Offset.String())
 }
 
 func (node *Limit) walkSubtree(visit Visit) error {
@@ -753,7 +797,7 @@ const (
 
 // String returns the string representation of the node.
 func (node *BinaryExpr) String() string {
-	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
+	return fmt.Sprintf("%s%s%s", node.Left.String(), node.Operator, node.Right.String())
 }
 
 func (node *BinaryExpr) walkSubtree(visit Visit) error {
@@ -793,10 +837,10 @@ const (
 // String returns the string representation of the node.
 func (node *CmpExpr) String() string {
 	if node.Escape != nil {
-		return fmt.Sprintf("%s %s %s escape %s", node.Left.String(), node.Operator, node.Right.String(), node.Escape.String())
+		return nodeStringsConcat(node.Left.String(), node.Operator, node.Right.String(), "escape", node.Escape.String())
 	}
 
-	return fmt.Sprintf("%s %s %s", node.Left.String(), node.Operator, node.Right.String())
+	return nodeStringsConcat(node.Left.String(), node.Operator, node.Right.String())
 }
 
 func (node *CmpExpr) walkSubtree(visit Visit) error {
@@ -816,7 +860,7 @@ func (node *AndExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return fmt.Sprintf("%s and %s", node.Left.String(), node.Right.String())
+	return nodeStringsConcat(node.Left.String(), "and", node.Right.String())
 }
 
 func (node *AndExpr) walkSubtree(visit Visit) error {
@@ -837,7 +881,7 @@ func (node *OrExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return fmt.Sprintf("%s or %s", node.Left.String(), node.Right.String())
+	return nodeStringsConcat(node.Left.String(), "or", node.Right.String())
 }
 
 func (node *OrExpr) walkSubtree(visit Visit) error {
@@ -858,7 +902,7 @@ func (node *NotExpr) String() string {
 	if node == nil {
 		return ""
 	}
-	return fmt.Sprintf("not %s", node.Expr.String())
+	return nodeStringsConcat("not", node.Expr.String())
 }
 
 func (node *NotExpr) walkSubtree(visit Visit) error {
@@ -876,7 +920,7 @@ type IsExpr struct {
 
 // String returns the string representation of the node.
 func (node *IsExpr) String() string {
-	return fmt.Sprintf("%s is %s", node.Left.String(), node.Right.String())
+	return nodeStringsConcat(node.Left.String(), "is", node.Right.String())
 }
 
 func (node *IsExpr) walkSubtree(visit Visit) error {
@@ -894,7 +938,7 @@ type IsNullExpr struct {
 
 // String returns the string representation of the node.
 func (node *IsNullExpr) String() string {
-	return fmt.Sprintf("%s isnull", node.Expr.String())
+	return nodeStringsConcat(node.Expr.String(), "isnull")
 }
 
 func (node *IsNullExpr) walkSubtree(visit Visit) error {
@@ -912,7 +956,7 @@ type NotNullExpr struct {
 
 // String returns the string representation of the node.
 func (node *NotNullExpr) String() string {
-	return fmt.Sprintf("%s notnull", node.Expr.String())
+	return nodeStringsConcat(node.Expr.String(), "notnull")
 }
 
 func (node *NotNullExpr) walkSubtree(visit Visit) error {
@@ -931,7 +975,7 @@ type CollateExpr struct {
 
 // String returns the string representation of the node.
 func (node *CollateExpr) String() string {
-	return fmt.Sprintf("%s collate %s", node.Expr.String(), node.CollationName.String())
+	return nodeStringsConcat(node.Expr.String(), "collate", node.CollationName.String())
 }
 
 func (node *CollateExpr) walkSubtree(visit Visit) error {
@@ -959,7 +1003,7 @@ const (
 
 // String returns the string representation of the node.
 func (node *ConvertExpr) String() string {
-	return fmt.Sprintf("cast (%s as %s)", node.Expr.String(), string(node.Type))
+	return nodeStringsConcat("cast(", node.Expr.String(), "as", string(node.Type), ")")
 }
 
 func (node *ConvertExpr) walkSubtree(visit Visit) error {
@@ -985,7 +1029,7 @@ const (
 
 // String returns the string representation of the node.
 func (node *BetweenExpr) String() string {
-	return fmt.Sprintf("%s %s %s and %s", node.Left.String(), node.Operator, node.From.String(), node.To.String())
+	return nodeStringsConcat(node.Left.String(), node.Operator, node.From.String(), "and", node.To.String())
 }
 
 func (node *BetweenExpr) walkSubtree(visit Visit) error {
@@ -1003,7 +1047,7 @@ type When struct {
 
 // String returns the string representation of the node.
 func (node *When) String() string {
-	return fmt.Sprintf("when %v then %v", node.Condition.String(), node.Value.String())
+	return nodeStringsConcat("when", node.Condition.String(), "then", node.Value.String())
 }
 
 // CaseExpr represents a CASE expression.
@@ -1106,7 +1150,7 @@ func (node ColumnList) String() string {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
+	return nodeStringsConcat("(", strings.Join(strs, ","), ")")
 }
 
 func (node ColumnList) walkSubtree(visit Visit) error {
@@ -1160,7 +1204,7 @@ func (node IndexedColumnList) String() string {
 		strs = append(strs, col.String())
 	}
 
-	return fmt.Sprintf(" %s%s%s", "(", strings.Join(strs, ", "), ")")
+	return nodeStringsConcat("(", strings.Join(strs, ","), ")")
 }
 
 func (node IndexedColumnList) walkSubtree(visit Visit) error {
@@ -1183,7 +1227,7 @@ func (node Exprs) String() string {
 		strs = append(strs, expr.String())
 	}
 
-	return fmt.Sprintf("%s%s%s", "(", strings.Join(strs, ", "), ")")
+	return nodeStringsConcat("(", strings.Join(strs, ","), ")")
 }
 
 func (node Exprs) walkSubtree(visit Visit) error {
@@ -1203,7 +1247,7 @@ type ExistsExpr struct {
 
 // String returns the string representation of the node.
 func (node *ExistsExpr) String() string {
-	return fmt.Sprintf("exists %s", node.Subquery.String())
+	return nodeStringsConcat("exists", node.Subquery.String())
 }
 
 func (node *ExistsExpr) walkSubtree(visit Visit) error {
@@ -1241,7 +1285,7 @@ func (node *FuncExpr) String() string {
 
 	var filter string
 	if node.Filter != nil {
-		filter = fmt.Sprintf(" filter(%s)", node.Filter.String()[1:])
+		filter = nodeStringsConcat("filter(", node.Filter.String()[1:], ")")
 	}
 
 	var argsStr string
@@ -1251,7 +1295,7 @@ func (node *FuncExpr) String() string {
 		argsStr = "(*)"
 	}
 
-	return fmt.Sprintf("%s%s%s", node.Name.String(), argsStr[:1]+distinct+argsStr[1:], filter)
+	return nodeStringsConcat(node.Name.String(), argsStr[:1]+distinct+argsStr[1:], filter)
 }
 
 func (node *FuncExpr) walkSubtree(visit Visit) error {
@@ -1282,7 +1326,7 @@ func (node *CustomFuncExpr) String() string {
 		argsStr = "(*)"
 	}
 
-	return fmt.Sprintf("%s%s", node.Name.String(), argsStr[:1]+argsStr[1:])
+	return nodeStringsConcat(node.Name.String(), argsStr[:1]+argsStr[1:])
 }
 
 func (node *CustomFuncExpr) walkSubtree(visit Visit) error {
@@ -1300,7 +1344,7 @@ type ParenExpr struct {
 
 // String returns the string representation of the node.
 func (node *ParenExpr) String() string {
-	return fmt.Sprintf("(%s)", node.Expr.String())
+	return nodeStringsConcat("(", node.Expr.String(), ")")
 }
 
 func (node *ParenExpr) walkSubtree(visit Visit) error {
@@ -1345,19 +1389,19 @@ func (node *CreateTable) String() string {
 	for _, column := range node.ColumnsDef {
 		columns = append(columns, column.String())
 	}
-	column := strings.Join(columns, ", ")
+	column := strings.Join(columns, ",")
 	if len(node.Constraints) > 0 {
 		constraints := []string{}
 		for _, constraint := range node.Constraints {
 			constraints = append(constraints, constraint.String())
 		}
-		column += ", " + strings.Join(constraints, ", ")
+		column += "," + strings.Join(constraints, ",")
 	}
 
 	if node.StrictMode {
-		return fmt.Sprintf("create table %s (%s) strict", node.Table.String(), column)
+		return nodeStringsConcat("create table ", node.Table.String(), "(", column, ")strict")
 	} else {
-		return fmt.Sprintf("create table %s (%s)", node.Table.String(), column)
+		return nodeStringsConcat("create table ", node.Table.String(), "(", column, ")")
 	}
 }
 
@@ -1415,7 +1459,7 @@ func (node *ColumnDef) String() string {
 		}
 		constraint = " " + strings.Join(constraints, " ")
 	}
-	return fmt.Sprintf("%s %s%s", node.Column, node.Type, constraint)
+	return nodeStringsConcat(node.Column.String(), node.Type, constraint)
 }
 
 func (node *ColumnDef) walkSubtree(visit Visit) error {
@@ -1480,18 +1524,18 @@ type ColumnConstraintPrimaryKey struct {
 func (node *ColumnConstraintPrimaryKey) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
 
 	var autoIncrement string
 	if node.AutoIncrement {
-		autoIncrement = " autoincrement"
+		autoIncrement = "autoincrement"
 	}
 
 	if node.Order == PrimaryKeyOrderEmpty {
-		return fmt.Sprintf("%sprimary key%s", constraintName, autoIncrement)
+		return nodeStringsConcat(constraintName, "primary key", autoIncrement)
 	}
-	return fmt.Sprintf("%sprimary key %s%s", constraintName, node.Order, autoIncrement)
+	return nodeStringsConcat(constraintName, "primary key", node.Order, autoIncrement)
 }
 
 func (node *ColumnConstraintPrimaryKey) walkSubtree(visit Visit) error {
@@ -1518,9 +1562,9 @@ type ColumnConstraintNotNull struct {
 func (node *ColumnConstraintNotNull) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
-	return fmt.Sprintf("%snot null", constraintName)
+	return nodeStringsConcat(constraintName, "not null")
 }
 
 func (node *ColumnConstraintNotNull) walkSubtree(visit Visit) error {
@@ -1541,9 +1585,9 @@ type ColumnConstraintUnique struct {
 func (node *ColumnConstraintUnique) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
-	return fmt.Sprintf("%sunique", constraintName)
+	return nodeStringsConcat(constraintName, "unique")
 }
 
 func (node *ColumnConstraintUnique) walkSubtree(visit Visit) error {
@@ -1564,9 +1608,9 @@ type ColumnConstraintCheck struct {
 func (node *ColumnConstraintCheck) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
-	return fmt.Sprintf("%scheck(%s)", constraintName, node.Expr.String())
+	return nodeStringsConcat(constraintName, "check(", node.Expr.String(), ")")
 }
 
 func (node *ColumnConstraintCheck) walkSubtree(visit Visit) error {
@@ -1588,12 +1632,12 @@ type ColumnConstraintDefault struct {
 func (node *ColumnConstraintDefault) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
 	if node.Parenthesis {
-		return fmt.Sprintf("%sdefault (%s)", constraintName, node.Expr.String())
+		return nodeStringsConcat(constraintName, "default (", node.Expr.String(), ")")
 	}
-	return fmt.Sprintf("%sdefault %s", constraintName, node.Expr.String())
+	return nodeStringsConcat(constraintName, "default", node.Expr.String())
 }
 
 func (node *ColumnConstraintDefault) walkSubtree(visit Visit) error {
@@ -1620,20 +1664,21 @@ type ColumnConstraintGenerated struct {
 func (node *ColumnConstraintGenerated) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
 	var b strings.Builder
 	if node.GeneratedAlways {
-		b.WriteString(fmt.Sprintf("%sgenerated always as (%s)", constraintName, node.Expr.String()))
+		b.WriteString(nodeStringsConcat(constraintName, "generated always as(", node.Expr.String(), ")"))
 	} else {
-		b.WriteString(fmt.Sprintf("%sas (%s)", constraintName, node.Expr.String()))
+		b.WriteString(nodeStringsConcat(constraintName, "as(", node.Expr.String(), ")"))
 	}
 
+	var bStr = b.String()
 	if node.IsStored {
-		b.WriteString(" stored")
+		return nodeStringsConcat(bStr, "stored")
 	}
 
-	return b.String()
+	return bStr
 }
 
 func (node *ColumnConstraintGenerated) walkSubtree(visit Visit) error {
@@ -1663,10 +1708,10 @@ type TableConstraintPrimaryKey struct {
 func (node *TableConstraintPrimaryKey) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sprimary key%s", constraintName, node.Columns.String())
+	return nodeStringsConcat(constraintName, "primary key", node.Columns.String())
 }
 
 func (node *TableConstraintPrimaryKey) walkSubtree(visit Visit) error {
@@ -1687,10 +1732,10 @@ type TableConstraintUnique struct {
 func (node *TableConstraintUnique) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
 
-	return fmt.Sprintf("%sunique%s", constraintName, node.Columns.String())
+	return nodeStringsConcat(constraintName, "unique", node.Columns.String())
 }
 
 func (node *TableConstraintUnique) walkSubtree(visit Visit) error {
@@ -1711,10 +1756,10 @@ type TableConstraintCheck struct {
 func (node *TableConstraintCheck) String() string {
 	var constraintName string
 	if !node.Name.IsEmpty() {
-		constraintName = fmt.Sprintf("constraint %s ", node.Name.String())
+		constraintName = nodeStringsConcat("constraint", node.Name.String())
 	}
 
-	return fmt.Sprintf("%scheck(%s)", constraintName, node.Expr.String())
+	return nodeStringsConcat(constraintName, "check(", node.Expr.String(), ")")
 }
 
 func (node *TableConstraintCheck) walkSubtree(visit Visit) error {
@@ -1747,22 +1792,22 @@ func (node *Insert) GetTable() *Table {
 func (node *Insert) String() string {
 	var returning string
 	if node.ReturningClause != nil {
-		returning = fmt.Sprintf(" returning %s", node.ReturningClause.String())
+		returning = nodeStringsConcat("returning", node.ReturningClause.String())
 	}
 
 	if node.Select != nil {
-		return fmt.Sprintf("insert into %s %s%s%s", node.Table.Name.String(), node.Select.String(), node.Upsert.String(), returning)
+		return nodeStringsConcat("insert into", node.Table.Name.String(), node.Select.String(), node.Upsert.String(), returning)
 	}
 
 	if node.DefaultValues {
-		return fmt.Sprintf("insert into %s default values%s", node.Table.Name.String(), returning)
+		return nodeStringsConcat("insert into", node.Table.Name.String(), "default values", returning)
 	}
 
 	var rows []string
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return fmt.Sprintf("insert into %s%s values %s%s%s", node.Table.String(), node.Columns.String(), strings.Join(rows, ", "), node.Upsert.String(), returning)
+	return nodeStringsConcat("insert into", node.Table.String(), node.Columns.String(), "values", strings.Join(rows, ","), node.Upsert.String(), returning)
 }
 
 // Resolve returns a string representation with custom function nodes resolved to the values
@@ -1799,7 +1844,7 @@ func (node Upsert) String() string {
 
 	var clauses []string
 	for _, clause := range node {
-		clauses = append(clauses, fmt.Sprintf("on conflict%s", clause.String()))
+		clauses = append(clauses, nodeStringsConcat("on conflict", clause.String()))
 	}
 
 	return fmt.Sprintf(" %s", strings.Join(clauses, " "))
@@ -1823,14 +1868,14 @@ type OnConflictClause struct {
 func (node *OnConflictClause) String() string {
 	var target string
 	if node.Target != nil {
-		target = fmt.Sprintf("%s%s", node.Target.Columns.String(), node.Target.Where.String())
+		target = nodeStringsConcat(node.Target.Columns.String(), node.Target.Where.String())
 	}
 
 	if node.DoUpdate == nil {
-		return fmt.Sprintf("%s do nothing", target)
+		return nodeStringsConcat(target, "do nothing")
 	}
 
-	return fmt.Sprintf("%s do update set %s%s", target, node.DoUpdate.Exprs.String(), node.DoUpdate.Where.String())
+	return nodeStringsConcat(target, "do update set", node.DoUpdate.Exprs.String(), node.DoUpdate.Where.String())
 }
 
 func (node *OnConflictClause) walkSubtree(visit Visit) error {
@@ -1858,7 +1903,7 @@ type Delete struct {
 
 // String returns the string representation of the node.
 func (node *Delete) String() string {
-	return fmt.Sprintf("delete from %s%s", node.Table.String(), node.Where.String())
+	return nodeStringsConcat("delete from", node.Table.String(), node.Where.String())
 }
 
 // GetTable returns the table.
@@ -1909,10 +1954,10 @@ type Update struct {
 func (node *Update) String() string {
 	var returning string
 	if node.ReturningClause != nil {
-		returning = fmt.Sprintf(" returning %s", node.ReturningClause.String())
+		returning = nodeStringsConcat("returning", node.ReturningClause.String())
 	}
 
-	return fmt.Sprintf("update %s set %s%s%s", node.Table.String(), node.Exprs.String(), node.Where.String(), returning)
+	return nodeStringsConcat("update", node.Table.String(), "set", node.Exprs.String(), node.Where.String(), returning)
 }
 
 // GetTable returns the table.
@@ -1954,10 +1999,10 @@ type UpdateExprs []*UpdateExpr
 func (node UpdateExprs) String() string {
 	var exprs []string
 	for _, expr := range node {
-		exprs = append(exprs, fmt.Sprintf("%s = %s", expr.Column.String(), expr.Expr.String()))
+		exprs = append(exprs, nodeStringsConcat(expr.Column.String(), "=", expr.Expr.String()))
 	}
 
-	return strings.Join(exprs, ", ")
+	return strings.Join(exprs, ",")
 }
 
 func (node UpdateExprs) walkSubtree(visit Visit) error {
@@ -1984,7 +2029,7 @@ type Grant struct {
 
 // String returns the string representation of the node.
 func (node *Grant) String() string {
-	return fmt.Sprintf("grant %s on %s to %s", node.Privileges.String(), node.Table.String(), "'"+strings.Join(node.Roles, "', '")+"'")
+	return nodeStringsConcat("grant", node.Privileges.String(), "on", node.Table.String(), "to", "'"+strings.Join(node.Roles, "', '")+"'")
 }
 
 // GetRoles returns the roles.
@@ -2021,7 +2066,7 @@ func (node Privileges) String() string {
 
 	// we cannot guarantee map order, so we sort it so the string is deterministic
 	sort.Strings(privileges)
-	return strings.Join(privileges, ", ")
+	return strings.Join(privileges, ",")
 }
 
 func (node Privileges) Len() int {
@@ -2041,7 +2086,7 @@ type Revoke struct {
 
 // String returns the string representation of the node.
 func (node *Revoke) String() string {
-	return fmt.Sprintf("revoke %s on %s from %s", node.Privileges.String(), node.Table.String(), "'"+strings.Join(node.Roles, "', '")+"'")
+	return nodeStringsConcat("revoke", node.Privileges.String(), "on", node.Table.String(), "from", "'"+strings.Join(node.Roles, "', '")+"'")
 }
 
 // GetRoles returns the roles.
