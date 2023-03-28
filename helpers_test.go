@@ -111,3 +111,19 @@ func TestValidateTargetTable(t *testing.T) {
 		require.Equal(t, "t_2_1__1", validTable.Name())
 	})
 }
+
+func TestWalk(t *testing.T) {
+	t.Parallel()
+	t.Run("upsert", func(t *testing.T) {
+		t.Parallel()
+
+		sql := "insert into test_31337_2 values (1,'a') on conflict do update set val='new';"
+		ast, err := Parse(sql)
+		require.NoError(t, err)
+
+		err = Walk(func(node Node) (stop bool, err error) {
+			return false, nil
+		}, ast)
+		require.NoError(t, err)
+	})
+}
