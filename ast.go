@@ -1882,7 +1882,17 @@ func (node *OnConflictClause) walkSubtree(visit Visit) error {
 	if node == nil {
 		return nil
 	}
-	return Walk(visit, node.Target.Columns, node.Target.Where, node.DoUpdate.Exprs, node.DoUpdate.Where)
+
+	nodes := []Node{}
+	if node.Target != nil {
+		nodes = append(nodes, node.Target.Columns, node.Target.Where)
+	}
+
+	if node.DoUpdate != nil {
+		nodes = append(nodes, node.DoUpdate.Exprs, node.DoUpdate.Where)
+	}
+
+	return Walk(visit, nodes...)
 }
 
 type OnConflictTarget struct {
