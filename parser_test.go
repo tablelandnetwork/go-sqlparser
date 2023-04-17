@@ -1538,7 +1538,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "multiple-columns",
 			stmt:     "SELECT a, t.b bcol, c1 as column, c2 as 'column2', * FROM t WHERE 1",
-			deparsed: "select a,t.b as bcol,c1 as column,c2 as column2,* from t where 1",
+			deparsed: "select a,t.b as bcol,c1 as column,c2 as 'column2',* from t where 1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1546,7 +1546,7 @@ func TestSelectStatement(t *testing.T) {
 							&AliasedSelectColumn{Expr: &Column{Name: "a"}},
 							&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t"}}, As: "bcol"},
 							&AliasedSelectColumn{Expr: &Column{Name: "c1"}, As: "column"},
-							&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "column2"},
+							&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "'column2'"},
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
@@ -1556,6 +1556,23 @@ func TestSelectStatement(t *testing.T) {
 						Where: &Where{
 							Type: WhereStr,
 							Expr: &Value{Type: IntValue, Value: []byte("1")},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "quoted-identifiers-like-drizzle",
+			stmt:     `SELECT "t"."a" as "t.a" FROM "t"`,
+			deparsed: `select "t"."a" as "t.a" from "t"`,
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&AliasedSelectColumn{Expr: &Column{Name: `"a"`, TableRef: &Table{Name: `"t"`}}, As: `"t.a"`},
+						},
+						From: &AliasedTableExpr{
+							Expr: &Table{Name: `"t"`, IsTarget: true},
 						},
 					},
 				},
