@@ -1538,7 +1538,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "multiple-columns",
 			stmt:     "SELECT a, t.b bcol, c1 as column, c2 as 'column2', * FROM t WHERE 1",
-			deparsed: "select a,t.b as bcol,c1 as column,c2 as column2,* from t where 1",
+			deparsed: "select a,t.b as bcol,c1 as column,c2 as 'column2',* from t where 1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1546,7 +1546,7 @@ func TestSelectStatement(t *testing.T) {
 							&AliasedSelectColumn{Expr: &Column{Name: "a"}},
 							&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t"}}, As: "bcol"},
 							&AliasedSelectColumn{Expr: &Column{Name: "c1"}, As: "column"},
-							&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "column2"},
+							&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "'column2'"},
 							&StarSelectColumn{},
 						},
 						From: &AliasedTableExpr{
@@ -1556,6 +1556,23 @@ func TestSelectStatement(t *testing.T) {
 						Where: &Where{
 							Type: WhereStr,
 							Expr: &Value{Type: IntValue, Value: []byte("1")},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "quoted-identifiers-like-drizzle",
+			stmt:     `SELECT "t"."a" as "t.a" FROM "t"`,
+			deparsed: `select "t"."a" as "t.a" from "t"`,
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&AliasedSelectColumn{Expr: &Column{Name: `"a"`, TableRef: &Table{Name: `"t"`}}, As: `"t.a"`},
+						},
+						From: &AliasedTableExpr{
+							Expr: &Table{Name: `"t"`, IsTarget: true},
 						},
 					},
 				},
@@ -1899,7 +1916,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "simple-select-alias-table-alt-string",
 			stmt:     "SELECT * FROM t 't'",
-			deparsed: "select * from t as t",
+			deparsed: "select * from t as 't'",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -1908,7 +1925,7 @@ func TestSelectStatement(t *testing.T) {
 						},
 						From: &AliasedTableExpr{
 							Expr: &Table{Name: "t", IsTarget: true},
-							As:   "t",
+							As:   "'t'",
 						},
 					},
 				},
@@ -2873,7 +2890,7 @@ func TestSelectStatement(t *testing.T) {
 		{
 			name:     "identifier delimiters",
 			stmt:     "SELECT t. a, `t2`.`b`, \"t3\".\"c\", [t4].[a]  FROM t JOIN `t2` JOIN \"t3\" JOIN [t4]",
-			deparsed: "select t.a,t2.b,t3.c,t4.a from t join t2 join t3 join t4",
+			deparsed: "select t.a,`t2`.`b`,\"t3\".\"c\",[t4].[a] from t join `t2` join \"t3\" join [t4]",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -2888,25 +2905,25 @@ func TestSelectStatement(t *testing.T) {
 							},
 							&AliasedSelectColumn{
 								Expr: &Column{
-									Name: Identifier("b"),
+									Name: Identifier("`b`"),
 									TableRef: &Table{
-										Name: Identifier("t2"),
+										Name: Identifier("`t2`"),
 									},
 								},
 							},
 							&AliasedSelectColumn{
 								Expr: &Column{
-									Name: Identifier("c"),
+									Name: Identifier("\"c\""),
 									TableRef: &Table{
-										Name: Identifier("t3"),
+										Name: Identifier("\"t3\""),
 									},
 								},
 							},
 							&AliasedSelectColumn{
 								Expr: &Column{
-									Name: Identifier("a"),
+									Name: Identifier("[a]"),
 									TableRef: &Table{
-										Name: Identifier("t4"),
+										Name: Identifier("[t4]"),
 									},
 								},
 							},
@@ -2921,15 +2938,15 @@ func TestSelectStatement(t *testing.T) {
 										Expr: &Table{Name: Identifier("t"), IsTarget: true},
 									},
 									RightExpr: &AliasedTableExpr{
-										Expr: &Table{Name: Identifier("t2"), IsTarget: true},
+										Expr: &Table{Name: Identifier("`t2`"), IsTarget: true},
 									},
 								},
 								RightExpr: &AliasedTableExpr{
-									Expr: &Table{Name: Identifier("t3"), IsTarget: true},
+									Expr: &Table{Name: Identifier("\"t3\""), IsTarget: true},
 								},
 							},
 							RightExpr: &AliasedTableExpr{
-								Expr: &Table{Name: Identifier("t4"), IsTarget: true},
+								Expr: &Table{Name: Identifier("[t4]"), IsTarget: true},
 							},
 						},
 					},
@@ -3209,12 +3226,12 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table backtick",
 			stmt:         "CREATE TABLE `t` (a INT);",
-			deparsed:     "create table t(a int)",
+			deparsed:     "create table `t`(a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t", IsTarget: true},
+						Table:       &Table{Name: "`t`", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3226,12 +3243,12 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table double quotes",
 			stmt:         "CREATE TABLE \"t\" (a INT);",
-			deparsed:     "create table t(a int)",
+			deparsed:     "create table \"t\"(a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t", IsTarget: true},
+						Table:       &Table{Name: "\"t\"", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},
@@ -3243,12 +3260,12 @@ func TestCreateTable(t *testing.T) {
 		{
 			name:         "create table square brackets",
 			stmt:         "CREATE TABLE [t] (a INT);",
-			deparsed:     "create table t(a int)",
+			deparsed:     "create table [t](a int)",
 			expectedHash: "0605f6c6705c7c1257edb2d61d94a03ad15f1d253a5a75525c6da8cda34a99ee",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&CreateTable{
-						Table:       &Table{Name: "t", IsTarget: true},
+						Table:       &Table{Name: "[t]", IsTarget: true},
 						Constraints: []TableConstraint{},
 						ColumnsDef: []*ColumnDef{
 							{Column: &Column{Name: "a"}, Type: TypeIntStr, Constraints: []ColumnConstraint{}},

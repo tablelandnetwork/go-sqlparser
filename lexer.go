@@ -299,6 +299,7 @@ func (l *Lexer) Lex(lval *yySymType) (token int) {
 			l.literal = literal
 			return ERROR
 		}
+		literal = append([]byte{ch}, append(literal, l.ch)...)
 		l.readByte() // consume closing char
 
 		l.literal = literal

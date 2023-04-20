@@ -354,7 +354,7 @@ col_alias:
   }
 | STRING
   {
-    $$ = Identifier(string($1[1:len($1)-1]))
+    $$ = Identifier(string($1[0:len($1)]))
   }
 ;
 
@@ -409,7 +409,7 @@ table_alias:
   }
 | STRING
   {
-    $$ = Identifier(string($1[1:len($1)-1]))
+    $$ = Identifier(string($1[0:len($1)]))
   }
 ;
 

@@ -55,10 +55,10 @@ func (ast *AST) PrettyPrint() {
 }
 
 // Combines an ordered set of two node strings with correct delimiting
-func nodeStringConcat (left string, right string) string {
+func nodeStringConcat(left string, right string) string {
 	// If a node string starts or ends with any of these bytes the string will never
 	// need to be space delimited when being concatinated with other node strings
-	var noDelim = map[byte]struct{}{
+	noDelim := map[byte]struct{}{
 		'=': {},
 		'<': {},
 		'>': {},
@@ -79,7 +79,7 @@ func nodeStringConcat (left string, right string) string {
 		return left
 	}
 
-	if _, ok := noDelim[left[len(left) - 1]]; ok {
+	if _, ok := noDelim[left[len(left)-1]]; ok {
 		return fmt.Sprintf("%s%s", left, right)
 	}
 	if _, ok := noDelim[right[0]]; ok {
@@ -89,7 +89,7 @@ func nodeStringConcat (left string, right string) string {
 	return fmt.Sprintf("%s %s", left, right)
 }
 
-func nodeStringsConcat (strs ...string) string {
+func nodeStringsConcat(strs ...string) string {
 	var subtreeString string
 	for _, str := range strs {
 		subtreeString = nodeStringConcat(subtreeString, str)
@@ -1673,7 +1673,7 @@ func (node *ColumnConstraintGenerated) String() string {
 		b.WriteString(nodeStringsConcat(constraintName, "as(", node.Expr.String(), ")"))
 	}
 
-	var bStr = b.String()
+	bStr := b.String()
 	if node.IsStored {
 		return nodeStringsConcat(bStr, "stored")
 	}
