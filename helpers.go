@@ -93,11 +93,25 @@ func ValidateTargetTable(table *Table) (*ValidatedTable, error) {
 		return nil, fmt.Errorf("table is not target")
 	}
 
-	if !tableNameRegEx.MatchString(table.String()) {
-		return nil, &ErrTableNameWrongFormat{Name: table.String()}
+	closingChar := map[byte]byte{
+		'"': '"',
+		'`': '`',
+		'[': ']',
 	}
 
-	parts := strings.Split(table.String(), "_")
+	tableName := table.String()
+	for start, end := range closingChar {
+		if tableName[0] == start && tableName[len(tableName)-1] == end {
+			tableName = tableName[1 : len(tableName)-1]
+			break
+		}
+	}
+
+	if !tableNameRegEx.MatchString(tableName) {
+		return nil, &ErrTableNameWrongFormat{Name: tableName}
+	}
+
+	parts := strings.Split(tableName, "_")
 	if len(parts) < 3 {
 		return nil, fmt.Errorf("not enough parts in the name")
 	}
@@ -124,11 +138,25 @@ func ValidateCreateTargetTable(table *Table) (*ValidatedCreateTable, error) {
 		return nil, fmt.Errorf("table is not target")
 	}
 
-	if !createTableNameRegEx.MatchString(table.String()) {
-		return nil, &ErrTableNameWrongFormat{Name: table.String()}
+	closingChar := map[byte]byte{
+		'"': '"',
+		'`': '`',
+		'[': ']',
 	}
 
-	parts := strings.Split(table.String(), "_")
+	tableName := table.String()
+	for start, end := range closingChar {
+		if tableName[0] == start && tableName[len(tableName)-1] == end {
+			tableName = tableName[1 : len(tableName)-1]
+			break
+		}
+	}
+
+	if !createTableNameRegEx.MatchString(tableName) {
+		return nil, &ErrTableNameWrongFormat{Name: tableName}
+	}
+
+	parts := strings.Split(tableName, "_")
 	if len(parts) < 2 {
 		return nil, fmt.Errorf("not enough parts in the name")
 	}

@@ -64,6 +64,16 @@ func TestValidateTargetTable(t *testing.T) {
 		require.Equal(t, "t_1_2", validTable.Name())
 	})
 
+	t.Run("valid table name enclosing", func(t *testing.T) {
+		table := &Table{Name: Identifier("[t_1_2]"), IsTarget: true}
+		validTable, err := ValidateTargetTable(table)
+		require.NoError(t, err)
+		require.Equal(t, "t", validTable.Prefix())
+		require.Equal(t, int64(1), validTable.ChainID())
+		require.Equal(t, int64(2), validTable.TokenID())
+		require.Equal(t, "[t_1_2]", validTable.Name())
+	})
+
 	t.Run("valid table name multple char", func(t *testing.T) {
 		table := &Table{Name: Identifier("table_1_2"), IsTarget: true}
 		validTable, err := ValidateTargetTable(table)
@@ -91,6 +101,15 @@ func TestValidateTargetTable(t *testing.T) {
 		require.Equal(t, "t", validTable.Prefix())
 		require.Equal(t, int64(1), validTable.ChainID())
 		require.Equal(t, "t_1", validTable.Name())
+	})
+
+	t.Run("valid create table name enclosing", func(t *testing.T) {
+		table := &Table{Name: Identifier("[t_1]"), IsTarget: true}
+		validTable, err := ValidateCreateTargetTable(table)
+		require.NoError(t, err)
+		require.Equal(t, "t", validTable.Prefix())
+		require.Equal(t, int64(1), validTable.ChainID())
+		require.Equal(t, "[t_1]", validTable.Name())
 	})
 
 	t.Run("valid create table name without prefix", func(t *testing.T) {
