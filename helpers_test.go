@@ -23,6 +23,15 @@ func TestGetUniqueTableReferences(t *testing.T) {
 		require.NoError(t, err)
 		require.ElementsMatch(t, []string{"t", "t3", "t2", "t4"}, GetUniqueTableReferences(ast))
 	})
+
+	t.Run("alter table", func(t *testing.T) {
+		t.Parallel()
+
+		sql := "alter table t add column a int;"
+		ast, err := Parse(sql)
+		require.NoError(t, err)
+		require.ElementsMatch(t, []string{"t"}, GetUniqueTableReferences(ast))
+	})
 }
 
 func TestValidateTargetTable(t *testing.T) {

@@ -111,6 +111,7 @@ func (*Delete) iStatement()         {}
 func (*Update) iStatement()         {}
 func (*Grant) iStatement()          {}
 func (*Revoke) iStatement()         {}
+func (*AlterTable) iStatement()     {}
 
 // ReadStatementResolver resolves Tableland Custom Functions for a read statement.
 type ReadStatementResolver interface {
@@ -130,13 +131,12 @@ type WriteStatementResolver interface {
 
 // ReadStatement is any SELECT statement or UNION statement.
 type ReadStatement interface {
+	Statement
 	iReadStatement()
-	iStatement()
 
 	// Resolve returns a string representation with custom function nodes resolved to the values
 	// passed by resolver.
 	Resolve(ReadStatementResolver) (string, error)
-	Node
 }
 
 func (*Select) iReadStatement()         {}
@@ -153,28 +153,27 @@ func (*CreateTable) iCreateTableStatement() {}
 
 // WriteStatement is any INSERT, UPDATE or DELETE statement.
 type WriteStatement interface {
+	Statement
 	iWriteStatement()
-	iStatement()
 	GetTable() *Table
 
 	// Resolve returns a string representation with custom function nodes resolved to the values
 	// passed by resolver.
 	Resolve(WriteStatementResolver) (string, error)
-	Node
 }
 
-func (*Insert) iWriteStatement() {}
-func (*Update) iWriteStatement() {}
-func (*Delete) iWriteStatement() {}
+func (*Insert) iWriteStatement()     {}
+func (*Update) iWriteStatement()     {}
+func (*Delete) iWriteStatement()     {}
+func (*AlterTable) iWriteStatement() {}
 
 // GrantOrRevokeStatement is any GRANT/REVOKE statement.
 type GrantOrRevokeStatement interface {
+	Statement
 	iGrantOrRevokeStatement()
-	iStatement()
 	GetRoles() []string
 	GetPrivileges() Privileges
 	GetTable() *Table
-	Node
 }
 
 func (*Grant) iGrantOrRevokeStatement()  {}
@@ -2119,6 +2118,98 @@ func (node *Revoke) walkSubtree(visit Visit) error {
 		return nil
 	}
 	return Walk(visit, node.Privileges, node.Table)
+}
+
+type AlterTableClause interface {
+	Node
+	iAlterTableClause()
+}
+
+func (*AlterTableRename) iAlterTableClause() {}
+func (*AlterTableDrop) iAlterTableClause()   {}
+func (*AlterTableAdd) iAlterTableClause()    {}
+
+// AlterTable represents an ALTER TABLE statement.
+type AlterTable struct {
+	Table            *Table
+	AlterTableClause AlterTableClause
+}
+
+// String returns the string representation of the node.
+func (node *AlterTable) String() string {
+	return fmt.Sprintf("alter table %s %s", node.Table.String(), node.AlterTableClause.String())
+}
+
+func (node *AlterTable) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.Table, node.AlterTableClause)
+}
+
+// GetTable returns the table that ALTER refers to.
+func (node *AlterTable) GetTable() *Table {
+	return node.Table
+}
+
+func (node *AlterTable) Resolve(resolver WriteStatementResolver) (string, error) {
+	return resolveWriteStatementWalk(node, resolver)
+}
+
+// AlterTableRename represents the alter table clause that renames a column.
+type AlterTableRename struct {
+	OldColumn *Column
+	NewColumn *Column
+}
+
+// String returns the string representation of the node.
+func (node *AlterTableRename) String() string {
+	return fmt.Sprintf("rename %s to %s", node.OldColumn.String(), node.NewColumn.String())
+}
+
+func (node *AlterTableRename) walkSubtree(visit Visit) error {
+	if node == nil {
+		return nil
+	}
+
+	return Walk(visit, node.OldColumn, node.NewColumn)
+}
+
+// AlterTableDrop represents the alter table clause that drops a column.
+type AlterTableDrop struct {
+	Column *Column
+}
+
+// String returns the string representation of the node.
+func (node *AlterTableDrop) String() string {
+	return fmt.Sprintf("drop %s", node.Column.String())
+}
+
+func (node *AlterTableDrop) walkSubtree(visit Visit) error {
+	if node != nil {
+		return nil
+	}
+
+	return Walk(visit, node.Column)
+}
+
+// AlterTableAdd represents the alter table clause that adds a column.
+type AlterTableAdd struct {
+	ColumnDef *ColumnDef
+}
+
+// String returns the string representation of the node.
+func (node *AlterTableAdd) String() string {
+	return fmt.Sprintf("add %s", node.ColumnDef.String())
+}
+
+func (node *AlterTableAdd) walkSubtree(visit Visit) error {
+	if node != nil {
+		return nil
+	}
+
+	return Walk(visit, node.ColumnDef)
 }
 
 // resolvers

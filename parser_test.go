@@ -1537,15 +1537,15 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "multiple-columns",
-			stmt:     "SELECT a, t.b bcol, c1 as column, c2 as 'column2', * FROM t WHERE 1",
-			deparsed: "select a,t.b as bcol,c1 as column,c2 as 'column2',* from t where 1",
+			stmt:     "SELECT a, t.b bcol, c1 as col, c2 as 'column2', * FROM t WHERE 1",
+			deparsed: "select a,t.b as bcol,c1 as col,c2 as 'column2',* from t where 1",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
 						SelectColumnList: SelectColumnList{
 							&AliasedSelectColumn{Expr: &Column{Name: "a"}},
 							&AliasedSelectColumn{Expr: &Column{Name: "b", TableRef: &Table{Name: "t"}}, As: "bcol"},
-							&AliasedSelectColumn{Expr: &Column{Name: "c1"}, As: "column"},
+							&AliasedSelectColumn{Expr: &Column{Name: "c1"}, As: "col"},
 							&AliasedSelectColumn{Expr: &Column{Name: "c2"}, As: "'column2'"},
 							&StarSelectColumn{},
 						},
@@ -5266,8 +5266,8 @@ func TestInsertWithSelect(t *testing.T) {
 		},
 		{
 			name:     "insert with select with order by",
-			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2 order by column desc",
-			deparsed: "insert into t_1_1 select * from t_1_2 order by column desc,rowid asc",
+			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2 order by c desc",
+			deparsed: "insert into t_1_1 select * from t_1_2 order by c desc,rowid asc",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -5282,7 +5282,7 @@ func TestInsertWithSelect(t *testing.T) {
 								Expr: &Table{Name: "t_1_2", IsTarget: true},
 							},
 							OrderBy: OrderBy{
-								&OrderingTerm{Expr: &Column{Name: "column"}, Direction: DescStr, Nulls: NullsNil},
+								&OrderingTerm{Expr: &Column{Name: "c"}, Direction: DescStr, Nulls: NullsNil},
 								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
 							},
 						},
@@ -5292,8 +5292,8 @@ func TestInsertWithSelect(t *testing.T) {
 		},
 		{
 			name:     "insert with select upsert do nothing",
-			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2 order by column desc ON CONFLICT DO NOTHING;",
-			deparsed: "insert into t_1_1 select * from t_1_2 order by column desc,rowid asc on conflict do nothing",
+			stmt:     "INSERT INTO t_1_1 SELECT * FROM t_1_2 order by c desc ON CONFLICT DO NOTHING;",
+			deparsed: "insert into t_1_1 select * from t_1_2 order by c desc,rowid asc on conflict do nothing",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -5308,7 +5308,7 @@ func TestInsertWithSelect(t *testing.T) {
 								Expr: &Table{Name: "t_1_2", IsTarget: true},
 							},
 							OrderBy: OrderBy{
-								&OrderingTerm{Expr: &Column{Name: "column"}, Direction: DescStr, Nulls: NullsNil},
+								&OrderingTerm{Expr: &Column{Name: "c"}, Direction: DescStr, Nulls: NullsNil},
 								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
 							},
 						},
@@ -5656,6 +5656,170 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 		_, err = ast.Statements[0].(WriteStatement).Resolve(nil)
 		require.Error(t, err)
 		require.ErrorContains(t, err, "write resolver is needed")
+	})
+}
+
+func TestAlterTable(t *testing.T) {
+	type testCase struct {
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+	}
+
+	tests := []testCase{
+		{
+			name:     "rename",
+			stmt:     "ALTER TABLE t RENAME COLUMN a TO b",
+			deparsed: "alter table t rename a to b",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&AlterTable{
+						Table: &Table{Name: Identifier("t"), IsTarget: true},
+						AlterTableClause: &AlterTableRename{
+							OldColumn: &Column{Name: Identifier("a")},
+							NewColumn: &Column{Name: Identifier("b")},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "rename without column keyword",
+			stmt:     "ALTER TABLE t RENAME a TO b",
+			deparsed: "alter table t rename a to b",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&AlterTable{
+						Table: &Table{Name: Identifier("t"), IsTarget: true},
+						AlterTableClause: &AlterTableRename{
+							OldColumn: &Column{Name: Identifier("a")},
+							NewColumn: &Column{Name: Identifier("b")},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "add",
+			stmt:     "ALTER TABLE t ADD COLUMN b int",
+			deparsed: "alter table t add b int",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&AlterTable{
+						Table: &Table{Name: Identifier("t"), IsTarget: true},
+						AlterTableClause: &AlterTableAdd{
+							ColumnDef: &ColumnDef{
+								Column:      &Column{Name: Identifier("b")},
+								Type:        TypeIntStr,
+								Constraints: []ColumnConstraint{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "add without keyword column",
+			stmt:     "ALTER TABLE t ADD b int",
+			deparsed: "alter table t add b int",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&AlterTable{
+						Table: &Table{Name: Identifier("t"), IsTarget: true},
+						AlterTableClause: &AlterTableAdd{
+							ColumnDef: &ColumnDef{
+								Column:      &Column{Name: Identifier("b")},
+								Type:        TypeIntStr,
+								Constraints: []ColumnConstraint{},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "drop",
+			stmt:     "ALTER TABLE t DROP COLUMN a",
+			deparsed: "alter table t drop a",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&AlterTable{
+						Table: &Table{Name: Identifier("t"), IsTarget: true},
+						AlterTableClause: &AlterTableDrop{
+							Column: &Column{Name: Identifier("a")},
+						},
+					},
+				},
+			},
+		},
+		{
+			name:     "drop without keyword column",
+			stmt:     "ALTER TABLE t DROP a",
+			deparsed: "alter table t drop a",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&AlterTable{
+						Table: &Table{Name: Identifier("t"), IsTarget: true},
+						AlterTableClause: &AlterTableDrop{
+							Column: &Column{Name: Identifier("a")},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+
+				ast, err := Parse(tc.stmt)
+				require.NoError(t, err)
+				require.Equal(t, tc.expectedAST, ast)
+				require.Equal(t, tc.deparsed, ast.String())
+
+				// test all ALTER TABLE statements against SQLite3
+				db, err := sql.Open("sqlite3", "file::"+uuid.NewString()+":?mode=memory&cache=shared&_foreign_keys=on")
+				require.NoError(t, err)
+
+				// create dumm table
+				_, err = db.Exec(`CREATE TABLE t (a int, foo int);`)
+				require.NoError(t, err)
+
+				_, err = db.Exec(tc.stmt)
+				require.NoError(t, err)
+				require.NoError(t, db.Close())
+			}
+		}(it))
+	}
+
+	t.Run("primary key constraint check", func(t *testing.T) {
+		t.Parallel()
+
+		var expErr *ErrAlterTablePrimaryKeyNotAllowed
+		_, err := Parse("alter table t ADD COLUMN a int PRIMARY KEY")
+		require.Error(t, err)
+		require.ErrorAs(t, err, &expErr)
+	})
+
+	t.Run("unique constraint check", func(t *testing.T) {
+		t.Parallel()
+
+		var expErr *ErrAlterTableUniqueNotAllowed
+		_, err := Parse("alter table t ADD COLUMN a int UNIQUE")
+		require.Error(t, err)
+		require.ErrorAs(t, err, &expErr)
+	})
+
+	t.Run("not null constraint check", func(t *testing.T) {
+		t.Parallel()
+
+		var expErr *ErrNotNullConstraintDefaultNotNull
+		_, err := Parse("alter table t ADD COLUMN a INT NOT NULL DEFAULT null")
+		require.Error(t, err)
+		require.ErrorAs(t, err, &expErr)
 	})
 }
 

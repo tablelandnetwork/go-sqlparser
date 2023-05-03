@@ -91,6 +91,11 @@ var keywords = map[string]int{
 	"UNION":      UNION,
 	"EXCEPT":     EXCEPT,
 	"INTERSECT":  INTERSECT,
+	"ALTER":      ALTER,
+	"RENAME":     RENAME,
+	"COLUMN":     COLUMN,
+	"ADD":        ADD,
+	"DROP":       DROP,
 }
 
 const EOF = 0

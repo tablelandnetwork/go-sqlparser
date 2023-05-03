@@ -155,3 +155,24 @@ type ErrTableNameWrongFormat struct {
 func (e *ErrTableNameWrongFormat) Error() string {
 	return fmt.Sprintf("table name has wrong format: %s", e.Name)
 }
+
+// ErrAlterTablePrimaryKeyNotAllowed indicates that primary key is not allowed in ALTER TABLE.
+type ErrAlterTablePrimaryKeyNotAllowed struct{}
+
+func (e *ErrAlterTablePrimaryKeyNotAllowed) Error() string {
+	return "cannot add a PRIMARY KEY column in ALTER TABLE"
+}
+
+// ErrAlterTableUniqueNotAllowed indicates that unique is not allowed in ALTER TABLE.
+type ErrAlterTableUniqueNotAllowed struct{}
+
+func (e *ErrAlterTableUniqueNotAllowed) Error() string {
+	return "cannot add a UNIQUE column in ALTER TABLE"
+}
+
+// ErrNotNullConstraintDefaultNotNull indicates that you cannot add a not null constraint together with a not null default.
+type ErrNotNullConstraintDefaultNotNull struct{}
+
+func (e *ErrNotNullConstraintDefaultNotNull) Error() string {
+	return "cannot add a NOT NULL column with default value NULL"
+}
