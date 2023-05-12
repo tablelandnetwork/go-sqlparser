@@ -2417,7 +2417,7 @@ yydefault:
 			}
 
 			if sel, ok := yyDollar[5].readStmt.(*Select); ok {
-				if sel.Having != nil || sel.GroupBy != nil {
+				if sel.Having != nil {
 					yylex.(*Lexer).AddError(&ErrHavingOrGroupByIsNotAllowed{})
 				}
 
@@ -2427,10 +2427,10 @@ yydefault:
 					sel.OrderBy = append(sel.OrderBy, &OrderingTerm{Expr: &Column{Name: Identifier("rowid")}, Direction: AscStr, Nulls: NullsNil})
 				}
 
-				yyVAL.insertStmt = &Insert{Table: yyDollar[3].table, Columns: ColumnList{}, Rows: []Exprs{}, Select: sel, Upsert: yyDollar[6].upsertClause}
+				yyVAL.insertStmt = &Insert{Table: yyDollar[3].table, Columns: yyDollar[4].columnList, Rows: []Exprs{}, Select: sel, Upsert: yyDollar[6].upsertClause}
 			} else {
 				yylex.(*Lexer).AddError(&ErrCompoudSelectNotAllowed{})
-				yyVAL.insertStmt = &Insert{Table: yyDollar[3].table, Columns: ColumnList{}, Rows: []Exprs{}, Upsert: yyDollar[6].upsertClause}
+				yyVAL.insertStmt = &Insert{Table: yyDollar[3].table, Columns: yyDollar[4].columnList, Rows: []Exprs{}, Upsert: yyDollar[6].upsertClause}
 			}
 		}
 	case 227:

@@ -5320,6 +5320,60 @@ func TestInsertWithSelect(t *testing.T) {
 			},
 		},
 		{
+			name: "insert with select group by",
+			stmt: `INSERT INTO voting_power (address, ft)
+			SELECT owner, SUM(COALESCE(end_time, BLOCK_NUM()) - start_time)
+			FROM pilot_sessions GROUP BY owner`,
+			deparsed: "insert into voting_power select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Table: &Table{Name: "voting_power", IsTarget: true},
+						Columns: ColumnList{
+							&Column{Name: "address"},
+							&Column{Name: "ft"},
+						},
+						Rows: []Exprs{},
+						Select: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{Expr: &Column{Name: "owner"}},
+								&AliasedSelectColumn{
+									Expr: &FuncExpr{
+										Name: "sum",
+										Args: Exprs{
+											&BinaryExpr{
+												Left: &FuncExpr{
+													Name: "coalesce",
+													Args: Exprs{
+														&Column{Name: "end_time"},
+														&CustomFuncExpr{
+															Name: "block_num",
+															Args: Exprs{},
+														},
+													},
+												},
+												Operator: MinusStr,
+												Right:    &Column{Name: "start_time"},
+											},
+										},
+									},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "pilot_sessions", IsTarget: true},
+							},
+							GroupBy: GroupBy{
+								&Column{Name: "owner"},
+							},
+							OrderBy: OrderBy{
+								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "insert with compound select",
 			stmt: "INSERT INTO t_1_1 SELECT * FROM t_1_2 UNION SELECT * FROM t_1_3",
 			expectedErr: func() **ErrCompoudSelectNotAllowed {
@@ -5340,14 +5394,6 @@ func TestInsertWithSelect(t *testing.T) {
 			stmt: "INSERT INTO t_1_1 SELECT * FROM (select * from t_1_2)",
 			expectedErr: func() **ErrStatementContainsSubquery {
 				err := &ErrStatementContainsSubquery{StatementKind: "insert+select"}
-				return &err
-			}(),
-		},
-		{
-			name: "insert with select group by",
-			stmt: "INSERT INTO t_1_1 SELECT a FROM t_1_2 GROUP BY 1",
-			expectedErr: func() **ErrHavingOrGroupByIsNotAllowed {
-				err := &ErrHavingOrGroupByIsNotAllowed{}
 				return &err
 			}(),
 		},

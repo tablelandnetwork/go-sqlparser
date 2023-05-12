@@ -1402,7 +1402,7 @@ insert_stmt:
     }
 
     if sel, ok := $5.(*Select); ok {
-      if sel.Having != nil || sel.GroupBy != nil {
+      if sel.Having != nil {
         yylex.(*Lexer).AddError(&ErrHavingOrGroupByIsNotAllowed{})
       }
 
@@ -1412,10 +1412,10 @@ insert_stmt:
         sel.OrderBy = append(sel.OrderBy, &OrderingTerm{Expr: &Column{Name: Identifier("rowid")}, Direction: AscStr, Nulls: NullsNil})
       }
 
-      $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{}, Select: sel, Upsert: $6}
+      $$ = &Insert{Table: $3, Columns: $4, Rows: []Exprs{}, Select: sel, Upsert: $6}
     } else {
       yylex.(*Lexer).AddError(&ErrCompoudSelectNotAllowed{})
-      $$ = &Insert{Table: $3, Columns: ColumnList{}, Rows: []Exprs{},  Upsert: $6}
+      $$ = &Insert{Table: $3, Columns: $4, Rows: []Exprs{},  Upsert: $6}
     }
   }
 ;
