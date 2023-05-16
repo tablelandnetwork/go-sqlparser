@@ -2417,10 +2417,6 @@ yydefault:
 			}
 
 			if sel, ok := yyDollar[5].readStmt.(*Select); ok {
-				if sel.Having != nil {
-					yylex.(*Lexer).AddError(&ErrHavingOrGroupByIsNotAllowed{})
-				}
-
 				if sel.OrderBy == nil {
 					sel.OrderBy = OrderBy{&OrderingTerm{Expr: &Column{Name: Identifier("rowid")}, Direction: AscStr, Nulls: NullsNil}}
 				} else {

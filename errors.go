@@ -140,13 +140,6 @@ func (e *ErrContainsJoinTableExpr) Error() string {
 	return "JOIN is not allowed"
 }
 
-// ErrHavingOrGroupByIsNotAllowed indicates that a node contains a JOIN.
-type ErrHavingOrGroupByIsNotAllowed struct{}
-
-func (e *ErrHavingOrGroupByIsNotAllowed) Error() string {
-	return "HAVING or GROUP BY clauses are not allowed"
-}
-
 // ErrNaturalJoinWithOnOrUsingClause indicates that a ON or USING clause is used together with a NATURAL JOIN.
 type ErrNaturalJoinWithOnOrUsingClause struct{}
 
