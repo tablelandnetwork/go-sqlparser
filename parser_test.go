@@ -5374,6 +5374,41 @@ func TestInsertWithSelect(t *testing.T) {
 			},
 		},
 		{
+			name:     "insert with select having",
+			stmt:     "INSERT INTO t_1_1 SELECT a FROM t_1_2 having a > 0",
+			deparsed: "insert into t_1_1 select a from t_1_2 having a>0 order by rowid asc",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Insert{
+						Columns: ColumnList{},
+						Table:   &Table{Name: "t_1_1", IsTarget: true},
+						Rows:    []Exprs{},
+						Select: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t_1_2", IsTarget: true},
+							},
+							Having: &Where{
+								Type: HavingStr,
+								Expr: &CmpExpr{
+									Operator: GreaterThanStr,
+									Left:     &Column{Name: "a"},
+									Right:    &Value{Type: IntValue, Value: []byte("0")},
+								},
+							},
+							OrderBy: OrderBy{
+								&OrderingTerm{Expr: &Column{Name: "rowid"}, Direction: AscStr, Nulls: NullsNil},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			name: "insert with compound select",
 			stmt: "INSERT INTO t_1_1 SELECT * FROM t_1_2 UNION SELECT * FROM t_1_3",
 			expectedErr: func() **ErrCompoudSelectNotAllowed {
@@ -5394,14 +5429,6 @@ func TestInsertWithSelect(t *testing.T) {
 			stmt: "INSERT INTO t_1_1 SELECT * FROM (select * from t_1_2)",
 			expectedErr: func() **ErrStatementContainsSubquery {
 				err := &ErrStatementContainsSubquery{StatementKind: "insert+select"}
-				return &err
-			}(),
-		},
-		{
-			name: "insert with select having",
-			stmt: "INSERT INTO t_1_1 SELECT a FROM t_1_2 having a > 0",
-			expectedErr: func() **ErrHavingOrGroupByIsNotAllowed {
-				err := &ErrHavingOrGroupByIsNotAllowed{}
 				return &err
 			}(),
 		},

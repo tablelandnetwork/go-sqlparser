@@ -358,7 +358,7 @@ state 38
 state 39
 	identifier:  IDENTIFIER.    (256)
 
-	.  reduce 256 (src line 1648)
+	.  reduce 256 (src line 1644)
 
 
 state 40
@@ -373,25 +373,25 @@ state 40
 state 41
 	privileges:  privilege.    (251)
 
-	.  reduce 251 (src line 1615)
+	.  reduce 251 (src line 1611)
 
 
 state 42
 	privilege:  INSERT.    (253)
 
-	.  reduce 253 (src line 1633)
+	.  reduce 253 (src line 1629)
 
 
 state 43
 	privilege:  UPDATE.    (254)
 
-	.  reduce 254 (src line 1638)
+	.  reduce 254 (src line 1634)
 
 
 state 44
 	privilege:  DELETE.    (255)
 
-	.  reduce 255 (src line 1642)
+	.  reduce 255 (src line 1638)
 
 
 state 45
@@ -943,7 +943,7 @@ state 84
 
 	'('  shift 157
 	DEFAULT  shift 156
-	.  reduce 227 (src line 1423)
+	.  reduce 227 (src line 1419)
 
 	column_name_list_opt  goto 155
 
@@ -2504,7 +2504,7 @@ state 157
 state 158
 	delete_stmt:  DELETE FROM table_name where_opt.    (239)
 
-	.  reduce 239 (src line 1511)
+	.  reduce 239 (src line 1507)
 
 
 state 159
@@ -2556,19 +2556,19 @@ state 161
 	common_update_list:  common_update_list.',' update_expression 
 
 	','  shift 240
-	.  reduce 241 (src line 1533)
+	.  reduce 241 (src line 1529)
 
 
 state 162
 	update_list:  paren_update_list.    (242)
 
-	.  reduce 242 (src line 1538)
+	.  reduce 242 (src line 1534)
 
 
 state 163
 	common_update_list:  update_expression.    (243)
 
-	.  reduce 243 (src line 1544)
+	.  reduce 243 (src line 1540)
 
 
 state 164
@@ -2604,7 +2604,7 @@ state 167
 state 168
 	privileges:  privileges ',' privilege.    (252)
 
-	.  reduce 252 (src line 1622)
+	.  reduce 252 (src line 1618)
 
 
 state 169
@@ -4291,7 +4291,7 @@ state 234
 	upsert_clause_opt: .    (231)
 
 	ON  shift 297
-	.  reduce 231 (src line 1444)
+	.  reduce 231 (src line 1440)
 
 	upsert_clause_opt  goto 294
 	on_conflict_clause_list  goto 295
@@ -4389,7 +4389,7 @@ state 238
 state 239
 	update_stmt:  UPDATE table_name SET update_list where_opt.    (240)
 
-	.  reduce 240 (src line 1522)
+	.  reduce 240 (src line 1518)
 
 
 state 240
@@ -5277,7 +5277,7 @@ state 292
 
 	','  shift 349
 	ON  shift 297
-	.  reduce 231 (src line 1444)
+	.  reduce 231 (src line 1440)
 
 	upsert_clause_opt  goto 348
 	on_conflict_clause_list  goto 295
@@ -5330,14 +5330,14 @@ state 295
 	on_conflict_clause_list:  on_conflict_clause_list.on_conflict_clause 
 
 	ON  shift 297
-	.  reduce 232 (src line 1448)
+	.  reduce 232 (src line 1444)
 
 	on_conflict_clause  goto 351
 
 state 296
 	on_conflict_clause_list:  on_conflict_clause.    (233)
 
-	.  reduce 233 (src line 1460)
+	.  reduce 233 (src line 1456)
 
 
 state 297
@@ -5360,13 +5360,13 @@ state 298
 state 299
 	column_name_list_opt:  '(' column_name_list ')'.    (228)
 
-	.  reduce 228 (src line 1427)
+	.  reduce 228 (src line 1423)
 
 
 state 300
 	common_update_list:  common_update_list ',' update_expression.    (244)
 
-	.  reduce 244 (src line 1552)
+	.  reduce 244 (src line 1548)
 
 
 state 301
@@ -5437,7 +5437,7 @@ state 302
 	JSON_EXTRACT_OP  shift 111
 	JSON_UNQUOTE_EXTRACT_OP  shift 112
 	COLLATE  shift 123
-	.  reduce 246 (src line 1577)
+	.  reduce 246 (src line 1573)
 
 	cmp_op  goto 113
 	cmp_inequality_op  goto 114
@@ -5449,13 +5449,13 @@ state 303
 	roles:  roles.',' STRING 
 
 	','  shift 355
-	.  reduce 247 (src line 1587)
+	.  reduce 247 (src line 1583)
 
 
 state 304
 	roles:  STRING.    (249)
 
-	.  reduce 249 (src line 1604)
+	.  reduce 249 (src line 1600)
 
 
 state 305
@@ -5463,7 +5463,7 @@ state 305
 	roles:  roles.',' STRING 
 
 	','  shift 355
-	.  reduce 248 (src line 1595)
+	.  reduce 248 (src line 1591)
 
 
 state 306
@@ -6209,7 +6209,7 @@ state 350
 state 351
 	on_conflict_clause_list:  on_conflict_clause_list on_conflict_clause.    (234)
 
-	.  reduce 234 (src line 1465)
+	.  reduce 234 (src line 1461)
 
 
 state 352
@@ -6218,7 +6218,7 @@ state 352
 	conflict_target_opt: .    (237)
 
 	'('  shift 392
-	.  reduce 237 (src line 1494)
+	.  reduce 237 (src line 1490)
 
 	conflict_target_opt  goto 391
 
@@ -6754,7 +6754,7 @@ state 389
 state 390
 	insert_rows:  '(' expr_list ')'.    (229)
 
-	.  reduce 229 (src line 1433)
+	.  reduce 229 (src line 1429)
 
 
 state 391
@@ -6814,7 +6814,7 @@ state 393
 state 394
 	roles:  roles ',' STRING.    (250)
 
-	.  reduce 250 (src line 1609)
+	.  reduce 250 (src line 1605)
 
 
 state 395
@@ -7685,13 +7685,13 @@ state 433
 state 434
 	insert_rows:  insert_rows ',' '(' expr_list ')'.    (230)
 
-	.  reduce 230 (src line 1438)
+	.  reduce 230 (src line 1434)
 
 
 state 435
 	on_conflict_clause:  ON CONFLICT conflict_target_opt DO NOTHING.    (235)
 
-	.  reduce 235 (src line 1471)
+	.  reduce 235 (src line 1467)
 
 
 state 436
@@ -7713,7 +7713,7 @@ state 437
 state 438
 	paren_update_list:  '(' column_name_list ')' '=' '(' expr_list ')'.    (245)
 
-	.  reduce 245 (src line 1558)
+	.  reduce 245 (src line 1554)
 
 
 state 439
@@ -7838,7 +7838,7 @@ state 450
 state 451
 	conflict_target_opt:  '(' column_name_list ')' where_opt.    (238)
 
-	.  reduce 238 (src line 1498)
+	.  reduce 238 (src line 1494)
 
 
 state 452
@@ -8002,7 +8002,7 @@ state 464
 state 465
 	on_conflict_clause:  ON CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt.    (236)
 
-	.  reduce 236 (src line 1478)
+	.  reduce 236 (src line 1474)
 
 
 state 466
