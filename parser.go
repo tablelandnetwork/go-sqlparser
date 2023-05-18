@@ -20,6 +20,7 @@ func yyParsePooled(yylex yyLexer) int {
 	return parser.Parse(yylex)
 }
 
+// Parse parses an statement into an AST.
 func Parse(statement string) (*AST, error) {
 	// yyErrorVerbose = true
 	// yyDebug = 4

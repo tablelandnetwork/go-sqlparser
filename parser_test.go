@@ -104,8 +104,8 @@ func TestSelectStatement(t *testing.T) {
 		},
 		{
 			name:     "string",
-			stmt:     "SELECT 'anything betwen single quotes is a string' FROM t",
-			deparsed: "select 'anything betwen single quotes is a string' from t",
+			stmt:     "SELECT 'anything between single quotes is a string' FROM t",
+			deparsed: "select 'anything between single quotes is a string' from t",
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Select{
@@ -113,7 +113,7 @@ func TestSelectStatement(t *testing.T) {
 							&AliasedSelectColumn{
 								Expr: &Value{
 									Type:  StrValue,
-									Value: []byte("anything betwen single quotes is a string"),
+									Value: []byte("anything between single quotes is a string"),
 								},
 							},
 						},
@@ -3105,7 +3105,10 @@ func TestSelectStatement(t *testing.T) {
 					require.NoError(t, err)
 
 					// create dummy tables
-					_, err = db.Exec(`CREATE TABLE t (a int, b int, c int, c1 int, c2 int, thisisacolumn int, this_is_a_column3208ADKJHKDS_ int, _also_column int);
+					_, err = db.Exec(`
+					    CREATE TABLE t (
+							a int, b int, c int, c1 int, c2 int, thisisacolumn int, this_is_a_column3208ADKJHKDS_ int, _also_column int
+						);
 						CREATE TABLE t2 (a int, b int, c int, c1 int, c2 int);
 						CREATE TABLE t3 (a int, b int, c int, c1 int, c2 int);
 						CREATE TABLE t4 (a int, b int, c int, c1 int, c2 int);
@@ -3476,8 +3479,8 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table default",
-			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);",
-			deparsed:     "create table t(a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'),f int default 1)",
+			stmt:         "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);", // nolint
+			deparsed:     "create table t(a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'),f int default 1)",         // nolint
 			expectedHash: "70a57145d62731d006bc23ede6126e3fe3f3f0a3954a87411edd2fb66ff59d7b",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3548,8 +3551,8 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table generated",
-			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));",
-			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as(a*abs(b)),e text generated always as(substr(c,b,b+1))stored,f text as(substr(c,b,b+1)))",
+			stmt:         "CREATE TABLE t (a INTEGER CONSTRAINT pk PRIMARY KEY, b INT, c TEXT, d INT CONSTRAINT gen GENERATED ALWAYS AS (a * abs(b)) VIRTUAL, e TEXT GENERATED ALWAYS AS (substr(c, b, b + 1)) STORED, f TEXT AS (substr(c, b, b + 1)));", // nolint
+			deparsed:     "create table t(a integer constraint pk primary key autoincrement,b int,c text,d int constraint gen generated always as(a*abs(b)),e text generated always as(substr(c,b,b+1))stored,f text as(substr(c,b,b+1)))",                // nolint
 			expectedHash: "09a0bb453d40af2c8cb23235d92658a73b7e4c0f3688bb8e81c32c48c2266be2",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3648,8 +3651,8 @@ func TestCreateTable(t *testing.T) {
 		},
 		{
 			name:         "create table table constraints",
-			stmt:         "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));",
-			deparsed:     "create table t(id int constraint nm not null,id2 int,constraint pk primary key(id),constraint un unique(id,id2),constraint c check(id>0))",
+			stmt:         "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2), CONSTRAINT c CHECK(id > 0));", // nolint
+			deparsed:     "create table t(id int constraint nm not null,id2 int,constraint pk primary key(id),constraint un unique(id,id2),constraint c check(id>0))",            // nolint
 			expectedHash: "43a25e6519b90d5c1303898c3d3883360fcd4559fc0cbabd4015e5de9ab4d1cf",
 			expectedAST: &AST{
 				Statements: []Statement{
@@ -3853,7 +3856,7 @@ func TestCreateTableAutoIncrementRules(t *testing.T) {
 	// - CREATE TABLE t(a INTEGER PRIMARY KEY DESC) -> as is, since isn't an alias.
 	// - CREATE TABLE t(a XXXX PRIMARY KEY) where XXXX isn't INTEGER, as is.
 	// - CREATE TABLE t(a INTEGER, PRIMARY KEY(a ASC)) -> automatically transformed to first bullet
-	// - CREATE TABLE t(a INTEGER, PRIMARY KEY(a DESC)) -> automatically transformed to second bullet, because if we don't do this it means an alias.
+	// - CREATE TABLE t(a INTEGER, PRIMARY KEY(a DESC)) -> automatically transformed to second bullet.
 
 	tests := []testCase{
 		{
@@ -4087,8 +4090,8 @@ func TestInsert(t *testing.T) {
 		},
 		{
 			name:     "upsert do update with target excluded",
-			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;",
-			deparsed: "insert into phonebook(name,phonenumber)values('Alice','704-555-1212')on conflict(name)do update set phonenumber=excluded.phonenumber",
+			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber;", // nolint
+			deparsed: "insert into phonebook(name,phonenumber)values('Alice','704-555-1212')on conflict(name)do update set phonenumber=excluded.phonenumber",     // nolint
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4130,8 +4133,8 @@ func TestInsert(t *testing.T) {
 		},
 		{
 			name:     "upsert do update with target excluded with where",
-			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';",
-			deparsed: "insert into phonebook(name,phonenumber)values('Alice','704-555-1212')on conflict(name)do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",
+			stmt:     "INSERT INTO phonebook(name,phonenumber) VALUES('Alice','704-555-1212') ON CONFLICT(name) DO UPDATE SET phonenumber=excluded.phonenumber WHERE excluded.phonenumber != '';", // nolint
+			deparsed: "insert into phonebook(name,phonenumber)values('Alice','704-555-1212')on conflict(name)do update set phonenumber=excluded.phonenumber where excluded.phonenumber!=''",       // nolint
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -4782,7 +4785,7 @@ func TestDisallowSubqueriesOnStatements(t *testing.T) {
 	})
 
 	t.Run("upsert", func(t *testing.T) {
-		ast, err := Parse("INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1 WHERE (SELECT 1 FROM t2);")
+		ast, err := Parse("INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1 WHERE (SELECT 1 FROM t2);") // nolint
 		require.Error(t, err)
 		require.Len(t, ast.Errors, 1)
 
@@ -4835,8 +4838,8 @@ func TestParallel(t *testing.T) {
 			deparsed: "select false from t",
 		},
 		{
-			stmt:     "SELECT 'anything betwen single quotes is a string' FROM t",
-			deparsed: "select 'anything betwen single quotes is a string' from t",
+			stmt:     "SELECT 'anything between single quotes is a string' FROM t",
+			deparsed: "select 'anything between single quotes is a string' from t",
 		},
 		{
 			stmt:     "SELECT 'bruno''s car' FROM t",
@@ -5075,8 +5078,8 @@ func TestParallel(t *testing.T) {
 			deparsed: "create table t(a int check(a>2),id2 int constraint check_constraint check(a>2))",
 		},
 		{
-			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));",
-			deparsed: "create table t(a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'))",
+			stmt:     "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'));", // nolint
+			deparsed: "create table t(a int constraint default_constraint default 0,b int default 1,c int default 0x1,d text default 'foo',e text default ('foo'))",       // nolint
 		},
 	}
 
@@ -5324,7 +5327,7 @@ func TestInsertWithSelect(t *testing.T) {
 			stmt: `INSERT INTO voting_power (address, ft)
 			SELECT owner, SUM(COALESCE(end_time, BLOCK_NUM()) - start_time)
 			FROM pilot_sessions GROUP BY owner`,
-			deparsed: "insert into voting_power select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc",
+			deparsed: "insert into voting_power select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc", // nolint
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -5453,11 +5456,11 @@ func TestInsertWithSelect(t *testing.T) {
 }
 
 type readResolver struct {
-	map_ map[int]int64
+	m map[int]int64
 }
 
 func (r *readResolver) GetBlockNumber(chainID int64) (int64, bool) {
-	v, ok := r.map_[int(chainID)]
+	v, ok := r.m[int(chainID)]
 	return v, ok
 }
 
@@ -5826,7 +5829,7 @@ func TestAlterTable(t *testing.T) {
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.
 func TestReservedKeywords(t *testing.T) {
 	// https://www.sqlite.org/lang_keywords.html
-	allSQLiteKeywords := []string{"ABORT", "ACTION", "ADD", "AFTER", "ALL", "ALTER", "ALWAYS", "ANALYZE", "AND", "AS", "ASC", "ATTACH", "AUTOINCREMENT", "BEFORE", "BEGIN", "BETWEEN", "BY", "CASCADE", "CASE", "CAST", "CHECK", "COLLATE", "COLUMN", "COMMIT", "CONFLICT", "CONSTRAINT", "CREATE", "CROSS", "CURRENT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "DATABASE", "DEFAULT", "DEFERRABLE", "DEFERRED", "DELETE", "DESC", "DETACH", "DISTINCT", "DO", "DROP", "EACH", "ELSE", "END", "ESCAPE", "EXCEPT", "EXCLUDE", "EXCLUSIVE", "EXISTS", "EXPLAIN", "FAIL", "FILTER", "FIRST", "FOLLOWING", "FOR", "FOREIGN", "FROM", "FULL", "GENERATED", "GLOB", "GROUP", "GROUPS", "HAVING", "IF", "IGNORE", "IMMEDIATE", "IN", "INDEX", "INDEXED", "INITIALLY", "INNER", "INSERT", "INSTEAD", "INTERSECT", "INTO", "IS", "ISNULL", "JOIN", "KEY", "LAST", "LEFT", "LIKE", "LIMIT", "MATCH", "MATERIALIZED", "NATURAL", "NO", "NOT", "NOTHING", "NOTNULL", "NULL", "NULLS", "OF", "OFFSET", "ON", "OR", "ORDER", "OTHERS", "OUTER", "OVER", "PARTITION", "PLAN", "PRAGMA", "PRECEDING", "PRIMARY", "QUERY", "RAISE", "RANGE", "RECURSIVE", "REFERENCES", "REGEXP", "REINDEX", "RELEASE", "RENAME", "REPLACE", "RESTRICT", "RETURNING", "RIGHT", "ROLLBACK", "ROW", "ROWS", "SAVEPOINT", "SELECT", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", "TIES", "TO", "TRANSACTION", "TRIGGER", "UNBOUNDED", "UNION", "UNIQUE", "UPDATE", "USING", "VACUUM", "VALUES", "VIEW", "VIRTUAL", "WHEN", "WHERE", "WINDOW", "WITH", "WITHOUT"}
+	allSQLiteKeywords := []string{"ABORT", "ACTION", "ADD", "AFTER", "ALL", "ALTER", "ALWAYS", "ANALYZE", "AND", "AS", "ASC", "ATTACH", "AUTOINCREMENT", "BEFORE", "BEGIN", "BETWEEN", "BY", "CASCADE", "CASE", "CAST", "CHECK", "COLLATE", "COLUMN", "COMMIT", "CONFLICT", "CONSTRAINT", "CREATE", "CROSS", "CURRENT", "CURRENT_DATE", "CURRENT_TIME", "CURRENT_TIMESTAMP", "DATABASE", "DEFAULT", "DEFERRABLE", "DEFERRED", "DELETE", "DESC", "DETACH", "DISTINCT", "DO", "DROP", "EACH", "ELSE", "END", "ESCAPE", "EXCEPT", "EXCLUDE", "EXCLUSIVE", "EXISTS", "EXPLAIN", "FAIL", "FILTER", "FIRST", "FOLLOWING", "FOR", "FOREIGN", "FROM", "FULL", "GENERATED", "GLOB", "GROUP", "GROUPS", "HAVING", "IF", "IGNORE", "IMMEDIATE", "IN", "INDEX", "INDEXED", "INITIALLY", "INNER", "INSERT", "INSTEAD", "INTERSECT", "INTO", "IS", "ISNULL", "JOIN", "KEY", "LAST", "LEFT", "LIKE", "LIMIT", "MATCH", "MATERIALIZED", "NATURAL", "NO", "NOT", "NOTHING", "NOTNULL", "NULL", "NULLS", "OF", "OFFSET", "ON", "OR", "ORDER", "OTHERS", "OUTER", "OVER", "PARTITION", "PLAN", "PRAGMA", "PRECEDING", "PRIMARY", "QUERY", "RAISE", "RANGE", "RECURSIVE", "REFERENCES", "REGEXP", "REINDEX", "RELEASE", "RENAME", "REPLACE", "RESTRICT", "RETURNING", "RIGHT", "ROLLBACK", "ROW", "ROWS", "SAVEPOINT", "SELECT", "SET", "TABLE", "TEMP", "TEMPORARY", "THEN", "TIES", "TO", "TRANSACTION", "TRIGGER", "UNBOUNDED", "UNION", "UNIQUE", "UPDATE", "USING", "VACUUM", "VALUES", "VIEW", "VIRTUAL", "WHEN", "WHERE", "WINDOW", "WITH", "WITHOUT"} // nolint
 
 	for _, keyword := range allSQLiteKeywords {
 		// open a different db for each keyword

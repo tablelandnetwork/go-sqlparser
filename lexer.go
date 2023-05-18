@@ -98,8 +98,10 @@ var keywords = map[string]int{
 	"DROP":       DROP,
 }
 
+// EOF is the end of input.
 const EOF = 0
 
+// Lexer is responsible for token generation.
 type Lexer struct {
 	input        []byte
 	position     int
@@ -139,6 +141,7 @@ func (l *Lexer) Error(e string) {
 	l.syntaxError = &ErrSyntaxError{YaccError: e, Position: l.position, Literal: string(l.literal)}
 }
 
+// Lex returns a token to be used in the parser.
 func (l *Lexer) Lex(lval *yySymType) (token int) {
 	defer func() {
 		l.lastToken = token
@@ -413,7 +416,7 @@ func digitVal(ch byte) int {
 	return 16 // larger than any legal digit val
 }
 
-// TODO(bcalza): need to account for escape sequences
+// TODO(bcalza): need to account for escape sequences.
 func (l *Lexer) readString() (int, []byte) {
 	var literal bytes.Buffer
 	literal.WriteByte(l.ch)
@@ -449,15 +452,15 @@ func (l *Lexer) readByte() {
 	}
 
 	l.position = l.readPosition
-	l.readPosition += 1
+	l.readPosition++
 }
 
 func (l *Lexer) peekByte() byte {
 	if l.readPosition >= len(l.input) {
 		return 0
-	} else {
-		return l.input[l.readPosition]
 	}
+
+	return l.input[l.readPosition]
 }
 
 func (l *Lexer) readComparison() (int, []byte) {
@@ -470,11 +473,11 @@ func (l *Lexer) readComparison() (int, []byte) {
 			literal.WriteByte(l.ch)
 			l.readByte()
 			return int('='), literal.Bytes()
-		} else {
-			literal := l.ch
-			l.readByte()
-			return int('='), []byte{literal}
 		}
+
+		literal := l.ch
+		l.readByte()
+		return int('='), []byte{literal}
 	case '<':
 		if l.peekByte() == '=' {
 			var literal bytes.Buffer

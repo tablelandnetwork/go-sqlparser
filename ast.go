@@ -48,16 +48,17 @@ func (node *AST) walkSubtree(visit Visit) error {
 	return nil
 }
 
-func (ast *AST) PrettyPrint() {
+// PrettyPrint prints the AST.
+func (node *AST) PrettyPrint() {
 	spew.Config.DisablePointerAddresses = true
 	spew.Config.DisableMethods = true
-	spew.Dump("%#v", ast)
+	spew.Dump("%#v", node)
 }
 
-// Combines an ordered set of two node strings with correct delimiting
+// Combines an ordered set of two node strings with correct delimiting.
 func nodeStringConcat(left string, right string) string {
 	// If a node string starts or ends with any of these bytes the string will never
-	// need to be space delimited when being concatinated with other node strings
+	// need to be space delimited when being concataneted with other node strings
 	noDelim := map[byte]struct{}{
 		'=': {},
 		'<': {},
@@ -230,7 +231,7 @@ func (node *Select) walkSubtree(visit Visit) error {
 	)
 }
 
-// Compound Select operation types
+// Compound Select operation types.
 const (
 	CompoundUnionStr     = "union"
 	CompoundUnionAllStr  = "union all"
@@ -248,7 +249,13 @@ type CompoundSelect struct {
 }
 
 func (node *CompoundSelect) String() string {
-	return nodeStringsConcat(node.Left.String(), node.Type, node.Right.String(), node.Limit.String(), node.OrderBy.String())
+	return nodeStringsConcat(
+		node.Left.String(),
+		node.Type,
+		node.Right.String(),
+		node.Limit.String(),
+		node.OrderBy.String(),
+	)
 }
 
 // Resolve returns a string representation with custom function nodes resolved to the values
@@ -264,7 +271,7 @@ func (node *CompoundSelect) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Left, node.Right, node.Limit, node.OrderBy)
 }
 
-// Distinct/All
+// Distinct/All.
 const (
 	DistinctStr = "distinct "
 	AllStr      = "all "
@@ -442,7 +449,7 @@ func (node *JoinOperator) String() string {
 	return nodeStringsConcat(natural, node.Op)
 }
 
-func (node *JoinOperator) walkSubtree(visit Visit) error {
+func (node *JoinOperator) walkSubtree(_ Visit) error {
 	return nil
 }
 
@@ -468,14 +475,30 @@ const (
 // String returns the string representation of the node.
 func (node *JoinTableExpr) String() string {
 	if node.On != nil {
-		return nodeStringsConcat(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), "on", node.On.String())
+		return nodeStringsConcat(
+			node.LeftExpr.String(),
+			node.JoinOperator.String(),
+			node.RightExpr.String(),
+			"on",
+			node.On.String(),
+		)
 	}
 
 	if node.Using != nil {
-		return nodeStringsConcat(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String(), "using", node.Using.String())
+		return nodeStringsConcat(
+			node.LeftExpr.String(),
+			node.JoinOperator.String(),
+			node.RightExpr.String(),
+			"using",
+			node.Using.String(),
+		)
 	}
 
-	return nodeStringsConcat(node.LeftExpr.String(), node.JoinOperator.String(), node.RightExpr.String())
+	return nodeStringsConcat(
+		node.LeftExpr.String(),
+		node.JoinOperator.String(),
+		node.RightExpr.String(),
+	)
 }
 
 func (node *JoinTableExpr) walkSubtree(visit Visit) error {
@@ -687,7 +710,7 @@ func (node *NullValue) String() string {
 	return "null"
 }
 
-func (node *NullValue) walkSubtree(visit Visit) error {
+func (node *NullValue) walkSubtree(_ Visit) error {
 	return nil
 }
 
@@ -703,7 +726,7 @@ func (node BoolValue) String() string {
 	return "false"
 }
 
-func (node BoolValue) walkSubtree(visit Visit) error {
+func (node BoolValue) walkSubtree(_ Visit) error {
 	return nil
 }
 
@@ -740,7 +763,7 @@ func (node *Value) String() string {
 	return value
 }
 
-func (node *Value) walkSubtree(visit Visit) error {
+func (node *Value) walkSubtree(_ Visit) error {
 	return nil
 }
 
@@ -912,7 +935,7 @@ func (node *NotExpr) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Expr)
 }
 
-// IsExpr represents a IS expression
+// IsExpr represents a IS expression.
 type IsExpr struct {
 	Left, Right Expr
 }
@@ -930,7 +953,7 @@ func (node *IsExpr) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Left, node.Right)
 }
 
-// IsNullExpr represents a IS expression
+// IsNullExpr represents a IS expression.
 type IsNullExpr struct {
 	Expr Expr
 }
@@ -948,7 +971,7 @@ func (node *IsNullExpr) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Expr)
 }
 
-// NotNullExpr represents a IS expression
+// NotNullExpr represents a IS expression.
 type NotNullExpr struct {
 	Expr Expr
 }
@@ -966,7 +989,7 @@ func (node *NotNullExpr) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Expr)
 }
 
-// CollateExpr the COLLATE operator
+// CollateExpr the COLLATE operator.
 type CollateExpr struct {
 	Expr          Expr
 	CollationName Identifier
@@ -995,8 +1018,13 @@ type ConvertExpr struct {
 type ConvertType string
 
 const (
-	NoneStr    = ConvertType("none")
-	TextStr    = ConvertType("text")
+	// NoneStr NONE convert type.
+	NoneStr = ConvertType("none")
+
+	// TextStr TEXT convert type.
+	TextStr = ConvertType("text")
+
+	// IntegerStr INTEGER convert type.
 	IntegerStr = ConvertType("integer")
 )
 
@@ -1361,7 +1389,7 @@ func (node Identifier) String() string {
 	return string(node)
 }
 
-func (node Identifier) walkSubtree(visit Visit) error {
+func (node Identifier) walkSubtree(_ Visit) error {
 	return nil
 }
 
@@ -1399,9 +1427,9 @@ func (node *CreateTable) String() string {
 
 	if node.StrictMode {
 		return nodeStringsConcat("create table ", node.Table.String(), "(", column, ")strict")
-	} else {
-		return nodeStringsConcat("create table ", node.Table.String(), "(", column, ")")
 	}
+
+	return nodeStringsConcat("create table ", node.Table.String(), "(", column, ")")
 }
 
 func (node *CreateTable) walkSubtree(visit Visit) error {
@@ -1546,9 +1574,14 @@ func (node *ColumnConstraintPrimaryKey) walkSubtree(visit Visit) error {
 }
 
 const (
+	// PrimaryKeyOrderEmpty no primary key order.
 	PrimaryKeyOrderEmpty = ""
-	PrimaryKeyOrderAsc   = "asc"
-	PrimaryKeyOrderDesc  = "desc"
+
+	// PrimaryKeyOrderAsc primary key asc order.
+	PrimaryKeyOrderAsc = "asc"
+
+	// PrimaryKeyOrderDesc primary key desc order.
+	PrimaryKeyOrderDesc = "desc"
 )
 
 // ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
@@ -1688,6 +1721,7 @@ func (node *ColumnConstraintGenerated) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Expr)
 }
 
+// TableConstraint is a contrainst applied to the whole table in a CREATE TABLE statement.
 type TableConstraint interface {
 	iTableConstraint()
 	Node
@@ -1795,18 +1829,35 @@ func (node *Insert) String() string {
 	}
 
 	if node.Select != nil {
-		return nodeStringsConcat("insert into", node.Table.Name.String(), node.Select.String(), node.Upsert.String(), returning)
+		return nodeStringsConcat(
+			"insert into",
+			node.Table.Name.String(),
+			node.Select.String(),
+			node.Upsert.String(),
+			returning)
 	}
 
 	if node.DefaultValues {
-		return nodeStringsConcat("insert into", node.Table.Name.String(), "default values", returning)
+		return nodeStringsConcat(
+			"insert into",
+			node.Table.Name.String(),
+			"default values",
+			returning,
+		)
 	}
 
 	var rows []string
 	for _, row := range node.Rows {
 		rows = append(rows, row.String())
 	}
-	return nodeStringsConcat("insert into", node.Table.String(), node.Columns.String(), "values", strings.Join(rows, ","), node.Upsert.String(), returning)
+	return nodeStringsConcat("insert into",
+		node.Table.String(),
+		node.Columns.String(),
+		"values",
+		strings.Join(rows, ","),
+		node.Upsert.String(),
+		returning,
+	)
 }
 
 // Resolve returns a string representation with custom function nodes resolved to the values
@@ -1859,6 +1910,7 @@ func (node Upsert) walkSubtree(visit Visit) error {
 	return nil
 }
 
+// OnConflictClause represents an ON CONFLICT clause for upserts.
 type OnConflictClause struct {
 	Target   *OnConflictTarget
 	DoUpdate *OnConflictUpdate
@@ -1894,11 +1946,13 @@ func (node *OnConflictClause) walkSubtree(visit Visit) error {
 	return Walk(visit, nodes...)
 }
 
+// OnConflictTarget represents an ON CONFLICT target for upserts.
 type OnConflictTarget struct {
 	Columns ColumnList
 	Where   *Where
 }
 
+// OnConflictUpdate represents an ON CONFLICT.
 type OnConflictUpdate struct {
 	Exprs UpdateExprs
 	Where *Where
@@ -2003,8 +2057,10 @@ func (node *Update) AddWhereClause(where *Where) {
 	}
 }
 
+// UpdateExprs represents a slice of UpdateExpr.
 type UpdateExprs []*UpdateExpr
 
+// String returns the string representation of the node.
 func (node UpdateExprs) String() string {
 	var exprs []string
 	for _, expr := range node {
@@ -2038,7 +2094,13 @@ type Grant struct {
 
 // String returns the string representation of the node.
 func (node *Grant) String() string {
-	return nodeStringsConcat("grant", node.Privileges.String(), "on", node.Table.String(), "to", "'"+strings.Join(node.Roles, "', '")+"'")
+	return nodeStringsConcat("grant",
+		node.Privileges.String(),
+		"on",
+		node.Table.String(),
+		"to",
+		"'"+strings.Join(node.Roles, "', '")+"'",
+	)
 }
 
 // GetRoles returns the roles.
@@ -2078,11 +2140,12 @@ func (node Privileges) String() string {
 	return strings.Join(privileges, ",")
 }
 
+// Len returns the length of privileges slice.
 func (node Privileges) Len() int {
 	return len(node)
 }
 
-func (node Privileges) walkSubtree(visit Visit) error {
+func (node Privileges) walkSubtree(_ Visit) error {
 	return nil
 }
 
@@ -2095,7 +2158,14 @@ type Revoke struct {
 
 // String returns the string representation of the node.
 func (node *Revoke) String() string {
-	return nodeStringsConcat("revoke", node.Privileges.String(), "on", node.Table.String(), "from", "'"+strings.Join(node.Roles, "', '")+"'")
+	return nodeStringsConcat(
+		"revoke",
+		node.Privileges.String(),
+		"on",
+		node.Table.String(),
+		"from",
+		"'"+strings.Join(node.Roles, "', '")+"'",
+	)
 }
 
 // GetRoles returns the roles.
@@ -2120,6 +2190,7 @@ func (node *Revoke) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Privileges, node.Table)
 }
 
+// AlterTableClause represents an ALTER TABLE operation such as RENAME, ADD, or DROP.
 type AlterTableClause interface {
 	Node
 	iAlterTableClause()
@@ -2153,6 +2224,8 @@ func (node *AlterTable) GetTable() *Table {
 	return node.Table
 }
 
+// Resolve returns a string representation with custom function nodes resolved to the values
+// passed by resolver.
 func (node *AlterTable) Resolve(resolver WriteStatementResolver) (string, error) {
 	return resolveWriteStatementWalk(node, resolver)
 }

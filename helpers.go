@@ -88,6 +88,7 @@ var (
 	createTableNameRegEx = regexp.MustCompile("^([A-Za-z]+[A-Za-z0-9_]*)*_[0-9]+$")
 )
 
+// ValidateTargetTable validates the tables' names of statements.
 func ValidateTargetTable(table *Table) (*ValidatedTable, error) {
 	if !table.IsTarget {
 		return nil, fmt.Errorf("table is not target")
@@ -133,6 +134,7 @@ func ValidateTargetTable(table *Table) (*ValidatedTable, error) {
 	return &ValidatedTable{name: table.String(), prefix: prefix, chainID: chainID, tokenID: tokenID}, nil
 }
 
+// ValidateCreateTargetTable validates the table name for CREATE statements.
 func ValidateCreateTargetTable(table *Table) (*ValidatedCreateTable, error) {
 	if !table.IsTarget {
 		return nil, fmt.Errorf("table is not target")

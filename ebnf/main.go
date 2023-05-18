@@ -58,15 +58,14 @@ func (s *scanner) readByte() {
 		s.ch = s.input[s.pos]
 	}
 
-	s.pos += 1
+	s.pos++
 }
 
 func (s *scanner) peekByte() byte {
 	if s.pos >= len(s.input) {
 		return 0
-	} else {
-		return s.input[s.pos]
 	}
+	return s.input[s.pos]
 }
 
 func (s *scanner) skipUntilStart() {
