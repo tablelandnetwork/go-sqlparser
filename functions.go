@@ -1,5 +1,7 @@
 package sqlparser
 
+// AllowedFunctions is a map of allowed functions in Tableland.
+// The value indicates if the function is custom.
 var AllowedFunctions = map[string]bool{
 	// core functions
 	"abs": false,

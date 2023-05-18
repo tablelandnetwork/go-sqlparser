@@ -10,7 +10,7 @@ type ErrSyntaxError struct {
 }
 
 func (e *ErrSyntaxError) Error() string {
-	return fmt.Sprintf("%s at position %d near '%s'", e.YaccError, e.Position, string(e.Literal))
+	return fmt.Sprintf("%s at position %d near '%s'", e.YaccError, e.Position, e.Literal)
 }
 
 // ErrKeywordIsNotAllowed indicates an error for keyword that is not allowed (eg CURRENT_TIME).
@@ -103,14 +103,16 @@ func (e *ErrMultiplePrimaryKey) Error() string {
 }
 
 // ErrUpsertMissingTarget indicates a missing conflict target.
-// The conflict target may be omitted on the last ON CONFLICT clause in the INSERT statement, but is required for all other ON CONFLICT clause.
+// The conflict target may be omitted on the last ON CONFLICT clause in the INSERT statement,
+// but is required for all other ON CONFLICT clause.
 type ErrUpsertMissingTarget struct{}
 
 func (e *ErrUpsertMissingTarget) Error() string {
 	return "has a missing conflict target"
 }
 
-// ErrRowIDNotAllowed indicates a reference to the columns rowid, _rowid_, or oid in an INSERT, UPDATE or CREATE statement.
+// ErrRowIDNotAllowed indicates a reference to the columns rowid, _rowid_,
+// or oid in an INSERT, UPDATE or CREATE statement.
 type ErrRowIDNotAllowed struct{}
 
 func (e *ErrRowIDNotAllowed) Error() string {
@@ -154,4 +156,26 @@ type ErrTableNameWrongFormat struct {
 
 func (e *ErrTableNameWrongFormat) Error() string {
 	return fmt.Sprintf("table name has wrong format: %s", e.Name)
+}
+
+// ErrAlterTablePrimaryKeyNotAllowed indicates that primary key is not allowed in ALTER TABLE.
+type ErrAlterTablePrimaryKeyNotAllowed struct{}
+
+func (e *ErrAlterTablePrimaryKeyNotAllowed) Error() string {
+	return "cannot add a PRIMARY KEY column in ALTER TABLE"
+}
+
+// ErrAlterTableUniqueNotAllowed indicates that unique is not allowed in ALTER TABLE.
+type ErrAlterTableUniqueNotAllowed struct{}
+
+func (e *ErrAlterTableUniqueNotAllowed) Error() string {
+	return "cannot add a UNIQUE column in ALTER TABLE"
+}
+
+// ErrNotNullConstraintDefaultNotNull indicates that you cannot add a not null constraint
+// together with a not null default.
+type ErrNotNullConstraintDefaultNotNull struct{}
+
+func (e *ErrNotNullConstraintDefaultNotNull) Error() string {
+	return "cannot add a NOT NULL column with default value NULL"
 }

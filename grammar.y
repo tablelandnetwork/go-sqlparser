@@ -21,12 +21,9 @@ var keywordsNotAllowed = map[string]struct{}{
   //
   // These were identified by running the `TestReservedKeywords` test.
   "REFERENCES" : {},
-  "ADD": {},
-  "ALTER": {},
   "AUTOINCREMENT": {},
   "COMMIT": {},
   "DEFERRABLE": {},
-  "DROP": {},
   "FOREIGN": {},
   "INDEX": {},
   "RETURNING": {},
@@ -88,6 +85,7 @@ func isRowID(column Identifier) bool {
   updateList []*UpdateExpr
   grant *Grant
   revoke *Revoke
+  alterTableStmt *AlterTable
   strings []string
   privileges Privileges
   stmts []Statement
@@ -109,6 +107,7 @@ func isRowID(column Identifier) bool {
 %token <empty> CREATE TABLE INT BLOB PRIMARY KEY UNIQUE CHECK DEFAULT GENERATED ALWAYS STORED VIRTUAL CONSTRAINT
 %token <empty> INSERT INTO VALUES DELETE UPDATE SET CONFLICT DO NOTHING
 %token <empty> GRANT TO REVOKE
+%token <empty> ALTER RENAME COLUMN ADD DROP
 
 %left <empty> RIGHT FULL INNER LEFT NATURAL OUTER CROSS JOIN
 %left <empty> ON USING
@@ -169,6 +168,7 @@ func isRowID(column Identifier) bool {
 %type <updateList> update_list common_update_list paren_update_list
 %type <grant> grant_stmt
 %type <revoke> revoke_stmt
+%type <alterTableStmt> alter_table_stmt
 %type <strings> roles
 %type <privileges> privileges
 %type <stmts> stmts multi_stmts
@@ -238,6 +238,11 @@ multi_stmt:
     $$ = $1
   }
 | revoke_stmt
+  {
+    yylex.(*Lexer).statementIdx++ 
+    $$ = $1
+  }
+| alter_table_stmt
   {
     yylex.(*Lexer).statementIdx++ 
     $$ = $1
@@ -1640,6 +1645,78 @@ privilege:
     $$ = "delete"
   }
 ;
+
+alter_table_stmt:
+  ALTER TABLE table_name RENAME column_opt column_name TO column_name
+  {
+    $3.IsTarget = true
+    $$ = &AlterTable{
+      Table: $3,
+      AlterTableClause: &AlterTableRename{
+        OldColumn: $6,
+        NewColumn: $8,
+      },
+    }
+  }
+| ALTER TABLE table_name ADD column_opt column_def
+  {
+
+		// Adds the following validation to the column definition:
+    // - The column may not have a PRIMARY KEY or UNIQUE constraint.
+    // - If a NOT NULL constraint is specified, then the column must have a default value other than NULL.
+    var hasNotNull, hasDefault bool
+    var defaultConstraint *ColumnConstraintDefault
+    for _, constraint := range $6.Constraints {
+      if _, hasPrimaryKey := constraint.(*ColumnConstraintPrimaryKey); hasPrimaryKey {
+        yylex.(*Lexer).AddError(&ErrAlterTablePrimaryKeyNotAllowed{})
+      }
+
+      if _, hasUnique := constraint.(*ColumnConstraintUnique); hasUnique {
+        yylex.(*Lexer).AddError(&ErrAlterTableUniqueNotAllowed{})
+      }
+
+      if _, ok := constraint.(*ColumnConstraintNotNull); ok {
+        hasNotNull = true	
+      }
+
+      if constraint, ok := constraint.(*ColumnConstraintDefault); ok {
+        hasDefault = true	
+        defaultConstraint = constraint
+      }
+    }
+
+    if hasNotNull && hasDefault && defaultConstraint != nil {
+      if _, ok := defaultConstraint.Expr.(*NullValue); ok {
+        yylex.(*Lexer).AddError(&ErrNotNullConstraintDefaultNotNull{})
+      }
+    }
+
+    $3.IsTarget = true
+    $$ = &AlterTable{
+      Table: $3,
+      AlterTableClause: &AlterTableAdd{
+        ColumnDef: $6,
+      },
+    }
+  }
+| ALTER TABLE table_name DROP column_opt column_name
+  {
+
+    $3.IsTarget = true
+    $$ = &AlterTable{
+      Table: $3,
+      AlterTableClause: &AlterTableDrop{
+        Column: $6,
+      },
+    }
+  }
+;
+
+column_opt:
+ {}
+| COLUMN
+ {}
+; 
 
 identifier:
   IDENTIFIER
