@@ -5327,7 +5327,7 @@ func TestInsertWithSelect(t *testing.T) {
 			stmt: `INSERT INTO voting_power (address, ft)
 			SELECT owner, SUM(COALESCE(end_time, BLOCK_NUM()) - start_time)
 			FROM pilot_sessions GROUP BY owner`,
-			deparsed: "insert into voting_power select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc", // nolint
+			deparsed: "insert into voting_power(address,ft)select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc", // nolint
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
