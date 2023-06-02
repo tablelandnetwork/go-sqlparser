@@ -1832,6 +1832,7 @@ func (node *Insert) String() string {
 		return nodeStringsConcat(
 			"insert into",
 			node.Table.Name.String(),
+			node.Columns.String(),
 			node.Select.String(),
 			node.Upsert.String(),
 			returning)
