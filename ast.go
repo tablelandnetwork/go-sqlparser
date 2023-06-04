@@ -1872,7 +1872,7 @@ func (node *Insert) walkSubtree(visit Visit) error {
 		return nil
 	}
 
-	if err := Walk(visit, node.Table, node.Columns); err != nil {
+	if err := Walk(visit, node.Table, node.Columns, node.Upsert, node.Select); err != nil {
 		return err
 	}
 

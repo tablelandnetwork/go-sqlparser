@@ -5591,6 +5591,16 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 			expQueries: []string{"insert into foo_1337_1 values('0xabc',100)"},
 		},
 		{
+			name:       "insert with select",
+			query:      "insert into foo_1337_1 select block_num(), 1 from foo_1337_2",
+			expQueries: []string{"insert into foo_1337_1 select 100,1 from foo_1337_2 order by rowid asc"},
+		},
+		{
+			name:       "upsert",
+			query:      "insert into foo_1337_1 (a) values (1) on conflict do update set a = block_num()",
+			expQueries: []string{"insert into foo_1337_1(a)values(1)on conflict do update set a=100"},
+		},
+		{
 			name:       "update with custom functions",
 			query:      "update foo_1337_1 SET a=txn_hash(), b=block_num() where c in (block_num(), block_num()+1)",
 			expQueries: []string{"update foo_1337_1 set a='0xabc',b=100 where c in(100,100+1)"},
