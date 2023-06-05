@@ -241,11 +241,9 @@ const (
 
 // CompoundSelect represents a compound operation of selects.
 type CompoundSelect struct {
-	Left    *Select
-	Type    string
-	Right   *Select
-	Limit   *Limit
-	OrderBy OrderBy
+	Left  *Select
+	Type  string
+	Right ReadStatement
 }
 
 func (node *CompoundSelect) String() string {
@@ -253,8 +251,6 @@ func (node *CompoundSelect) String() string {
 		node.Left.String(),
 		node.Type,
 		node.Right.String(),
-		node.Limit.String(),
-		node.OrderBy.String(),
 	)
 }
 
@@ -268,7 +264,7 @@ func (node *CompoundSelect) walkSubtree(visit Visit) error {
 	if node == nil {
 		return nil
 	}
-	return Walk(visit, node.Left, node.Right, node.Limit, node.OrderBy)
+	return Walk(visit, node.Left, node.Right)
 }
 
 // Distinct/All.
