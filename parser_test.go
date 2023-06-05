@@ -2986,6 +2986,52 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
+			name:     "select multiple union",
+			stmt:     "SELECT a FROM t UNION SELECT a FROM t2 UNION SELECT a FROM t3",
+			deparsed: "select a from t union select a from t2 union select a from t3",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CompoundSelect{
+						Left: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t", IsTarget: true},
+							},
+						},
+						Type: CompoundUnionStr,
+						Right: &CompoundSelect{
+							Left: &Select{
+								SelectColumnList: SelectColumnList{
+									&AliasedSelectColumn{
+										Expr: &Column{Name: "a"},
+									},
+								},
+								From: &AliasedTableExpr{
+									Expr: &Table{Name: "t2", IsTarget: true},
+								},
+							},
+							Type: CompoundUnionStr,
+							Right: &Select{
+								SelectColumnList: SelectColumnList{
+									&AliasedSelectColumn{
+										Expr: &Column{Name: "a"},
+									},
+								},
+								From: &AliasedTableExpr{
+									Expr: &Table{Name: "t3", IsTarget: true},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
 			name:     "select union all",
 			stmt:     "SELECT a FROM t UNION ALL SELECT a FROM t2",
 			deparsed: "select a from t union all select a from t2",
@@ -3076,11 +3122,11 @@ func TestSelectStatement(t *testing.T) {
 							From: &AliasedTableExpr{
 								Expr: &Table{Name: "t2", IsTarget: true},
 							},
-						},
-						OrderBy: []*OrderingTerm{
-							{
-								Expr:      &Column{Name: "a"},
-								Direction: AscStr,
+							OrderBy: []*OrderingTerm{
+								{
+									Expr:      &Column{Name: "a"},
+									Direction: AscStr,
+								},
 							},
 						},
 					},
