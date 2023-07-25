@@ -4,7 +4,9 @@ updates:
     directory: "/" 
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 5
   - package-ecosystem: "npm"
     directory: "/js"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 5
