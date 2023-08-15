@@ -15,6 +15,7 @@ describe("sqlparser", function () {
         "CREATE table blah_5_ (id int, image blob, description text);"
       );
       // TODO: Write actual tests!
+      console.log(struct);
     });
   })
 

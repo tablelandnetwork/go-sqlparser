@@ -66,15 +66,12 @@ declare namespace sqlparser {
     nameMap?: Record<string, string>
   ): Promise<NormalizedStatement>;
 
-
   /**
    * Parse a string containing (possibly multiple) SQL statement(s) and return the AST.
    * @param sql A string containing SQL statement(s).
    * @return A `Promise` that resolves to an object.
    */
-  export function getAst(
-    sql: string,
-  ): Promise<Record<string, any>>; // TODO: Can we generate proper types here?
+  export function getAst(sql: string): Promise<Record<string, any>>; // TODO: Can we generate proper types here?
 
   /**
    * Validate a table name.
