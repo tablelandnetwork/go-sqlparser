@@ -9,6 +9,15 @@ describe("sqlparser", function () {
     await init();
   });
 
+  describe("getAst", function () {
+    test("when there is a single valid create statement", async function () {
+      const struct = await globalThis.sqlparser.getAst(
+        "CREATE table blah_5_ (id int, image blob, description text);"
+      );
+      // TODO: Write actual tests!
+    });
+  })
+
   describe("normalize", function () {
     test("when there is a basic syntax error", async function () {
       await rejects(

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"regexp"
 	"strings"
 	"syscall/js"
@@ -63,6 +64,37 @@ func UpdateTableNames(node sqlparser.Node, nameMapper func(string) (string, bool
 		return nil, err
 	}
 	return node, nil
+}
+
+func getAst(this js.Value, args []js.Value) interface{} {
+	Error := js.Global().Get("Error")
+	Promise := js.Global().Get("Promise")
+	if len(args) < 1 {
+		return Promise.Call("reject", Error.New("missing required argument: statement"))
+	}
+	statement := args[0].String()
+	handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		resolve := args[0]
+		reject := args[1]
+		go func() interface{} {
+			ast, err := sqlparser.Parse(statement)
+			if err != nil {
+				return reject.Invoke(Error.New("error parsing statement: " + err.Error()))
+			}
+			if len(ast.Statements) == 0 {
+				return reject.Invoke(Error.New("error parsing statement: empty string"))
+			}
+			if len(ast.String()) > maxQuerySize {
+				return reject.Invoke(Error.New("statement size error: larger than specified max"))
+			}
+			b, _ := json.Marshal(&ast)
+			var response map[string]interface{}
+			_ = json.Unmarshal(b, &response)
+			return resolve.Invoke(js.ValueOf(response))
+		}()
+		return nil
+	})
+	return Promise.New(handler)
 }
 
 func validateTableName(this js.Value, args []js.Value) interface{} {
@@ -239,6 +271,7 @@ func main() {
 		"normalize":           js.FuncOf(normalize),
 		"validateTableName":   js.FuncOf(validateTableName),
 		"getUniqueTableNames": js.FuncOf(getUniqueTableNames),
+		"getAst":              js.FuncOf(getAst),
 	}))
 
 	<-make(chan bool)
