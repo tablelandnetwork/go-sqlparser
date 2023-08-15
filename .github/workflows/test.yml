@@ -70,7 +70,7 @@ jobs:
       - name: Setup 🐹
         uses: acifani/setup-tinygo@v1
         with:
-          tinygo-version: 0.27.0
+          tinygo-version: 0.28.1
 
       - name: Install 🔧
         run: npm install
