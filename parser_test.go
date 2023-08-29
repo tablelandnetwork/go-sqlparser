@@ -2986,6 +2986,52 @@ func TestSelectStatement(t *testing.T) {
 			},
 		},
 		{
+			name:     "select multiple union",
+			stmt:     "SELECT a FROM t UNION SELECT a FROM t2 UNION SELECT a FROM t3",
+			deparsed: "select a from t union select a from t2 union select a from t3",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&CompoundSelect{
+						Left: &Select{
+							SelectColumnList: SelectColumnList{
+								&AliasedSelectColumn{
+									Expr: &Column{Name: "a"},
+								},
+							},
+							From: &AliasedTableExpr{
+								Expr: &Table{Name: "t", IsTarget: true},
+							},
+						},
+						Type: CompoundUnionStr,
+						Right: &CompoundSelect{
+							Left: &Select{
+								SelectColumnList: SelectColumnList{
+									&AliasedSelectColumn{
+										Expr: &Column{Name: "a"},
+									},
+								},
+								From: &AliasedTableExpr{
+									Expr: &Table{Name: "t2", IsTarget: true},
+								},
+							},
+							Type: CompoundUnionStr,
+							Right: &Select{
+								SelectColumnList: SelectColumnList{
+									&AliasedSelectColumn{
+										Expr: &Column{Name: "a"},
+									},
+								},
+								From: &AliasedTableExpr{
+									Expr: &Table{Name: "t3", IsTarget: true},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+
+		{
 			name:     "select union all",
 			stmt:     "SELECT a FROM t UNION ALL SELECT a FROM t2",
 			deparsed: "select a from t union all select a from t2",
@@ -3076,11 +3122,11 @@ func TestSelectStatement(t *testing.T) {
 							From: &AliasedTableExpr{
 								Expr: &Table{Name: "t2", IsTarget: true},
 							},
-						},
-						OrderBy: []*OrderingTerm{
-							{
-								Expr:      &Column{Name: "a"},
-								Direction: AscStr,
+							OrderBy: []*OrderingTerm{
+								{
+									Expr:      &Column{Name: "a"},
+									Direction: AscStr,
+								},
 							},
 						},
 					},
@@ -5327,7 +5373,7 @@ func TestInsertWithSelect(t *testing.T) {
 			stmt: `INSERT INTO voting_power (address, ft)
 			SELECT owner, SUM(COALESCE(end_time, BLOCK_NUM()) - start_time)
 			FROM pilot_sessions GROUP BY owner`,
-			deparsed: "insert into voting_power select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc", // nolint
+			deparsed: "insert into voting_power(address,ft)select owner,sum(coalesce(end_time,block_num())-start_time)from pilot_sessions group by owner order by rowid asc", // nolint
 			expectedAST: &AST{
 				Statements: []Statement{
 					&Insert{
@@ -5589,6 +5635,16 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 			name:       "insert with custom functions",
 			query:      "insert into foo_1337_1 values (txn_hash(), block_num())",
 			expQueries: []string{"insert into foo_1337_1 values('0xabc',100)"},
+		},
+		{
+			name:       "insert with select",
+			query:      "insert into foo_1337_1 select block_num(), 1 from foo_1337_2",
+			expQueries: []string{"insert into foo_1337_1 select 100,1 from foo_1337_2 order by rowid asc"},
+		},
+		{
+			name:       "upsert",
+			query:      "insert into foo_1337_1 (a) values (1) on conflict do update set a = block_num()",
+			expQueries: []string{"insert into foo_1337_1(a)values(1)on conflict do update set a=100"},
 		},
 		{
 			name:       "update with custom functions",

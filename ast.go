@@ -241,11 +241,9 @@ const (
 
 // CompoundSelect represents a compound operation of selects.
 type CompoundSelect struct {
-	Left    *Select
-	Type    string
-	Right   *Select
-	Limit   *Limit
-	OrderBy OrderBy
+	Left  *Select
+	Type  string
+	Right ReadStatement
 }
 
 func (node *CompoundSelect) String() string {
@@ -253,8 +251,6 @@ func (node *CompoundSelect) String() string {
 		node.Left.String(),
 		node.Type,
 		node.Right.String(),
-		node.Limit.String(),
-		node.OrderBy.String(),
 	)
 }
 
@@ -268,7 +264,7 @@ func (node *CompoundSelect) walkSubtree(visit Visit) error {
 	if node == nil {
 		return nil
 	}
-	return Walk(visit, node.Left, node.Right, node.Limit, node.OrderBy)
+	return Walk(visit, node.Left, node.Right)
 }
 
 // Distinct/All.
@@ -1832,6 +1828,7 @@ func (node *Insert) String() string {
 		return nodeStringsConcat(
 			"insert into",
 			node.Table.Name.String(),
+			node.Columns.String(),
 			node.Select.String(),
 			node.Upsert.String(),
 			returning)
@@ -1871,7 +1868,7 @@ func (node *Insert) walkSubtree(visit Visit) error {
 		return nil
 	}
 
-	if err := Walk(visit, node.Table, node.Columns); err != nil {
+	if err := Walk(visit, node.Table, node.Columns, node.Upsert, node.Select); err != nil {
 		return err
 	}
 

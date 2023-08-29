@@ -1,6 +1,12 @@
 version: 2
 updates:
-  - package-ecosystem: "gomod" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "gomod" 
+    directory: "/" 
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 5
+  - package-ecosystem: "npm"
+    directory: "/js"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5

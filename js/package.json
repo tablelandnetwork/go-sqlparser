@@ -1,0 +1,72 @@
+{
+  "name": "@tableland/sqlparser",
+  "version": "0.0.0",
+  "files": [
+    "cjs/*.js",
+    "cjs/package.json",
+    "esm/*.js",
+    "esm/package.json",
+    "*.d.ts",
+    "*.wasm"
+  ],
+  "exports": {
+    "node": "./cjs/out.js",
+    "require": "./cjs/out.js",
+    "import": "./esm/out.js",
+    "default": "./esm/out.js"
+  },
+  "type": "module",
+  "main": "./esm/out.js",
+  "module": "./esm/out.js",
+  "types": "types.d.ts",
+  "devDependencies": {
+    "@types/assert": "^1.5.6",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.5.7",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.4.1",
+    "assert": "^2.0.0",
+    "esbuild": "0.19.2",
+    "esbuild-plugin-wat": "^0.2.7",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-n": "^16.0.2",
+    "eslint-plugin-promise": "^6.1.1",
+    "mocha": "^10.2.0",
+    "prettier": "^3.0.2",
+    "tsd": "^0.28.1",
+    "wasm-opt": "^1.4.0"
+  },
+  "scripts": {
+    "test": "npm run test:types && npm run test:esm && npm run test:cjs",
+    "test:types": "tsd",
+    "test:esm": "mocha test/main.test.js",
+    "test:cjs": "mocha test/main.test.cjs",
+    "lint": "eslint '**/*.{js,ts}'",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier '**/*.{ts,json,sol,md}' --check",
+    "prettier:fix": "npm run prettier -- --write",
+    "format": "npm run prettier:fix && npm run lint:fix",
+    "wasm:go": "tinygo build -gc=leaking -no-debug -o main.wasm -target wasm ../cmd/wasm/main.go",
+    "wasm:opt": "npx wasm-opt -O main.wasm -o main.wasm",
+    "fixup": "echo '{\n  \"type\": \"commonjs\"\n}' > cjs/package.json",
+    "build:cjs": "node ./cjs-build.js && npm run fixup",
+    "build:esm": "node ./esm-build.js",
+    "build:wasm": "npm run wasm:go && npm run wasm:opt",
+    "build": "npm run build:wasm && npm run build:cjs && npm run build:esm",
+    "clean": "rm -rf main.wasm cjs",
+    "prepublishOnly": "npm run build"
+  },
+  "tsd": {
+    "directory": "test",
+    "compilerOptions": {
+      "paths": {
+        "@tableland/sqlparser": [
+          "."
+        ]
+      }
+    }
+  }
+}

@@ -262,9 +262,9 @@ select_stmt:
     $1.Limit = $3
     $$ = $1
   }
-| base_select compound_op base_select order_by_opt limit_opt
+| base_select compound_op select_stmt
   {
-    $$ = &CompoundSelect{Type: $2, Left: $1, Right: $3, OrderBy: $4, Limit: $5}
+    $$ = &CompoundSelect{Type: $2, Left: $1, Right: $3}
   }
 ;
 
