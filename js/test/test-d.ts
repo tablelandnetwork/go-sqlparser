@@ -8,6 +8,7 @@ import defaultInit, {
   NormalizedStatement,
   ValidatedTable,
   StatementType,
+  CreateTable,
 } from "@tableland/sqlparser";
 
 expectType<Promise<WebAssembly.Exports>>(defaultInit());
@@ -21,12 +22,24 @@ expectType<Promise<NormalizedStatement>>(
   })
 );
 
-const { normalize, validateTableName, getUniqueTableNames, getAst } =
-  globalThis.sqlparser;
+const {
+  normalize,
+  validateTableName,
+  getUniqueTableNames,
+  createStatementToObject,
+  createStatementFromObject,
+} = globalThis.sqlparser;
 
-// TODO: Can we do better type checking here?
-expectType<Promise<Record<string, any>>>(
-  getAst("select * from table where id = 1;")
+expectType<Promise<CreateTable>>(
+  createStatementToObject("select * from table where id = 1;")
+);
+expectType<Promise<string>>(
+  createStatementFromObject({
+    Table: { Name: "table", IsTarget: true },
+    ColumnsDef: [],
+    Constraints: [],
+    StrictMode: false,
+  })
 );
 
 expectType<Promise<NormalizedStatement>>(

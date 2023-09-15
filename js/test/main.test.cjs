@@ -9,15 +9,6 @@ describe("sqlparser", function () {
     await init();
   });
 
-  describe("getAst", function () {
-    test("when there is a single valid create statement", async function () {
-      const struct = await globalThis.sqlparser.getAst(
-        "CREATE table blah_5_ (id int, image blob, description text);"
-      );
-      // TODO: Write actual tests!
-    });
-  })
-
   describe("normalize", function () {
     test("when there is a basic syntax error", async function () {
       await rejects(
@@ -347,6 +338,77 @@ describe("sqlparser", function () {
       deepStrictEqual(tables, []);
     });
   });
+
+  describe("to and from create statements and objects", function() {
+    test("round trip", async function() {
+      const statement = "create table blah_5_(id int,image blob,description text)"
+      const obj = await globalThis.sqlparser.createStatementToObject(statement);
+      const sql = await globalThis.sqlparser.createStatementFromObject(obj);
+      strictEqual(sql, statement);
+    });
+
+    test("from object", async function() {
+      /** @type {import("@tableland/sqlparser").CreateTable } */
+      const obj = {
+        Table: {
+          Name: "blah_5_30001",
+          IsTarget: true
+        },
+        ColumnsDef: [
+          {
+            Column: {
+              Name: "id",
+              TableRef: null,
+            },
+            Type: "int",
+            Constraints: []
+          }
+        ],
+        Constraints: [],
+        StrictMode: false
+      };
+      const observed = await globalThis.sqlparser.createStatementFromObject(obj);
+      const expected = "create table blah_5_30001(id int)";
+      strictEqual(observed, expected);
+    });
+
+    test("to object", async function() {
+      /** @type {import("@tableland/sqlparser").CreateTable } */
+      const expected = {
+        Table: {
+          Name: "blah_5_30001",
+          IsTarget: true
+        },
+        ColumnsDef: [
+          {
+            Column: {
+              Name: "id",
+              TableRef: null,
+            },
+            Type: "int",
+            Constraints: []
+          }
+        ],
+        Constraints: [],
+        StrictMode: false
+      };
+      const observed = await globalThis.sqlparser.createStatementToObject("create table blah_5_30001(id int)");
+      deepStrictEqual(observed, expected);
+    });
+
+    test("with an error on valid statement", async function() {
+      await rejects(
+        globalThis.sqlparser.createStatementToObject("insert INTO blah_5_ values (1, 'three', 'something');"),
+        (/** @type {any} */ err) => {
+          strictEqual(
+            err.message,
+            "expected single create statement"
+          );
+          return true;
+        }
+      );
+    });
+  })
 
   describe("validateTableName()", function () {
     test("when provided with invalid table names", async function () {

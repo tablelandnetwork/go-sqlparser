@@ -12,6 +12,7 @@
     "ecmaVersion": 12
   },
   "rules": {
-    "import/order": "warn"
+    "import/order": "warn",
+    "no-use-before-define": "off"
   }
 }

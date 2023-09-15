@@ -14,7 +14,7 @@
     // Initialize module
     await init();
     // Parse content in header
-    const { Statements } = await globalThis.sqlparser.getAst(
+    const { statements } = await globalThis.sqlparser.normalize(
       document.querySelector("#raw").innerText
     );
     // Create code element with parsed string

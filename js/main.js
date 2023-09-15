@@ -1,10 +1,11 @@
+// @ts-check
+/* global Go */
+
 // Need to optionally shim `crypto.getRandomValues` and esbuild needs the
 // import to come before importing `wasm_exec.js`
 import "./polyfills/crypto.js";
-
-// @ts-check
-/* global Go */
 import "./wasm_exec.js";
+// @ts-ignore
 import mainWasm from "./main.wasm";
 
 // @ts-ignore
