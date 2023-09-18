@@ -52,11 +52,12 @@
     "wasm:go": "tinygo build -gc=leaking -no-debug -o main.wasm -target wasm ../cmd/wasm/main.go",
     "wasm:opt": "npx wasm-opt -O main.wasm -o main.wasm",
     "fixup": "echo '{\n  \"type\": \"commonjs\"\n}' > cjs/package.json",
+    "build:go-types": "cd ..; make types; cd js", 
     "build:cjs": "node ./cjs-build.js && npm run fixup",
     "build:esm": "node ./esm-build.js",
     "build:wasm": "npm run wasm:go && npm run wasm:opt",
-    "build": "npm run build:wasm && npm run build:cjs && npm run build:esm",
-    "clean": "rm -rf main.wasm cjs",
+    "build": "npm run build:wasm && npm run build:go-types && npm run build:cjs && npm run build:esm",
+    "clean": "rm -rf main.wasm cjs go-types.d.ts",
     "prepublishOnly": "npm run build"
   },
   "tsd": {
