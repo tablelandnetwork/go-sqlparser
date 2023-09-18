@@ -17,7 +17,7 @@ generate-diagrams:
 
 
 types:
-	struct2ts --interface --no-helpers \
+	go run github.com/OneOfOne/struct2ts/cmd/struct2ts@v1.0.6 --interface --no-helpers \
 	sqlparser.CreateTable \
 	sqlparser.ColumnConstraintPrimaryKey \
 	sqlparser.ColumnConstraintNotNull \

@@ -1,3 +1,4 @@
 .vscode
 .DS_Store
 diagrams*
+s2ts_gen_*.go
