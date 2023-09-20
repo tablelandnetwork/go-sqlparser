@@ -30,6 +30,6 @@ types:
 	sqlparser.TableConstraintUnique \
 	sqlparser.TableConstraintCheck \
 	> js/go-types.d.ts
-	echo "export type ColumnConstraint = ColumnConstraintPrimaryKey | ColumnConstraintNotNull | ColumnConstraintUnique | ColumnConstraintCheck | ColumnConstraintDefault | ColumnConstraintGenerated;" >> js/go-types.d.ts
+	echo "export type ColumnConstraint = ColumnConstraintPrimaryKey | ColumnConstraintNotNull | ColumnConstraintUnique | ColumnConstraintCheck | ColumnConstraintDefault | ColumnConstraintGenerated & { Type: string };" >> js/go-types.d.ts
 	echo "export type TableConstraint = TableConstraintPrimaryKey | TableConstraintUnique | TableConstraintCheck;" >> js/go-types.d.ts
 .PHONY: types

@@ -95,10 +95,20 @@ tinygo build -gc=leaking -no-debug -o main.wasm -target wasm ./main.go
 wasm-opt -O main.wasm -o main.wasm
 ```
 
+## Generate types
+
+From the top-level directory:
+
+```
+go get github.com/OneOfOne/struct2ts/...
+make types
+```
+
 or use the build scripts:
 
 ```
 npm install
+npm run build:go-types
 npm run build
 ```
 

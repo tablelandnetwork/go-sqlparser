@@ -1466,6 +1466,46 @@ func (node *CreateTable) StructureHash() string {
 	return hex.EncodeToString(hash)
 }
 
+// UnmarshalJSON implements the json.Marshaler interface.
+func (node *CreateTable) UnmarshalJSON(data []byte) error {
+	var v struct {
+		Table       *Table
+		ColumnsDef  []*ColumnDef
+		Constraints []json.RawMessage
+		StrictMode  bool
+	}
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	node.Table = v.Table
+	node.StrictMode = v.StrictMode
+	node.ColumnsDef = v.ColumnsDef
+	for _, constraintData := range v.Constraints {
+		var constraintType struct {
+			Type string
+		}
+		if err := json.Unmarshal(constraintData, &constraintType); err != nil {
+			return err
+		}
+
+		var constraint TableConstraint
+		switch constraintType.Type {
+		case "primary-key":
+			constraint = &TableConstraintPrimaryKey{}
+		case "unique":
+			constraint = &TableConstraintUnique{}
+		default:
+			return fmt.Errorf("unable to process constraint type: %s", constraintType.Type)
+		}
+
+		if err := json.Unmarshal(constraintData, constraint); err != nil {
+			return err
+		}
+		node.Constraints = append(node.Constraints, constraint)
+	}
+	return nil
+}
+
 // ColumnDef represents the column definition of a CREATE TABLE statement.
 type ColumnDef struct {
 	Column      *Column
@@ -1513,6 +1553,46 @@ func (node *ColumnDef) HasPrimaryKey() bool {
 	}
 
 	return false
+}
+
+// UnmarshalJSON implements the json.Marshaler interface.
+func (node *ColumnDef) UnmarshalJSON(data []byte) error {
+	var v struct {
+		Column      *Column
+		Type        string
+		Constraints []json.RawMessage
+	}
+	if err := json.Unmarshal(data, &v); err != nil {
+		return err
+	}
+	node.Type = v.Type
+	node.Column = v.Column
+	for _, constraintData := range v.Constraints {
+		var constraintType struct {
+			Type string
+		}
+		if err := json.Unmarshal(constraintData, &constraintType); err != nil {
+			return err
+		}
+
+		var constraint ColumnConstraint
+		switch constraintType.Type {
+		case "primary-key":
+			constraint = &ColumnConstraintPrimaryKey{}
+		case "not-null":
+			constraint = &ColumnConstraintNotNull{}
+		case "unique":
+			constraint = &ColumnConstraintUnique{}
+		default:
+			return fmt.Errorf("unable to process constraint type: %s", constraintType.Type)
+		}
+
+		if err := json.Unmarshal(constraintData, constraint); err != nil {
+			return err
+		}
+		node.Constraints = append(node.Constraints, constraint)
+	}
+	return nil
 }
 
 // Types for ColumnDef type.
@@ -1581,33 +1661,34 @@ const (
 	PrimaryKeyOrderDesc = "desc"
 )
 
-func (c *ColumnConstraintPrimaryKey) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (node *ColumnConstraintPrimaryKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Type string
 		ColumnConstraintPrimaryKey
 	}{
-		Type: "primary_key",
+		Type: "primary-key",
 		ColumnConstraintPrimaryKey: ColumnConstraintPrimaryKey{
-			Name:          c.Name,
-			Order:         c.Order,
-			AutoIncrement: c.AutoIncrement,
+			Name:          node.Name,
+			Order:         node.Order,
+			AutoIncrement: node.AutoIncrement,
 		},
 	})
 }
 
-func (c *ColumnConstraintPrimaryKey) UnmarshalJSON(data []byte) error {
-	var v struct {
-		Type string
-		ColumnConstraintPrimaryKey
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
-	c.Name = v.Name
-	c.Order = v.Order
-	c.AutoIncrement = v.AutoIncrement
-	return nil
-}
+// func (c *ColumnConstraintPrimaryKey) UnmarshalJSON(data []byte) error {
+// 	var v struct {
+// 		Type string
+// 		ColumnConstraintPrimaryKey
+// 	}
+// 	if err := json.Unmarshal(data, &v); err != nil {
+// 		return err
+// 	}
+// 	c.Name = v.Name
+// 	c.Order = v.Order
+// 	c.AutoIncrement = v.AutoIncrement
+// 	return nil
+// }
 
 // ColumnConstraintNotNull represents a NOT NULL column constraint for CREATE TABLE.
 type ColumnConstraintNotNull struct {
@@ -1632,29 +1713,30 @@ func (node *ColumnConstraintNotNull) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name)
 }
 
-func (c *ColumnConstraintNotNull) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (node *ColumnConstraintNotNull) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Type string
 		ColumnConstraintNotNull
 	}{
-		Type: "not_null",
+		Type: "not-null",
 		ColumnConstraintNotNull: ColumnConstraintNotNull{
-			Name: c.Name,
+			Name: node.Name,
 		},
 	})
 }
 
-func (c *ColumnConstraintNotNull) UnmarshalJSON(data []byte) error {
-	var v struct {
-		Type string
-		ColumnConstraintNotNull
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
-	c.Name = v.Name
-	return nil
-}
+// func (c *ColumnConstraintNotNull) UnmarshalJSON(data []byte) error {
+// 	var v struct {
+// 		Type string
+// 		ColumnConstraintNotNull
+// 	}
+// 	if err := json.Unmarshal(data, &v); err != nil {
+// 		return err
+// 	}
+// 	c.Name = v.Name
+// 	return nil
+// }
 
 // ColumnConstraintUnique represents a UNIQUE column constraint for CREATE TABLE.
 type ColumnConstraintUnique struct {
@@ -1679,29 +1761,30 @@ func (node *ColumnConstraintUnique) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name)
 }
 
-func (c *ColumnConstraintUnique) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (node *ColumnConstraintUnique) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Type string
 		ColumnConstraintUnique
 	}{
 		Type: "unique",
 		ColumnConstraintUnique: ColumnConstraintUnique{
-			Name: c.Name,
+			Name: node.Name,
 		},
 	})
 }
 
-func (c *ColumnConstraintUnique) UnmarshalJSON(data []byte) error {
-	var v struct {
-		Type string
-		ColumnConstraintUnique
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
-	c.Name = v.Name
-	return nil
-}
+// func (c *ColumnConstraintUnique) UnmarshalJSON(data []byte) error {
+// 	var v struct {
+// 		Type string
+// 		ColumnConstraintUnique
+// 	}
+// 	if err := json.Unmarshal(data, &v); err != nil {
+// 		return err
+// 	}
+// 	c.Name = v.Name
+// 	return nil
+// }
 
 // ColumnConstraintCheck represents a CHECK column constraint for CREATE TABLE.
 type ColumnConstraintCheck struct {
@@ -1726,31 +1809,32 @@ func (node *ColumnConstraintCheck) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Expr)
 }
 
-func (c *ColumnConstraintCheck) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (node *ColumnConstraintCheck) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Type string
 		ColumnConstraintCheck
 	}{
 		Type: "check",
 		ColumnConstraintCheck: ColumnConstraintCheck{
-			Name: c.Name,
-			Expr: c.Expr,
+			Name: node.Name,
+			Expr: node.Expr,
 		},
 	})
 }
 
-func (c *ColumnConstraintCheck) UnmarshalJSON(data []byte) error {
-	var v struct {
-		Type string
-		ColumnConstraintCheck
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
-	c.Name = v.Name
-	c.Expr = v.Expr
-	return nil
-}
+// func (c *ColumnConstraintCheck) UnmarshalJSON(data []byte) error {
+// 	var v struct {
+// 		Type string
+// 		ColumnConstraintCheck
+// 	}
+// 	if err := json.Unmarshal(data, &v); err != nil {
+// 		return err
+// 	}
+// 	c.Name = v.Name
+// 	c.Expr = v.Expr
+// 	return nil
+// }
 
 // ColumnConstraintDefault represents a DEFAULT column constraint for CREATE TABLE.
 type ColumnConstraintDefault struct {
@@ -1779,33 +1863,34 @@ func (node *ColumnConstraintDefault) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Expr)
 }
 
-func (c *ColumnConstraintDefault) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (node *ColumnConstraintDefault) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Type string
 		ColumnConstraintDefault
 	}{
 		Type: "default",
 		ColumnConstraintDefault: ColumnConstraintDefault{
-			Name:        c.Name,
-			Expr:        c.Expr,
-			Parenthesis: c.Parenthesis,
+			Name:        node.Name,
+			Expr:        node.Expr,
+			Parenthesis: node.Parenthesis,
 		},
 	})
 }
 
-func (c *ColumnConstraintDefault) UnmarshalJSON(data []byte) error {
-	var v struct {
-		Type string
-		ColumnConstraintDefault
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
-	c.Name = v.Name
-	c.Expr = v.Expr
-	c.Parenthesis = v.Parenthesis
-	return nil
-}
+// func (c *ColumnConstraintDefault) UnmarshalJSON(data []byte) error {
+// 	var v struct {
+// 		Type string
+// 		ColumnConstraintDefault
+// 	}
+// 	if err := json.Unmarshal(data, &v); err != nil {
+// 		return err
+// 	}
+// 	c.Name = v.Name
+// 	c.Expr = v.Expr
+// 	c.Parenthesis = v.Parenthesis
+// 	return nil
+// }
 
 // ColumnConstraintGenerated represents a GENERATED ALWAYS column constraint for CREATE TABLE.
 type ColumnConstraintGenerated struct {
@@ -1848,35 +1933,36 @@ func (node *ColumnConstraintGenerated) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Expr)
 }
 
-func (c *ColumnConstraintGenerated) MarshalJSON() ([]byte, error) {
+// MarshalJSON implements the json.Marshaler interface.
+func (node *ColumnConstraintGenerated) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Type string
 		ColumnConstraintGenerated
 	}{
 		Type: "generated",
 		ColumnConstraintGenerated: ColumnConstraintGenerated{
-			Name:            c.Name,
-			Expr:            c.Expr,
-			GeneratedAlways: c.GeneratedAlways,
-			IsStored:        c.IsStored,
+			Name:            node.Name,
+			Expr:            node.Expr,
+			GeneratedAlways: node.GeneratedAlways,
+			IsStored:        node.IsStored,
 		},
 	})
 }
 
-func (c *ColumnConstraintGenerated) UnmarshalJSON(data []byte) error {
-	var v struct {
-		Type string
-		ColumnConstraintGenerated
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
-		return err
-	}
-	c.Name = v.Name
-	c.Expr = v.Expr
-	c.GeneratedAlways = v.GeneratedAlways
-	c.IsStored = v.IsStored
-	return nil
-}
+// func (c *ColumnConstraintGenerated) UnmarshalJSON(data []byte) error {
+// 	var v struct {
+// 		Type string
+// 		ColumnConstraintGenerated
+// 	}
+// 	if err := json.Unmarshal(data, &v); err != nil {
+// 		return err
+// 	}
+// 	c.Name = v.Name
+// 	c.Expr = v.Expr
+// 	c.GeneratedAlways = v.GeneratedAlways
+// 	c.IsStored = v.IsStored
+// 	return nil
+// }
 
 // TableConstraint is a contrainst applied to the whole table in a CREATE TABLE statement.
 type TableConstraint interface {
@@ -1912,6 +1998,20 @@ func (node *TableConstraintPrimaryKey) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Columns)
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (node *TableConstraintPrimaryKey) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Type string
+		TableConstraintPrimaryKey
+	}{
+		Type: "primary-key",
+		TableConstraintPrimaryKey: TableConstraintPrimaryKey{
+			Name:    node.Name,
+			Columns: node.Columns,
+		},
+	})
+}
+
 // TableConstraintUnique is a UNIQUE constraint for table definition.
 type TableConstraintUnique struct {
 	Name    Identifier
@@ -1936,6 +2036,20 @@ func (node *TableConstraintUnique) walkSubtree(visit Visit) error {
 	return Walk(visit, node.Name, node.Columns)
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (node *TableConstraintUnique) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Type string
+		TableConstraintUnique
+	}{
+		Type: "unique",
+		TableConstraintUnique: TableConstraintUnique{
+			Name:    node.Name,
+			Columns: node.Columns,
+		},
+	})
+}
+
 // TableConstraintCheck is a CHECK constraint for table definition.
 type TableConstraintCheck struct {
 	Name Identifier
@@ -1958,6 +2072,20 @@ func (node *TableConstraintCheck) walkSubtree(visit Visit) error {
 	}
 
 	return Walk(visit, node.Name, node.Expr)
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (node *TableConstraintCheck) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Type string
+		TableConstraintCheck
+	}{
+		Type: "check",
+		TableConstraintCheck: TableConstraintCheck{
+			Name: node.Name,
+			Expr: node.Expr,
+		},
+	})
 }
 
 // Insert represents an INSERT statement.

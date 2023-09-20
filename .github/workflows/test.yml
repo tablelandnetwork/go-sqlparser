@@ -62,11 +62,6 @@ jobs:
             ${{ runner.os }}-build-
             ${{ runner.os }}-
 
-      - name: Install Go
-        uses: actions/setup-go@v2
-        with:
-          go-version: v1.20
-
       - name: Node ⬢
         uses: actions/setup-node@v2-beta
         with:
@@ -81,9 +76,7 @@ jobs:
         run: npm install
 
       - name: Build 🛠
-        run: |
-          go get -u github.com/OneOfOne/struct2ts/...
-          npm run build
+        run: npm run build
 
       - name: Test 🧪
         run: npm test

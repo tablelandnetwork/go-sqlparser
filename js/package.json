@@ -56,7 +56,7 @@
     "build:cjs": "node ./cjs-build.js && npm run fixup",
     "build:esm": "node ./esm-build.js",
     "build:wasm": "npm run wasm:go && npm run wasm:opt",
-    "build": "npm run build:wasm && npm run build:go-types && npm run build:cjs && npm run build:esm",
+    "build": "npm run build:wasm && npm run build:cjs && npm run build:esm",
     "clean": "rm -rf main.wasm cjs go-types.d.ts",
     "prepublishOnly": "npm run build"
   },
