@@ -85,7 +85,7 @@ Use the corresponding tinygo version.
 **Warning** this will overwrite any existing `wasm_exec.js` file, which has Tableland specific modifications.
 
 ```
-wget https://raw.githubusercontent.com/tinygo-org/tinygo/v0.28.1/targets/wasm_exec.js
+wget https://raw.githubusercontent.com/tinygo-org/tinygo/v0.29.0/targets/wasm_exec.js
 ```
 
 ## Build with tinygo

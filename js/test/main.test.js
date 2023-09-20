@@ -377,6 +377,36 @@ describe("sqlparser", function () {
       strictEqual(observed, expected);
     });
 
+    test("from object when constraint is ambiguous", async function() {
+      /** @type {import("@tableland/sqlparser").CreateTable } */
+      const obj = {
+        Table: {
+          Name: "blah_5_30001",
+          IsTarget: true
+        },
+        ColumnsDef: [
+          {
+            Column: {
+              Name: "id",
+              TableRef: null,
+            },
+            Type: "int",
+            Constraints: [{
+              Type: "primary key",
+              Name: "id",
+              Order: "asc",
+              AutoIncrement: false,
+            }]
+          }
+        ],
+        Constraints: [],
+        StrictMode: false
+      };
+      const observed = await globalThis.sqlparser.createStatementFromObject(obj);
+      const expected = "create table blah_5_30001(id int)";
+      strictEqual(observed, expected);
+    });
+
     test("to object", async function() {
       /** @type {import("@tableland/sqlparser").CreateTable } */
       const expected = {

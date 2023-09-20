@@ -96,7 +96,7 @@ export type ColumnConstraint =
   | ColumnConstraintUnique
   | ColumnConstraintCheck
   | ColumnConstraintDefault
-  | ColumnConstraintGenerated;
+  | ColumnConstraintGenerated & { Type: string };
 export type TableConstraint =
   | TableConstraintPrimaryKey
   | TableConstraintUnique
