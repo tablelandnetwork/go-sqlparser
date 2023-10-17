@@ -22,7 +22,7 @@
   "devDependencies": {
     "@types/assert": "^1.5.7",
     "@types/mocha": "^10.0.2",
-    "@types/node": "^20.8.4",
+    "@types/node": "^20.8.6",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
     "@typescript-eslint/parser": "^6.8.0",
     "assert": "^2.1.0",
