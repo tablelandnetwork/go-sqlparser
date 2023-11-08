@@ -1,6 +1,7 @@
 package sqlparser
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 
@@ -153,5 +154,44 @@ func TestWalk(t *testing.T) {
 			return false, nil
 		}, ast)
 		require.NoError(t, err)
+	})
+}
+
+func TestJsonMarshalling(t *testing.T) {
+	t.Parallel()
+
+	t.Run("roundtrip", func(t *testing.T) {
+		t.Parallel()
+
+		sql := "CREATE TABLE t (id INT CONSTRAINT nm NOT NULL, id2 INT, CONSTRAINT pk PRIMARY KEY (id), CONSTRAINT un UNIQUE (id, id2));" // nolint
+		ast, err := Parse(sql)
+		require.NoError(t, err)
+		create, ok := ast.Statements[0].(CreateTableStatement)
+		require.True(t, ok)
+		table, ok := create.(*CreateTable)
+		require.True(t, ok)
+		b, err := json.Marshal(&table)
+		require.NoError(t, err)
+		var output CreateTable
+		err = json.Unmarshal(b, &output)
+		require.NoError(t, err)
+		require.Equal(t, ast.String(), output.String())
+	})
+
+	t.Run("limited types on unmarshall", func(t *testing.T) {
+		t.Parallel()
+
+		sql := "CREATE TABLE t (a INT CONSTRAINT default_constraint DEFAULT 0, b INT DEFAULT 1, c INT DEFAULT 0x1, d TEXT DEFAULT 'foo', e TEXT DEFAULT ('foo'), f INT DEFAULT +1);" // nolint
+		ast, err := Parse(sql)
+		require.NoError(t, err)
+		create, ok := ast.Statements[0].(CreateTableStatement)
+		require.True(t, ok)
+		table, ok := create.(*CreateTable)
+		require.True(t, ok)
+		b, err := json.Marshal(&table)
+		require.NoError(t, err)
+		var output CreateTable
+		err = json.Unmarshal(b, &output)
+		require.Error(t, err)
 	})
 }

@@ -10,7 +10,6 @@
     "esModuleInterop": true,
     "strict": true,
     "allowJs": true,
-    "skipLibCheck": true,
-    "types": ["types.d.ts", "@types/node"]
+    "skipLibCheck": true
   }
 }

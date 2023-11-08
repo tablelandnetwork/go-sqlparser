@@ -2,6 +2,7 @@
 package main
 
 import (
+	"encoding/json"
 	"regexp"
 	"strings"
 	"syscall/js"
@@ -28,6 +29,22 @@ const (
 type EnclosingType struct {
 	open  string
 	close string
+}
+
+var (
+	Console   js.Value
+	JSON      js.Value
+	Error     js.Value
+	TypeError js.Value
+	Promise   js.Value
+)
+
+func init() {
+	Console = js.Global().Get("console")
+	TypeError = js.Global().Get("TypeError")
+	Error = js.Global().Get("Error")
+	Promise = js.Global().Get("Promise")
+	JSON = js.Global().Get("JSON")
 }
 
 func getEnclosures() []EnclosingType {
@@ -65,9 +82,65 @@ func UpdateTableNames(node sqlparser.Node, nameMapper func(string) (string, bool
 	return node, nil
 }
 
+func createStatementFromObject(this js.Value, args []js.Value) interface{} {
+	if len(args) < 1 {
+		return Promise.Call("reject", Error.New("missing required argument: ast"))
+	}
+	astObject := args[0]
+	if astObject.Type() != js.TypeObject {
+		return Promise.Call("reject", TypeError.New("invalid argument: object expected"))
+	}
+	handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		resolve := args[0]
+		reject := args[1]
+		go func() interface{} {
+			jsonString := JSON.Call("stringify", astObject).String()
+			var create sqlparser.CreateTable
+			if err := json.Unmarshal([]byte(jsonString), &create); err != nil {
+				return reject.Invoke(Error.New("Error unmarshaling into struct: " + err.Error()))
+			}
+			var response interface{} = create.String()
+			return resolve.Invoke(js.ValueOf(response))
+		}()
+		return nil
+	})
+	return Promise.New(handler)
+}
+
+func createStatementToObject(this js.Value, args []js.Value) interface{} {
+	if len(args) < 1 {
+		return Promise.Call("reject", Error.New("missing required argument: statement"))
+	}
+	statement := args[0].String()
+	handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		resolve := args[0]
+		reject := args[1]
+		go func() interface{} {
+			ast, err := sqlparser.Parse(statement)
+			if err != nil {
+				return reject.Invoke(Error.New("error parsing statement: " + err.Error()))
+			}
+			if len(ast.Statements) == 0 {
+				return reject.Invoke(Error.New("error parsing statement: empty string"))
+			}
+			if len(ast.Statements) > 1 {
+				return reject.Invoke(Error.New("expected single create statement"))
+			}
+			create, ok := ast.Statements[0].(sqlparser.CreateTableStatement)
+			if !ok {
+				return reject.Invoke(Error.New("expected single create statement"))
+			}
+			b, _ := json.Marshal(&create)
+			var response map[string]interface{}
+			_ = json.Unmarshal(b, &response)
+			return resolve.Invoke(js.ValueOf(response))
+		}()
+		return nil
+	})
+	return Promise.New(handler)
+}
+
 func validateTableName(this js.Value, args []js.Value) interface{} {
-	Error := js.Global().Get("Error")
-	Promise := js.Global().Get("Promise")
 	if len(args) < 1 {
 		return Promise.Call("reject", Error.New("missing required argument: tableName"))
 	}
@@ -108,8 +181,6 @@ func validateTableName(this js.Value, args []js.Value) interface{} {
 }
 
 func getUniqueTableNames(this js.Value, args []js.Value) interface{} {
-	Error := js.Global().Get("Error")
-	Promise := js.Global().Get("Promise")
 	if len(args) < 1 {
 		return Promise.Call("reject", Error.New("missing required argument: statement"))
 	}
@@ -135,8 +206,6 @@ func getUniqueTableNames(this js.Value, args []js.Value) interface{} {
 }
 
 func normalize(this js.Value, args []js.Value) interface{} {
-	Error := js.Global().Get("Error")
-	Promise := js.Global().Get("Promise")
 	if len(args) < 1 {
 		return Promise.Call("reject", Error.New("missing required argument: statement"))
 	}
@@ -236,9 +305,11 @@ func getEnclosedName(name string) (string, EnclosingType, bool) {
 func main() {
 	// Outer object is exported globally and contains these keys
 	js.Global().Set(GLOBAL_NAME, js.ValueOf(map[string]interface{}{
-		"normalize":           js.FuncOf(normalize),
-		"validateTableName":   js.FuncOf(validateTableName),
-		"getUniqueTableNames": js.FuncOf(getUniqueTableNames),
+		"normalize":                 js.FuncOf(normalize),
+		"validateTableName":         js.FuncOf(validateTableName),
+		"getUniqueTableNames":       js.FuncOf(getUniqueTableNames),
+		"createStatementFromObject": js.FuncOf(createStatementFromObject),
+		"createStatementToObject":   js.FuncOf(createStatementToObject),
 	}))
 
 	<-make(chan bool)

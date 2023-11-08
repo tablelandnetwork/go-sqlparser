@@ -34,9 +34,11 @@ declare module "@tableland/sqlparser" {
   export type NormalizedStatement = sqlparser.NormalizedStatement;
   export type ValidatedTable = sqlparser.ValidatedTable;
   export type StatementType = sqlparser.StatementType;
+  export type CreateTable = sqlparser.CreateTable;
 }
 
 declare namespace sqlparser {
+  type CreateTable = import("./go-types").CreateTable;
   // StatementType is the type of SQL statement.
   export type StatementType = "read" | "write" | "create" | "acl";
 
@@ -86,4 +88,22 @@ declare namespace sqlparser {
    * @return A `Promise` that resolves to an array of strings.
    */
   export function getUniqueTableNames(sql: string): Promise<string[]>;
+
+  export { CreateTable };
+
+  /**
+   * Internal API: Build an AST from a string containing (possibly multiple) SQL statement(s).
+   * @internal
+   * @param sql A string containing SQL statement(s).
+   * @return A `Promise` that resolves to an AST object.
+   */
+  export function createStatementToObject(sql: string): Promise<CreateTable>;
+
+  /**
+   * Internal API: Build a string containing (possibly multiple) SQL statement(s) from an input AST.
+   * @internal
+   * @param ast An AST object.
+   * @return A `Promise` that resolves to a string containing (possibly multiple) SQL statement(s).
+   */
+  export function createStatementFromObject(ast: CreateTable): Promise<string>;
 }

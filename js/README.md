@@ -72,6 +72,8 @@ To get started clone this repo.
 
 ## Install tinygo
 
+We require tinygo version `0.28.1` or greater
+
 ```
 brew tap tinygo-org/tools
 brew install tinygo
@@ -79,10 +81,11 @@ brew install tinygo
 
 ## Fetch wasm helpers
 
-Use the corresponding tinygo version
+Use the corresponding tinygo version.
+**Warning** this will overwrite any existing `wasm_exec.js` file, which has Tableland specific modifications.
 
 ```
-wget https://raw.githubusercontent.com/tinygo-org/tinygo/v0.23.0/targets/wasm_exec.js
+wget https://raw.githubusercontent.com/tinygo-org/tinygo/v0.29.0/targets/wasm_exec.js
 ```
 
 ## Build with tinygo
@@ -92,10 +95,20 @@ tinygo build -gc=leaking -no-debug -o main.wasm -target wasm ./main.go
 wasm-opt -O main.wasm -o main.wasm
 ```
 
+## Generate types
+
+From the top-level directory:
+
+```
+go get github.com/OneOfOne/struct2ts/...
+make types
+```
+
 or use the build scripts:
 
 ```
 npm install
+npm run build:go-types
 npm run build
 ```
 

@@ -1,26 +1,29 @@
 <html>
-  <head>
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <p>
-      <code id="raw">SELECT * from blah WHERE id = 1;</code>
-    </p>
-    <script type="module">
-      // Load module
-      import init from "../module.js";
-      // Initialize module
-      await init();
-      // Parse content in header
-      const { statements } = await globalThis.sqlparser.normalize(
-        document.querySelector("#raw").innerText
-      );
-      // Create code element with parsed string
-      const output = document.createElement("code");
-      output.id = "parsed";
-      output.innerHTML = statements.join(";");
-      // Add to body
-      document.body.appendChild(output);
-    </script>
-  </body>
+
+<head>
+  <meta charset="utf-8" />
+</head>
+
+<body>
+  <p>
+    <code id="raw">SELECT * from blah WHERE id = 1;</code>
+  </p>
+  <script type="module">
+    // Load module
+    import init from "../esm/out.js";
+    // Initialize module
+    await init();
+    // Parse content in header
+    const { statements } = await globalThis.sqlparser.normalize(
+      document.querySelector("#raw").innerText
+    );
+    // Create code element with parsed string
+    const output = document.createElement("code");
+    output.id = "parsed";
+    output.innerHTML = JSON.stringify(Statements, null, 2);
+    // Add to body
+    document.body.appendChild(output);
+  </script>
+</body>
+
 </html>
