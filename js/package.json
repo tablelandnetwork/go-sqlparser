@@ -23,7 +23,7 @@
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.10.5",
-    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
     "assert": "^2.1.0",
     "esbuild": "0.19.10",
@@ -36,7 +36,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^10.2.0",
     "prettier": "^3.1.1",
-    "tsd": "^0.30.0",
+    "tsd": "^0.30.1",
     "wasm-opt": "^1.4.0"
   },
   "scripts": {
