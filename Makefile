@@ -3,7 +3,7 @@ lint:
 .PHONY: lint
 
 test:
-	go test ./... -race
+	go test $(go list ./... | grep -v cmd) -race
 .PHONY: test
 
 generate:

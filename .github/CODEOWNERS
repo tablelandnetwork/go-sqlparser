@@ -3,3 +3,4 @@
 # By convention in @tablelandnetwork repos, the first listed
 # CODEOWNER is the repo DRI (directly responsible individual)
 *       @brunocalza @avichalp
+/js/    @carsonfarmer @joewagner @brunocalza
