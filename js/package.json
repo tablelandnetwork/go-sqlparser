@@ -35,7 +35,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^10.2.0",
-    "prettier": "^3.2.4",
+    "prettier": "^3.2.5",
     "tsd": "^0.30.4",
     "wasm-opt": "^1.4.0"
   },
