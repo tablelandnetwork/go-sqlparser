@@ -22,9 +22,9 @@
   "devDependencies": {
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.11.28",
+    "@types/node": "^20.12.2",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "@typescript-eslint/parser": "^7.2.0",
+    "@typescript-eslint/parser": "^7.5.0",
     "assert": "^2.1.0",
     "esbuild": "0.20.2",
     "esbuild-plugin-wat": "^0.2.7",
@@ -34,9 +34,9 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
-    "mocha": "^10.3.0",
+    "mocha": "^10.4.0",
     "prettier": "^3.2.5",
-    "tsd": "^0.30.7",
+    "tsd": "^0.31.0",
     "wasm-opt": "^1.4.0"
   },
   "scripts": {
