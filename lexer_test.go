@@ -15,7 +15,7 @@ func TestLexer(t *testing.T) {
 		< >= <= <> ->
 		->> || LIKE IS ISNULL
 		NOTNULL IN regexp GLOB MATCH 
-		ESCAPE COLLATE . & | + * / % ~ ;
+		ESCAPE COLLATE . & | + * / % ~ ; ?
 		<< >> BETWEEN AND
 		CASE WHEN THEN ELSE END
 		SELECT FROM WHERE GROUP BY UNION EXCEPT INTERSECT
@@ -38,7 +38,7 @@ func TestLexer(t *testing.T) {
 		JSON_UNQUOTE_EXTRACT_OP, CONCAT, LIKE, IS, ISNULL,
 		NOTNULL, IN, REGEXP, GLOB, MATCH,
 		ESCAPE, COLLATE, '.', '&', '|',
-		'+', '*', '/', '%', '~', ';',
+		'+', '*', '/', '%', '~', ';', '?',
 		LSHIFT, RSHIFT, BETWEEN, AND,
 		CASE, WHEN, THEN, ELSE, END,
 		SELECT, FROM, WHERE, GROUP, BY, UNION, EXCEPT, INTERSECT,

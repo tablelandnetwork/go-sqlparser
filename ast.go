@@ -119,6 +119,9 @@ type ReadStatementResolver interface {
 	// GetBlockNumber returns the last known block number for the provided chainID. If the chainID isn't known,
 	// it returns (0, false).
 	GetBlockNumber(chainID int64) (int64, bool)
+
+	// GetBindValues returns a slice of values to be bound to their respective parameters.
+	GetBindValues() []Expr
 }
 
 // WriteStatementResolver resolves Tableland Custom Functions for a write statement.
@@ -1394,6 +1397,25 @@ func (node Identifier) IsEmpty() bool {
 	return node == ""
 }
 
+// Param represents a question mark (?) parameter.
+type Param struct {
+	ResolvedString string
+}
+
+func (node *Param) iExpr() {}
+
+// String returns the string representation of the node.
+func (node *Param) String() string {
+	if node.ResolvedString != "" {
+		return node.ResolvedString
+	}
+	return "?"
+}
+
+func (node *Param) walkSubtree(_ Visit) error {
+	return nil
+}
+
 // CreateTable represents a CREATE TABLE statement.
 type CreateTable struct {
 	Table       *Table
@@ -2285,13 +2307,26 @@ func (node *AlterTableAdd) walkSubtree(visit Visit) error {
 // resolvers
 
 func resolveReadStatementWalk(node Node, resolver ReadStatementResolver) (string, error) {
+	if resolver == nil {
+		return "", errors.New("read resolver is needed")
+	}
+
+	resolveReadStatementParam := resolveReadStatementParam(resolver)
 	err := Walk(func(node Node) (bool, error) {
 		if funcExpr, ok := node.(*CustomFuncExpr); ok && funcExpr != nil {
-			resolvedString, err := resolveReadStatement(funcExpr, resolver)
+			resolvedString, err := resolveReadStatementCustomFunc(funcExpr, resolver)
 			if err != nil {
 				return true, fmt.Errorf("resolve read statement: %s", err)
 			}
 			funcExpr.ResolvedString = resolvedString
+		}
+
+		if paramNode, ok := node.(*Param); ok {
+			resolvedString, err := resolveReadStatementParam()
+			if err != nil {
+				return true, fmt.Errorf("resolve read statement: %s", err)
+			}
+			paramNode.ResolvedString = resolvedString
 		}
 		return false, nil
 	}, node)
@@ -2301,11 +2336,7 @@ func resolveReadStatementWalk(node Node, resolver ReadStatementResolver) (string
 	return node.String(), nil
 }
 
-func resolveReadStatement(node *CustomFuncExpr, resolver ReadStatementResolver) (string, error) {
-	if resolver == nil {
-		return "", errors.New("read resolver is needed")
-	}
-
+func resolveReadStatementCustomFunc(node *CustomFuncExpr, resolver ReadStatementResolver) (string, error) {
 	switch node.Name {
 	case "block_num":
 		if len(node.Args) != 1 {
@@ -2335,6 +2366,24 @@ func resolveReadStatement(node *CustomFuncExpr, resolver ReadStatementResolver) 
 	}
 
 	return "", fmt.Errorf("custom function %s is not resolvable", node.Name)
+}
+
+// resolveReadStatementParam returns a function that acts like an iterator.
+// Every time the function is called it gets the next bind value.
+func resolveReadStatementParam(resolver ReadStatementResolver) func() (string, error) {
+	bindValues := resolver.GetBindValues()
+	i := 0
+
+	return func() (string, error) {
+		if i >= len(bindValues) {
+			return "", fmt.Errorf("number of params is greater than the number of bind values")
+		}
+
+		s := bindValues[i].String()
+		i++
+
+		return s, nil
+	}
 }
 
 func resolveWriteStatementWalk(node Node, resolver WriteStatementResolver) (string, error) {

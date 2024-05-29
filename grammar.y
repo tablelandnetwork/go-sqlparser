@@ -95,12 +95,13 @@ func isRowID(column Identifier) bool {
   onConflictTarget *OnConflictTarget
   collateOpt Identifier
   joinOperator *JoinOperator
+  param *Param
 }
 
 %token <bytes> IDENTIFIER STRING INTEGRAL HEXNUM FLOAT BLOBVAL
 %token ERROR 
 %token <empty> TRUE FALSE NULL AND
-%token <empty> '(' ',' ')' '.' ';'
+%token <empty> '(' ',' ')' '.' ';' '?'
 %token <empty> NONE INTEGER TEXT CAST AS
 %token <empty> CASE WHEN THEN ELSE END
 %token <empty> SELECT FROM WHERE GROUP BY HAVING LIMIT OFFSET ORDER ASC DESC NULLS FIRST LAST DISTINCT ALL EXISTS FILTER UNION EXCEPT INTERSECT
@@ -177,6 +178,7 @@ func isRowID(column Identifier) bool {
 %type <onConflictClause> on_conflict_clause
 %type <onConflictTarget> conflict_target_opt
 %type <joinOperator> join_op
+%type <param> param
 
 %%
 start: 
@@ -630,6 +632,7 @@ table_name:
 
 expr: 
   literal_value { $$ = $1 }
+| param { $$ = $1 }
 | column_name { $$ = $1 }
 | table_name '.' column_name
   {
@@ -1728,5 +1731,11 @@ identifier:
 
     $$ = Identifier($1)
   }
+
+param:
+  '?'
+  {
+    $$ = &Param{}
+  };
 %%
 
