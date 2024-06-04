@@ -5502,12 +5502,17 @@ func TestInsertWithSelect(t *testing.T) {
 }
 
 type readResolver struct {
-	m map[int]int64
+	m      map[int]int64
+	values []Expr
 }
 
 func (r *readResolver) GetBlockNumber(chainID int64) (int64, bool) {
 	v, ok := r.m[int(chainID)]
 	return v, ok
+}
+
+func (r *readResolver) GetBindValues() []Expr {
+	return r.values
 }
 
 type writeResolver struct{}
@@ -5531,7 +5536,8 @@ func TestCustomFunctionResolveReadQuery(t *testing.T) {
 	}
 
 	resolver := &readResolver{
-		map[int]int64{1337: 100, 5: 200, 1: 300},
+		m:      map[int]int64{1337: 100, 5: 200, 1: 300},
+		values: make([]Expr, 0),
 	}
 
 	tests := []testCase{
@@ -5718,6 +5724,54 @@ func TestCustomFunctionResolveWriteQuery(t *testing.T) {
 	})
 }
 
+func TestBindValuesResolveReadQuery(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name     string
+		query    string
+		mustFail bool
+		expQuery string
+	}
+
+	resolver := &readResolver{
+		values: []Expr{&Value{Type: StrValue, Value: []byte("joe")}, &Value{Type: IntValue, Value: []byte("12")}},
+	}
+
+	tests := []testCase{
+		{
+			name:     "select with params",
+			query:    "select * from from_1337_1 where name = ? and age = ?",
+			expQuery: "select * from from_1337_1 where name='joe' and age=12",
+		},
+		{
+			name:     "select with params with less values than params",
+			query:    "select * from from_1337_1 where name = ? and age = ? and height = ?",
+			mustFail: true,
+		},
+	}
+
+	for _, it := range tests {
+		t.Run(it.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+
+				ast, err := Parse(tc.query)
+				require.NoError(t, err)
+
+				for _, stmt := range ast.Statements {
+					resolved, err := stmt.(ReadStatement).Resolve(resolver)
+					if tc.mustFail {
+						require.Error(t, err)
+						return
+					}
+					require.Equal(t, tc.expQuery, resolved)
+				}
+			}
+		}(it))
+	}
+}
+
 func TestAlterTable(t *testing.T) {
 	type testCase struct {
 		name        string
@@ -5880,6 +5934,63 @@ func TestAlterTable(t *testing.T) {
 		require.Error(t, err)
 		require.ErrorAs(t, err, &expErr)
 	})
+}
+
+func TestSelectStatementWithParams(t *testing.T) {
+	t.Parallel()
+
+	type testCase struct {
+		name        string
+		stmt        string
+		deparsed    string
+		expectedAST *AST
+	}
+
+	tests := []testCase{
+		{
+			name:     "select param",
+			stmt:     "SELECT a FROM t WHERE a = ?",
+			deparsed: "select a from t where a=?",
+			expectedAST: &AST{
+				Statements: []Statement{
+					&Select{
+						SelectColumnList: SelectColumnList{
+							&AliasedSelectColumn{
+								Expr: &Column{Name: "a"},
+							},
+						},
+						From: &AliasedTableExpr{
+							Expr: &Table{Name: "t", IsTarget: true},
+						},
+						Where: &Where{
+							Type: WhereStr,
+							Expr: &CmpExpr{
+								Operator: EqualStr,
+								Left: &Column{
+									Name: Identifier("a"),
+								},
+								Right: &Param{},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(tc testCase) func(t *testing.T) {
+			return func(t *testing.T) {
+				t.Parallel()
+				ast, err := Parse(tc.stmt)
+
+				require.NoError(t, err)
+				require.Len(t, ast.Errors, 0)
+				require.Equal(t, tc.expectedAST, ast)
+				require.Equal(t, tc.deparsed, ast.String())
+			}
+		}(tc))
+	}
 }
 
 // This is not really a test. It just helps identify which SQLite keywords are reserved and which are not.

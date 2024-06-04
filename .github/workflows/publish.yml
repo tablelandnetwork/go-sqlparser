@@ -41,6 +41,7 @@ jobs:
         uses: jaywcjlove/github-action-package@v1.3.0
         with:
           version: ${{ github.event.inputs.release_version }}
+          path: ./js
 
       - name: Install 🔧
         run: npm install

@@ -316,7 +316,7 @@ func (l *Lexer) Lex(lval *yySymType) (token int) {
 	}
 
 	switch ch := l.ch; ch {
-	case '(', ')', ',', '&', '+', '*', '/', '%', '~', ';':
+	case '(', ')', ',', '&', '+', '*', '/', '%', '~', ';', '?':
 		l.literal = []byte{ch}
 		l.readByte()
 		return int(ch)
