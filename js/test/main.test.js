@@ -240,6 +240,19 @@ describe("sqlparser", function () {
       );
     });
 
+    test("when mapping names to table without a prefix", async function () {
+      const { tables, statements, type } = await globalThis.sqlparser.normalize(
+        "select * from t1;",
+        { t1: "_31337_123" }
+      );
+
+      deepStrictEqual(tables, ["_31337_123"]);
+      deepStrictEqual(statements, [
+        'select * from _31337_123',
+      ]);
+      strictEqual(type, "read");
+    });
+
     test("when mapping ens names to something else", async function () {
       // Also tests escape wrappers ``, [], and ""
       const { tables, statements, type } = await globalThis.sqlparser.normalize(

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 	"syscall/js"
@@ -13,7 +14,7 @@ const GLOBAL_NAME = "sqlparser"
 
 var (
 	maxQuerySize   = 35000
-	tableNameRegEx = regexp.MustCompile("^([A-Za-z]+[A-Za-z0-9_.]*)*$")
+	tableNameRegEx = regexp.MustCompile("^([A-Za-z_]+[A-Za-z0-9_.]*)*$")
 )
 
 type StatementType string
@@ -158,6 +159,7 @@ func normalize(this js.Value, args []js.Value) interface{} {
 			}
 			if !nameMap.IsUndefined() {
 				if _, err := UpdateTableNames(ast, func(name string) (string, bool) {
+					fmt.Println(name);
 					// take the name and see if it's captured by any of our enclosure characters
 					// if so, map what's inside the enclosure, if not try to map the original name
 					var value js.Value
