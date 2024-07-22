@@ -2,7 +2,6 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 	"syscall/js"
@@ -159,7 +158,6 @@ func normalize(this js.Value, args []js.Value) interface{} {
 			}
 			if !nameMap.IsUndefined() {
 				if _, err := UpdateTableNames(ast, func(name string) (string, bool) {
-					fmt.Println(name);
 					// take the name and see if it's captured by any of our enclosure characters
 					// if so, map what's inside the enclosure, if not try to map the original name
 					var value js.Value
