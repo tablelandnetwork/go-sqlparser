@@ -13,7 +13,7 @@ const GLOBAL_NAME = "sqlparser"
 
 var (
 	maxQuerySize   = 35000
-	tableNameRegEx = regexp.MustCompile("^([A-Za-z]+[A-Za-z0-9_.]*)*$")
+	tableNameRegEx = regexp.MustCompile("^([A-Za-z_]+[A-Za-z0-9_.]*)*$")
 )
 
 type StatementType string
