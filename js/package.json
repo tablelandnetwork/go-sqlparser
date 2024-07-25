@@ -23,7 +23,7 @@
     "@types/assert": "^1.5.10",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.14.12",
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
     "assert": "^2.1.0",
     "esbuild": "0.21.5",
