@@ -4772,97 +4772,37 @@ func TestLimits(t *testing.T) {
 	})
 }
 
-func TestDisallowSubqueriesOnStatements(t *testing.T) {
+func TestAllowSubqueriesOnStatements(t *testing.T) {
 	t.Parallel()
 	t.Run("insert", func(t *testing.T) {
 		ast, err := Parse("insert into t (a) VALUES ((select 1 FROM t limit 1))")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrStatementContainsSubquery
-		require.ErrorAs(t, ast.Errors[0], &e)
-		if errors.As(ast.Errors[0], &e) {
-			require.Equal(t, "insert", e.StatementKind)
-		}
-		require.ErrorAs(t, err, &e)
+		require.NoError(t, err)
 		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("update update expr", func(t *testing.T) {
 		ast, err := Parse("update t set a = (select 1 FROM t limit 1)")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrStatementContainsSubquery
-		require.ErrorAs(t, ast.Errors[0], &e)
-		if errors.As(ast.Errors[0], &e) {
-			require.Equal(t, "update", e.StatementKind)
-		}
-		require.ErrorAs(t, err, &e)
+		require.NoError(t, err)
 		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("update where", func(t *testing.T) {
 		ast, err := Parse("update foo set a=1 where a=(select a from bar limit 1) and b=1")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrStatementContainsSubquery
-		require.ErrorAs(t, ast.Errors[0], &e)
-		if errors.As(ast.Errors[0], &e) {
-			require.Equal(t, "where", e.StatementKind)
-		}
-		require.ErrorAs(t, err, &e)
+		require.NoError(t, err)
 		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("delete", func(t *testing.T) {
 		ast, err := Parse("delete from t where a or (select 1 FROM t limit 1)")
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrStatementContainsSubquery
-		require.ErrorAs(t, ast.Errors[0], &e)
-		if errors.As(ast.Errors[0], &e) {
-			require.Equal(t, "delete", e.StatementKind)
-		}
-		require.ErrorAs(t, err, &e)
+		require.NoError(t, err)
 		require.Equal(t, true, containsSubquery(ast))
 	})
 
 	t.Run("upsert", func(t *testing.T) {
 		ast, err := Parse("INSERT INTO t (id, count) VALUES (1, 1) ON CONFLICT (id) DO UPDATE SET count = count + 1 WHERE (SELECT 1 FROM t2);") // nolint
-		require.Error(t, err)
-		require.Len(t, ast.Errors, 1)
-
-		var e *ErrStatementContainsSubquery
-		require.ErrorAs(t, ast.Errors[0], &e)
-		if errors.As(ast.Errors[0], &e) {
-			require.Equal(t, "where", e.StatementKind)
-		}
-		require.ErrorAs(t, err, &e)
+		require.NoError(t, err)
 		require.Equal(t, true, containsSubquery(ast))
 	})
-}
-
-func TestMultipleErrors(t *testing.T) {
-	t.Parallel()
-	ast, err := Parse("UPDATE t SET a = (select 1 from t2), b = unknown()")
-	require.Error(t, err)
-	require.Len(t, ast.Errors, 1)
-
-	var e1 *ErrStatementContainsSubquery
-	var e2 *ErrNoSuchFunction
-	require.ErrorAs(t, ast.Errors[0], &e1)
-	require.ErrorAs(t, ast.Errors[0], &e2)
-	if errors.As(ast.Errors[0], &e1) {
-		require.Equal(t, "update", e1.StatementKind)
-	}
-	if errors.As(ast.Errors[0], &e2) {
-		require.Equal(t, "unknown", e2.FunctionName)
-	}
-
-	require.ErrorAs(t, err, &e1)
 }
 
 func TestParallel(t *testing.T) {
@@ -5462,22 +5402,6 @@ func TestInsertWithSelect(t *testing.T) {
 			stmt: "INSERT INTO t_1_1 SELECT * FROM t_1_2 UNION SELECT * FROM t_1_3",
 			expectedErr: func() **ErrCompoudSelectNotAllowed {
 				err := &ErrCompoudSelectNotAllowed{}
-				return &err
-			}(),
-		},
-		{
-			name: "insert with select with join",
-			stmt: "INSERT INTO t_1_1 SELECT * FROM t_1_2, t_1_3",
-			expectedErr: func() **ErrContainsJoinTableExpr {
-				err := &ErrContainsJoinTableExpr{}
-				return &err
-			}(),
-		},
-		{
-			name: "insert with select with subselect",
-			stmt: "INSERT INTO t_1_1 SELECT * FROM (select * from t_1_2)",
-			expectedErr: func() **ErrStatementContainsSubquery {
-				err := &ErrStatementContainsSubquery{StatementKind: "insert+select"}
 				return &err
 			}(),
 		},

@@ -2417,13 +2417,6 @@ yydefault:
 				}
 			}
 
-			for _, row := range yyDollar[6].insertRows {
-				for _, expr := range row {
-					if containsSubquery(expr) {
-						yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "insert"})
-					}
-				}
-			}
 			yyDollar[3].table.IsTarget = true
 			yyVAL.insertStmt = &Insert{Table: yyDollar[3].table, Columns: yyDollar[4].columnList, Rows: yyDollar[6].insertRows, Upsert: yyDollar[7].upsertClause}
 		}
@@ -2437,21 +2430,6 @@ yydefault:
 		yyDollar = yyS[yypt-6 : yypt+1]
 		{
 			yyDollar[3].table.IsTarget = true
-
-			err := yyDollar[5].readStmt.walkSubtree(func(node Node) (bool, error) {
-				if _, ok := node.(*Subquery); ok {
-					return true, &ErrStatementContainsSubquery{StatementKind: "insert+select"}
-				}
-
-				if _, ok := node.(*JoinTableExpr); ok {
-					return true, &ErrContainsJoinTableExpr{}
-				}
-
-				return false, nil
-			})
-			if err != nil {
-				yylex.(*Lexer).AddError(err)
-			}
 
 			if sel, ok := yyDollar[5].readStmt.(*Select); ok {
 				if sel.OrderBy == nil {
@@ -2522,10 +2500,6 @@ yydefault:
 	case 238:
 		yyDollar = yyS[yypt-8 : yypt+1]
 		{
-			if yyDollar[8].where != nil && containsSubquery(yyDollar[8].where) {
-				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
-			}
-
 			yyVAL.onConflictClause = &OnConflictClause{
 				Target: yyDollar[3].onConflictTarget,
 				DoUpdate: &OnConflictUpdate{
@@ -2554,18 +2528,12 @@ yydefault:
 	case 241:
 		yyDollar = yyS[yypt-4 : yypt+1]
 		{
-			if yyDollar[4].where != nil && containsSubquery(yyDollar[4].where) {
-				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
-			}
 			yyDollar[3].table.IsTarget = true
 			yyVAL.deleteStmt = &Delete{Table: yyDollar[3].table, Where: yyDollar[4].where}
 		}
 	case 242:
 		yyDollar = yyS[yypt-5 : yypt+1]
 		{
-			if yyDollar[5].where != nil && containsSubquery(yyDollar[5].where) {
-				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
-			}
 			yyDollar[2].table.IsTarget = true
 			yyVAL.updateStmt = &Update{Table: yyDollar[2].table, Exprs: yyDollar[4].updateList, Where: yyDollar[5].where}
 		}
@@ -2582,9 +2550,6 @@ yydefault:
 	case 245:
 		yyDollar = yyS[yypt-1 : yypt+1]
 		{
-			if containsSubquery(yyDollar[1].updateExpression.Expr) {
-				yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
-			}
 			yyVAL.updateList = []*UpdateExpr{yyDollar[1].updateExpression}
 		}
 	case 246:

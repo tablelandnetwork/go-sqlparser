@@ -1375,13 +1375,6 @@ insert_stmt:
       }
     }
 
-    for _, row := range $6 {
-      for _, expr := range row {
-				if containsSubquery(expr) {
-          yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "insert"})
-				}
-			}
-    }
     $3.IsTarget = true
     $$ = &Insert{Table: $3, Columns: $4, Rows: $6, Upsert: $7}
   }
@@ -1393,21 +1386,6 @@ insert_stmt:
 | INSERT INTO table_name column_name_list_opt select_stmt upsert_clause_opt
   {
     $3.IsTarget = true
-
-    err := $5.walkSubtree(func(node Node) (bool, error) {
-      if _, ok := node.(*Subquery); ok {
-        return true, &ErrStatementContainsSubquery{StatementKind: "insert+select"}
-      }
-
-      if _, ok := node.(*JoinTableExpr); ok {
-        return true, &ErrContainsJoinTableExpr{}
-      }
-
-      return false, nil
-    })
-    if err != nil {
-       yylex.(*Lexer).AddError(err)
-    }
 
     if sel, ok := $5.(*Select); ok {
       if sel.OrderBy == nil {
@@ -1481,10 +1459,6 @@ on_conflict_clause:
   }
 | ON CONFLICT conflict_target_opt DO UPDATE SET update_list where_opt
   {
-    if $8 != nil && containsSubquery($8) {
-      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
-    }
-
     $$ = &OnConflictClause{
       Target: $3,
       DoUpdate: &OnConflictUpdate{
@@ -1515,9 +1489,6 @@ conflict_target_opt:
 delete_stmt:
   DELETE FROM table_name where_opt
   {
-    if $4 != nil && containsSubquery($4) {
-      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "delete"})
-    }
     $3.IsTarget = true
     $$ = &Delete{Table: $3, Where: $4}
   }
@@ -1526,9 +1497,6 @@ delete_stmt:
 update_stmt:
   UPDATE table_name SET update_list where_opt
   {
-    if $5 != nil && containsSubquery($5) {
-      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "where"})
-    }
     $2.IsTarget = true
     $$ = &Update{Table: $2, Exprs: $4, Where: $5}
   }
@@ -1548,9 +1516,6 @@ update_list:
 common_update_list:
   update_expression
   {
-    if containsSubquery($1.Expr) {
-      yylex.(*Lexer).AddError(&ErrStatementContainsSubquery{StatementKind: "update"})
-    }
     $$ = []*UpdateExpr{$1}
   }
 | common_update_list ',' update_expression
