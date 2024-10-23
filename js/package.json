@@ -20,7 +20,7 @@
   "module": "./esm/out.js",
   "types": "types.d.ts",
   "devDependencies": {
-    "@types/assert": "^1.5.10",
+    "@types/assert": "^1.5.11",
     "@types/mocha": "^10.0.9",
     "@types/node": "^22.7.5",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
